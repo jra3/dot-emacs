@@ -5,7 +5,6 @@
   ;; If there is more than one, they won't work right.
  '(c-basic-offset 2)
  '(case-fold-search t)
- '(color-theme-is-global t)
  '(column-number-mode 1)
  '(compilation-ask-about-save nil)
  '(compilation-search-path (quote ("~/fbcode")))

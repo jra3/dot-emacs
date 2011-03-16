@@ -35,7 +35,6 @@
 (setq-default show-trailing-whitespace nil)
 
 (defun jallen-font () (interactive) (set-default-font "DejaVu Sans Mono-10"))
-(jallen-font)
-(add-hook 'after-init-hook 'jallen-font)
+(add-hook 'after-make-window-system-frame-hooks 'jallen-font)
 
 (provide 'j-appearance)
