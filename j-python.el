@@ -1,5 +1,5 @@
-;; (require 'flymake)
-;; (require 'j-flymake)
+(require 'flymake)
+(require 'j-flymake)
 (require 'diminish)
 
 ;; set code checker here from "epylint", "pyflakes"
