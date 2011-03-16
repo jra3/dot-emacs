@@ -17,7 +17,6 @@
 
 (add-hook 'python-mode-hook
           (lambda ()
-            (highlight-80+-mode t)
             (flymake-mode t)
             (setq require-final-newline t)
             (setq mode-name "Py")
