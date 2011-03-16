@@ -1,0 +1,7 @@
+Install instructions
+
+1. Add the path to this repo to your environment as EMACS_DIR
+
+     export EMACS_DIR=~/git/dot-emacs
+
+2. Install pyflakes - http://pypi.python.org/pypi/pyflakes
