@@ -1,5 +1,6 @@
 (require 'php-mode)
-
+(require 'xhp-mode)
+(require 'highlight-80+)
 (defun jallen-php-compile-command ()
   "Set a buffer local compile command if buffer is under flib"
   (set (make-local-variable 'compile-command)
@@ -28,5 +29,38 @@
             ))
 
 (add-hook 'php-mode-hook 'jallen-php-compile-command)
+
+;; PHP mode for .phpt files
+(autoload 'php-mode "php-mode" nil t nil)
+(setq auto-mode-alist (append '(("\\.phpt$" . php-mode))
+                              auto-mode-alist))
+(autoload 'xhp-mode "xhp-mode"
+  "Major mode for editing PHP code including XHP support." t)
+
+;; Set PHP mode based on the #! line
+(add-to-list 'interpreter-mode-alist '("php" . php-mode))
+
+(defconst fb-php-style
+  '((c-basic-offset . 2)
+    (c-offsets-alist . (
+                        (arglist-intro . +)
+                        (case-label . +)
+                        (arglist-close . c-lineup-close-paren)
+                        )))
+  "Facebook's PHP Programming style"
+)
+(c-add-style "fb-php-style" fb-php-style)
+
+(add-hook 'php-mode-hook
+          (lambda ()
+            (c-set-style "fb-php-style")
+            (highlight-80+-mode t)
+            ))
+
+(add-hook 'xhp-mode-hook
+          (lambda ()
+            (c-set-style "fb-php-style")
+            (highlight-80+-mode t)
+            ))
 
 (provide 'j-php)

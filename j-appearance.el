@@ -22,14 +22,21 @@
   (diminish 'flymake-mode "Fly"))
 (add-hook 'after-init-hook 'load-diminish)
 
+;; unique buffer names using path
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'reverse)
+(setq uniquify-separator "|")
+(setq uniquify-after-kill-buffer-p t)
+(setq uniquify-ignore-buffers-re "^\\*")
+
 ;; me!
 (make-face 'my-name-face)
 (set-face-foreground 'my-name-face "#000000")
 (set-face-background 'my-name-face "#ffff10")
 
-(add-hook 'font-lock-mode-hook 'highlight-my-name)
-(defun highlight-my-name () ""
-  (font-lock-add-keywords nil '(("jallen" (0 'my-name-face t)))))
+;; (add-hook 'font-lock-mode-hook 'highlight-my-name)
+;; (defun highlight-my-name () ""
+;;   (font-lock-add-keywords nil '(("jallen" (0 'my-name-face t)))))
 
 ;; Screw that, I kill it on save anyway
 (setq-default show-trailing-whitespace nil)

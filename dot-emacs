@@ -19,6 +19,7 @@
 (require 'j-python)
 (require 'j-js)
 (require 'j-css)
+(require 'j-thrift)
 
 (require 'j-smex)
 (require 'j-iswitchb)
