@@ -5,3 +5,7 @@ Install instructions
      export EMACS_DIR=~/git/dot-emacs
 
 2. Install pyflakes - http://pypi.python.org/pypi/pyflakes
+
+3. Byte compile js2 mode
+
+     M-x byte-compile-file RE path/to/js2.el RET
