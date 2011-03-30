@@ -20,6 +20,7 @@
 (require 'j-js)
 (require 'j-css)
 (require 'j-thrift)
+(require 'j-yaml)
 
 (require 'j-smex)
 (require 'j-iswitchb)
