@@ -18,6 +18,7 @@
  '(ecb-options-version "2.40")
  '(fill-column 78)
  '(flymake-no-changes-timeout 1)
+ '(global-auto-revert-mode t)
  '(indent-tabs-mode nil)
  '(js2-bounce-indent-p t)
  '(js2-cleanup-whitespace t)

@@ -17,6 +17,14 @@
                    module-or-path)))
        ))
 
+;; run php lint when press f8 key
+(defun phplint-thisfile ()
+  (interactive)
+  (compile (format "/usr/local/php/bin/php -l %s" (buffer-file-name))))
+(add-hook 'php-mode-hook
+          '(lambda ()
+             (local-set-key [f8] 'phplint-thisfile)))
+
 (add-hook 'php-mode-hook
           (lambda ()
             (highlight-80+-mode t)
