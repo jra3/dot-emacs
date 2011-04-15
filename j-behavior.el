@@ -43,6 +43,10 @@
 (require 'midnight)
 (midnight-delay-set 'midnight-delay 16200)
 
+;; use unstupid regex syntax
+(require 're-builder)
+(setq reb-re-syntax 'string)
+
 ;; ---------------- Tweak Variables ---------------------
 (setq make-backup-files t        ;; make backup files on save
       diff-switches "-u"         ;; unified diffs

@@ -58,12 +58,14 @@
           (lambda ()
             (c-set-style "fb-php-style")
             (highlight-80+-mode t)
+            (visit-tags-table "~/www/TAGS")
             ))
 
 (add-hook 'xhp-mode-hook
           (lambda ()
             (c-set-style "fb-php-style")
             (highlight-80+-mode t)
+            (visit-tags-table "~/www/TAGS")
             ))
 
 (provide 'j-php)
