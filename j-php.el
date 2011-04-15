@@ -6,19 +6,24 @@
   (set (make-local-variable 'compile-command)
        (let ((is-in-flib (string-match "^.*/flib/" buffer-file-name)))
          (let (
-               (checkModule-cmd "flib/_bin/checkModuleFast")
-               (checkModule-flags
-                (cond (is-in-flib "") ("-s")))
+               (checkModule-flags (cond (is-in-flib "-w") ("-w -s")))
                (module-or-path
                 (cond (is-in-flib
-                       (file-name-directory buffer-file-name))
+                       (replace-match "" nil nil
+                                      (file-name-directory buffer-file-name)))
                       (buffer-file-name))))
-           (format "%s%s --emacs %s %s "
-                   (fb-find-www-root buffer-file-name)
-                   checkModule-cmd
+           (format "cd /home/jallen/www && /home/jallen/www/flib/_bin/checkModule --emacs %s %s"
                    checkModule-flags
                    module-or-path)))
        ))
+
+;; run php lint when press f8 key
+(defun phplint-thisfile ()
+  (interactive)
+  (compile (format "/usr/local/php/bin/php -l %s" (buffer-file-name))))
+(add-hook 'php-mode-hook
+          '(lambda ()
+             (local-set-key [f8] 'phplint-thisfile)))
 
 (add-hook 'php-mode-hook
           (lambda ()
