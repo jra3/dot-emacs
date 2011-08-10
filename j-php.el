@@ -1,18 +1,23 @@
 (require 'php-mode)
 (require 'xhp-mode)
 (require 'highlight-80+)
+
 (defun jallen-php-compile-command ()
   "Set a buffer local compile command if buffer is under flib"
   (set (make-local-variable 'compile-command)
        (let ((is-in-flib (string-match "^.*/flib/" buffer-file-name)))
          (let (
-               (checkModule-flags (cond (is-in-flib "-w") ("-w -s")))
+               (checkModule-cmd "flib/_bin/checkModuleFast")
+               (checkModule-flags
+                (cond (is-in-flib "") ("-s"))
+                )
                (module-or-path
                 (cond (is-in-flib
-                       (replace-match "" nil nil
-                                      (file-name-directory buffer-file-name)))
+                       (file-name-directory buffer-file-name))
                       (buffer-file-name))))
-           (format "cd /home/jallen/www && /home/jallen/www/flib/_bin/checkModule --emacs %s %s"
+           (format "%s%s --emacs %s %s "
+                   (fb-find-www-root buffer-file-name)
+                   checkModule-cmd
                    checkModule-flags
                    module-or-path)))
        ))
