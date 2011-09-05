@@ -33,7 +33,9 @@
  '(show-paren-mode t nil (paren))
  '(split-height-threshold 1000)
  '(split-width-threshold 1000)
- '(transient-mark-mode t))
+ '(transient-mark-mode t)
+ '(use-dialog-box nil)
+ '(use-file-dialog nil))
 
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
