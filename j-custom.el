@@ -31,11 +31,12 @@
  '(remember-annotation-functions (quote (org-remember-annotation)))
  '(remember-handler-functions (quote (org-remember-handler)))
  '(show-paren-mode t nil (paren))
- '(split-height-threshold 1000)
- '(split-width-threshold 1000)
  '(transient-mark-mode t)
  '(use-dialog-box nil)
  '(use-file-dialog nil))
+
+;; '(split-height-threshold 1000)
+;; '(split-width-threshold 1000)
 
 (custom-set-faces
   ;; custom-set-faces was added by Custom.

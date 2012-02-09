@@ -1,9 +1,14 @@
-
 ;; GLOBAL KEY BINDINGS
 (global-set-key "\C-xx" nil)
 (global-set-key "\C-xxb" 'git-blame-mode)
 (global-set-key "\C-xxs" 'git-status)
 (global-set-key "\C-xxm" 'magit-status)
+
+;; Make windmove work in org-mode:
+(add-hook 'org-shiftup-final-hook 'windmove-up)
+(add-hook 'org-shiftleft-final-hook 'windmove-left)
+(add-hook 'org-shiftdown-final-hook 'windmove-down)
+(add-hook 'org-shiftright-final-hook 'windmove-right)
 
 (global-set-key [C-backspace] 'backward-kill-word)
 (global-set-key [C-delete] 'kill-word)
@@ -16,6 +21,8 @@
 (global-set-key [delete] 'delete-char)
 
 (global-set-key (kbd "C-c =") 'eq-align)
+
+(global-set-key "\M-'" 'tags-apropos)
 
 (global-set-key "\C-c\C-r" 'revert-buffer)
 (global-set-key "\C-t"  'goto-line)

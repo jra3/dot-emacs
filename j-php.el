@@ -25,7 +25,7 @@
 ;; run php lint when press f8 key
 (defun phplint-thisfile ()
   (interactive)
-  (compile (format "/usr/local/php/bin/php -l %s" (buffer-file-name))))
+  (compile (format "/usr/local/bin/php -l %s" (buffer-file-name))))
 (add-hook 'php-mode-hook
           '(lambda ()
              (local-set-key [f8] 'phplint-thisfile)))

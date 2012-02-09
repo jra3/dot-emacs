@@ -1,3 +1,6 @@
 [submodule "external/solarized"]
 	path = external/solarized
 	url = git://github.com/sellout/emacs-color-theme-solarized.git
+[submodule "external/popwin"]
+	path = external/popwin
+	url = https://github.com/m2ym/popwin-el.git

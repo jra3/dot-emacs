@@ -19,6 +19,9 @@
 (setq cua-enable-cua-keys nil)
 (cua-mode t)
 
+(require 'popwin)
+(setq display-buffer-function 'popwin:display-buffer)
+
 ;; make all backups in a single directory
 (defvar user-temporary-file-directory
   (concat temporary-file-directory user-login-name "/"))
