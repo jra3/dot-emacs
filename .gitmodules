@@ -1,3 +1,6 @@
 [submodule "external/solarized"]
 	path = external/solarized
 	url = git://github.com/sellout/emacs-color-theme-solarized.git
+[submodule "external/zenburn"]
+	path = external/zenburn
+	url = git://github.com/bbatsov/zenburn-emacs.git

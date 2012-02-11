@@ -1,6 +1,8 @@
 (require 'color-theme)
 (color-theme-initialize)
 (require 'color-theme-tangotango)
+(require 'color-theme-zenburn)
+(require 'color-theme-solarized)
 
 ;; Set up hooks to create frames with correct color schemes
 (defvar after-make-console-frame-hooks '()

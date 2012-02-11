@@ -10,7 +10,7 @@
  '(compilation-search-path (quote ("~/fbcode")))
  '(css-indent-level 2)
  '(current-language-environment "utf-8")
- '(default-frame-alist (quote ((left-fringe . 3) (right-fringe . right-only) (vertical-scroll-bars) (menu-bar-lines . 0) (tool-bar-lines . 0) (font . "6x13"))))
+ '(default-frame-alist (quote ((left-fringe . 3) (right-fringe . right-only) (vertical-scroll-bars) (menu-bar-lines . 0) (tool-bar-lines . 0) (font . "DejaVu Sans Mono-10"))))
  '(default-input-method "utf-8-prefix")
  '(default-major-mode (quote text-mode) t)
  '(display-buffer-reuse-frames nil)
