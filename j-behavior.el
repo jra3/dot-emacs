@@ -43,7 +43,7 @@
 (setq auto-save-list-file-prefix
       (concat user-temporary-file-directory ".auto-saves-"))
 
-; =======================================================================
+;; =======================================================================
 
 ;; mignight mode
 (require 'midnight)
