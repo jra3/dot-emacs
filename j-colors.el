@@ -2,6 +2,7 @@
 (color-theme-initialize)
 (require 'color-theme-tangotango)
 
+;; Set up hooks to create frames with correct color schemes
 (defvar after-make-console-frame-hooks '()
   "Hooks to run after creating a new TTY frame")
 (defvar after-make-window-system-frame-hooks '()
@@ -20,9 +21,13 @@
           (lambda ()
             (run-after-make-frame-hooks (selected-frame))))
 
-(color-theme-dark-laptop)
-(set-variable 'color-theme-is-global nil)
 (add-hook 'after-make-window-system-frame-hooks 'color-theme-tangotango)
 (add-hook 'after-make-console-frame-hooks 'color-theme-dark-laptop)
+
+(if window-system
+    (color-theme-tangotango)
+  (color-theme-dark-laptop))
+
+(set-variable 'color-theme-is-global nil)
 
 (provide 'j-colors)
