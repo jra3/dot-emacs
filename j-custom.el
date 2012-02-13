@@ -26,7 +26,7 @@
  '(line-number-mode 1)
  '(mode-require-final-newline t)
  '(org-startup-folded (quote content))
- '(popwin:special-display-config (quote (("*grep*") ("*Help*") ("*Completions*" :noselect t) ("*compilation*" :height 50 :noselect t) ("*Occur*" :noselect t))))
+ '(popwin:special-display-config (quote (("*grep*") ("*Help*") ("*Completions*" :noselect t) ("*compilation*") ("*Occur*" :noselect t))))
  '(py-basic-offset 4 t)
  '(remember-annotation-functions (quote (org-remember-annotation)))
  '(remember-handler-functions (quote (org-remember-handler)))
