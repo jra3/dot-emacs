@@ -4,7 +4,7 @@
 
 (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
     (let* ((my-lisp-dir dot-emacs-dir)
-	   (default-directory my-lisp-dir))
+           (default-directory my-lisp-dir))
       (add-to-list 'load-path my-lisp-dir)
       (normal-top-level-add-subdirs-to-load-path)))
 
@@ -24,3 +24,4 @@
 
 (require 'j-smex)
 (require 'j-iswitchb)
+(require 'j-irc)
