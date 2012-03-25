@@ -24,11 +24,11 @@
             (run-after-make-frame-hooks (selected-frame))))
 
 (add-hook 'after-make-window-system-frame-hooks 'color-theme-tangotango)
-(add-hook 'after-make-console-frame-hooks 'color-theme-dark-laptop)
+(add-hook 'after-make-console-frame-hooks 'color-theme-tangotango)
 
 (if window-system
     (color-theme-tangotango)
-  (color-theme-dark-laptop))
+  (color-theme-tangotango))
 
 (set-variable 'color-theme-is-global nil)
 
