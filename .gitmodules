@@ -9,3 +9,7 @@
 [submodule "external/popwin"]
 	path = external/popwin
 	url = https://github.com/m2ym/popwin-el.git
+
+[submodule "external/zencoding"]
+	path = external/zencoding
+	url = https://github.com/rooney/zencoding.git
