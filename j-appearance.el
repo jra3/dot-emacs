@@ -35,7 +35,6 @@
 ;; Screw that, I kill it on save anyway
 (setq-default show-trailing-whitespace nil)
 
-(setq bdf-directory-list '(dot-emacs-dir))
 (defun jallen-font () (interactive) (set-default-font "DejaVu Sans Mono-12"))
 (defun jallen-font-no-contacts () (interactive) (set-default-font "DejaVu Sans Mono-18"))
 (add-hook 'after-make-window-system-frame-hooks 'jallen-font)
