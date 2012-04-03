@@ -13,3 +13,6 @@
 [submodule "external/zencoding"]
 	path = external/zencoding
 	url = https://github.com/rooney/zencoding.git
+[submodule "external/org"]
+	path = external/org
+	url = git://orgmode.org/org-mode.git

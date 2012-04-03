@@ -1,8 +1,10 @@
-;; Set to the location of your Org files on your local system
-(setq org-directory "~/org")
-;; Set to the name of the file where new notes will be stored
-(setq org-mobile-inbox-for-pull "~/org/flagged.org")
-;; Set to <your Dropbox root directory>/MobileOrg.
-(setq org-mobile-directory "~/Dropbox/MobileOrg")
+(require 'org-install)
+
+(add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+(setq org-directory "~/Dropbox/org")
+(setq org-mobile-directory "~/Dropbox/MobileOrg/")
+
+(setq org-agenda-files (quote ("~/Dropbox/org/work.org")))
+(setq org-mobile-inbox-for-pull "~/Dropbox/org/index.org")
 
 (provide 'j-org)
