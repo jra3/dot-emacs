@@ -3,6 +3,9 @@
 
 (setq tags-case-fold-search nil)
 
+;; spell checking in comments & strings
+;;(add-hook ‘prog-mode-hook ‘flyspell-prog-mode)
+
 ;; mouse scroll
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control))))
 

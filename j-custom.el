@@ -41,6 +41,7 @@
  '(ido-everywhere t)
  '(ido-mode (quote buffer) nil (ido))
  '(indent-tabs-mode nil)
+ '(js2-bounce-indent-p nil)
  '(large-file-warning-threshold nil)
  '(line-number-mode 1)
  '(mode-require-final-newline t)
