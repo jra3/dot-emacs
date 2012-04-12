@@ -1,5 +1,4 @@
 ;; -*- Emacs-Lisp -*-
-
 (defvar dot-emacs-dir "~/.dot-emacs")
 
 (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
@@ -28,3 +27,4 @@
 (require 'j-smex)
 (require 'j-iswitchb)
 (require 'j-irc)
+(require 'j-completion)
