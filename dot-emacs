@@ -7,6 +7,7 @@
       (add-to-list 'load-path my-lisp-dir)
       (normal-top-level-add-subdirs-to-load-path)))
 
+(require 'j-terminal-compat)
 (require 'j-util)
 (require 'j-globalkeys)
 (require 'j-colors)
