@@ -60,16 +60,32 @@
 
 ;; ----------------- Key Bindings ----------------------------
 ;; Make modifier+arrow-key work inside ttys
-(when (not window-system)
-  (dolist (prefix '("\eO" "\eO1;" "\e[1;"))
-    (dolist (m '(("2" . "S-") ("3" . "M-") ("4" . "S-M-") ("5" . "C-")
-                 ("6" . "S-C-") ("7" . "C-M-") ("8" . "S-C-M-")))
-      (dolist (k '(("A" . "<up>") ("B" . "<down>") ("C" . "<right>")
-                   ("D" . "<left>") ("H" . "<home>") ("F" . "<end>")))
-        (define-key function-key-map
-          (concat prefix (car m) (car k))
-          (read-kbd-macro (concat (cdr m) (cdr k)))))
-      )
-    ))
+;; (add-hook
+;;  'term-setup-hook
+;;  '(lambda ()
+;;     (dolist (prefix '("\eO" "\eO1;" "\e[1;"))
+;;       (or (keymapp (lookup-key global-map prefix))
+;;           (define-key global-map prefix nil))
+;;       (dolist (m '(("2" . "S-") ("9" . "M-") ("10" . "S-M-") ("5" . "C-")
+;;                    ("6" . "S-C-") ("7" . "C-M-") ("8" . "S-C-M-")))
+;;         (dolist (k '(("A" . "<up>") ("B" . "<down>") ("C" . "<right>")
+;;                      ("D" . "<left>") ("H" . "<home>") ("F" . "<end>")))
+;;           (define-key function-key-map
+;;             (concat prefix (car m) (car k))
+;;             (read-kbd-macro (concat (cdr m) (cdr k)))))
+;;         )
+;;       )
+;;     )
+;;  )
+
+ ;; (add-hook
+ ;;  'term-setup-hook
+ ;;  '(lambda ()
+ ;;     (define-key input-decode-map "\e[1;5A" [C-up])
+ ;;     (define-key input-decode-map "\e[1;5B" [C-down])
+ ;;     (define-key input-decode-map "\e[1;5C" [C-right])
+ ;;     (define-key input-decode-map "\e[1;5D" [C-left])
+
+ ;;     ))
 
 (provide 'j-globalkeys)
