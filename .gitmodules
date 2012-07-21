@@ -16,3 +16,6 @@
 [submodule "external/org"]
 	path = external/org
 	url = git://orgmode.org/org-mode.git
+[submodule "external/js2-mode"]
+	path = external/js2-mode
+	url = https://github.com/mooz/js2-mode.git
