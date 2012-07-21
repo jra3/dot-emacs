@@ -1,6 +1,7 @@
 ;; working with fbcode
 (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
 
+(require 'j-completion)
 (require 'highlight-80+)
 (add-hook 'c++-mode-hook
           (lambda ()
@@ -13,6 +14,7 @@
 
 (add-hook 'c++-mode-hook
           '(lambda ()
-             (local-set-key [f8] 'phplint-thisfile)))
+             (local-set-key [f8] 'phplint-thisfile)
+             ))
 
 (provide 'j-cpp)

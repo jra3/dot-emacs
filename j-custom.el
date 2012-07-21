@@ -37,6 +37,7 @@
  '(fringe-mode (quote (1 . 1)) nil (fringe))
  '(global-auto-revert-mode t)
  '(gud-gdb-command-name "gdb --annotate=1")
+ '(highlight-80+-columns 76)
  '(ido-enable-flex-matching t)
  '(ido-everywhere t)
  '(ido-mode (quote buffer) nil (ido))

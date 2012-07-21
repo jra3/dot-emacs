@@ -2,6 +2,8 @@
 (require 'xhp-mode)
 (require 'highlight-80+)
 
+
+
 (defun jallen-php-compile-command ()
   "Set a buffer local compile command if buffer is under flib"
   (set (make-local-variable 'compile-command)
@@ -36,6 +38,7 @@
             (define-key php-mode-map (kbd "M-g") 'tbgs)
             (local-set-key (kbd "RET") 'c-context-line-break)
             (local-set-key (kbd "C-c a") 'php-array-align)
+            (local-set-key (kbd "C-M-T") 'pfff-infer-type-at-point)
             (c-set-offset 'case-label 2)
             (c-set-offset  'arglist-intro '+)
             (setq require-final-newline t)
@@ -77,5 +80,7 @@
             (highlight-80+-mode t)
             (visit-tags-table "~/www/TAGS")
             ))
+
+(load "/home/engshare/tools/pfff_php")
 
 (provide 'j-php)
