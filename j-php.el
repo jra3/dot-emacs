@@ -81,6 +81,6 @@
             (visit-tags-table "~/www/TAGS")
             ))
 
-(load "/home/engshare/tools/pfff_php")
+;; (load "/home/engshare/tools/pfff_php")
 
 (provide 'j-php)

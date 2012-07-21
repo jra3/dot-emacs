@@ -78,14 +78,20 @@
 ;;     )
 ;;  )
 
- ;; (add-hook
- ;;  'term-setup-hook
- ;;  '(lambda ()
- ;;     (define-key input-decode-map "\e[1;5A" [C-up])
- ;;     (define-key input-decode-map "\e[1;5B" [C-down])
- ;;     (define-key input-decode-map "\e[1;5C" [C-right])
- ;;     (define-key input-decode-map "\e[1;5D" [C-left])
+ (add-hook
+  'term-setup-hook
+  '(lambda ()
 
- ;;     ))
+     (define-key input-decode-map "\e[1;9A" [M-up])
+     (define-key input-decode-map "\e[1;9B" [M-down])
+     (define-key input-decode-map "\e[1;9C" [M-right])
+     (define-key input-decode-map "\e[1;9D" [M-left])
+
+     (define-key input-decode-map "\e[1;10A" [M-S-up])
+     (define-key input-decode-map "\e[1;10B" [M-S-down])
+     (define-key input-decode-map "\e[1;10C" [M-S-right])
+     (define-key input-decode-map "\e[1;10D" [M-S-left])
+
+     ))
 
 (provide 'j-globalkeys)
