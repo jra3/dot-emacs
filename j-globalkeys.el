@@ -58,40 +58,23 @@
   (replace-match (number-to-string (1+ (string-to-number (match-string 0))))))
 (global-set-key (kbd "C-c +") 'increment-number-at-point)
 
-;; ----------------- Key Bindings ----------------------------
-;; Make modifier+arrow-key work inside ttys
-;; (add-hook
-;;  'term-setup-hook
-;;  '(lambda ()
-;;     (dolist (prefix '("\eO" "\eO1;" "\e[1;"))
-;;       (or (keymapp (lookup-key global-map prefix))
-;;           (define-key global-map prefix nil))
-;;       (dolist (m '(("2" . "S-") ("9" . "M-") ("10" . "S-M-") ("5" . "C-")
-;;                    ("6" . "S-C-") ("7" . "C-M-") ("8" . "S-C-M-")))
-;;         (dolist (k '(("A" . "<up>") ("B" . "<down>") ("C" . "<right>")
-;;                      ("D" . "<left>") ("H" . "<home>") ("F" . "<end>")))
-;;           (define-key function-key-map
-;;             (concat prefix (car m) (car k))
-;;             (read-kbd-macro (concat (cdr m) (cdr k)))))
-;;         )
-;;       )
-;;     )
-;;  )
+;; fixing M+arrow keys (iTerm2 defaults)
+(add-hook
+ 'term-setup-hook
+ '(lambda ()
 
- (add-hook
-  'term-setup-hook
-  '(lambda ()
+    (define-key input-decode-map "\e[1;9A" [M-up])
+    (define-key input-decode-map "\e[1;9B" [M-down])
+    (define-key input-decode-map "\e[1;9C" [M-right])
+    (define-key input-decode-map "\e[1;9D" [M-left])
 
-     (define-key input-decode-map "\e[1;9A" [M-up])
-     (define-key input-decode-map "\e[1;9B" [M-down])
-     (define-key input-decode-map "\e[1;9C" [M-right])
-     (define-key input-decode-map "\e[1;9D" [M-left])
+    (define-key input-decode-map "\e[1;10A" [M-S-up])
+    (define-key input-decode-map "\e[1;10B" [M-S-down])
+    (define-key input-decode-map "\e[1;10C" [M-S-right])
+    (define-key input-decode-map "\e[1;10D" [M-S-left])
 
-     (define-key input-decode-map "\e[1;10A" [M-S-up])
-     (define-key input-decode-map "\e[1;10B" [M-S-down])
-     (define-key input-decode-map "\e[1;10C" [M-S-right])
-     (define-key input-decode-map "\e[1;10D" [M-S-left])
-
-     ))
+    ;; weird quirk
+    (global-set-key [select] [S-up])
+    ))
 
 (provide 'j-globalkeys)
