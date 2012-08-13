@@ -9,6 +9,7 @@
  '(compilation-ask-about-save nil)
  '(compilation-search-path (quote ("~/fbcode")))
  '(css-indent-level 2)
+ '(css-indent-offset 2)
  '(current-language-environment "utf-8")
  '(default-frame-alist (quote ((left-fringe . 1) (right-fringe . 1) (vertical-scroll-bars) (menu-bar-lines . 0) (tool-bar-lines . 0) (font . "DejaVu Sans Mono-12"))))
  '(default-input-method "utf-8-prefix")

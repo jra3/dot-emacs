@@ -1,21 +1,23 @@
 [submodule "external/solarized"]
-	path = external/solarized
-	url = git://github.com/sellout/emacs-color-theme-solarized.git
+        path = external/solarized
+        url = git://github.com/sellout/emacs-color-theme-solarized.git
 
 [submodule "external/zenburn"]
-	path = external/zenburn
-	url = git://github.com/bbatsov/zenburn-emacs.git
+        path = external/zenburn
+        url = git://github.com/bbatsov/zenburn-emacs.git
 
 [submodule "external/popwin"]
-	path = external/popwin
-	url = https://github.com/m2ym/popwin-el.git
+        path = external/popwin
+        url = https://github.com/m2ym/popwin-el.git
 
 [submodule "external/zencoding"]
-	path = external/zencoding
-	url = https://github.com/rooney/zencoding.git
+        path = external/zencoding
+        url = https://github.com/rooney/zencoding.git
+
 [submodule "external/org"]
-	path = external/org
-	url = git://orgmode.org/org-mode.git
+        path = external/org
+        url = git://orgmode.org/org-mode.git
+
 [submodule "external/js2-mode"]
-	path = external/js2-mode
-	url = https://github.com/mooz/js2-mode.git
+        path = external/js2-mode
+        url = https://github.com/mooz/js2-mode.git
