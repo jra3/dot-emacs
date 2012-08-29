@@ -9,6 +9,7 @@
             (define-key c++-mode-map (kbd "M-S-o") 'ff-get-other-file)
             (setq compile-command "cd ~/fbcode; fbmake --fast --color=no dbg -j 20 -w")
             (highlight-80+-mode t)
+            (subword-mode 1)
             (c-set-offset  'arglist-intro '+)
             (setq require-final-newline t)))
 
