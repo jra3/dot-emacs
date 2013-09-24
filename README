@@ -6,7 +6,7 @@ Install instructions
 
 2. Install pyflakes - http://pypi.python.org/pypi/pyflakes
 
-     easy_install pyflakes
+     pip install pyflakes
 
 3. Byte compile js2 mode
 
@@ -14,4 +14,4 @@ Install instructions
 
 4. Check out git submodules
 
-     g submodule update --init
+     git submodule update --init
