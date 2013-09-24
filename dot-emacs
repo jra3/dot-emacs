@@ -27,5 +27,5 @@
 
 (require 'j-smex)
 (require 'j-iswitchb)
-(require 'j-irc)
+;; (require 'j-irc)
 (require 'j-completion)

@@ -1,5 +1,3 @@
-
-
 ;; Note, we are expecting an xterm compatible terminal here. tmux requires you
 ;; to set xterm-mode as a terminal option for this
 ;;
