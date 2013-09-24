@@ -24,6 +24,7 @@
 (require 'j-css)
 (require 'j-thrift)
 (require 'j-yaml)
+(require 'j-markdown)
 
 (require 'j-smex)
 (require 'j-iswitchb)

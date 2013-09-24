@@ -21,3 +21,6 @@
 [submodule "external/js2-mode"]
         path = external/js2-mode
         url = https://github.com/mooz/js2-mode.git
+[submodule "external/markdown"]
+	path = external/markdown
+	url = git://jblevins.org/git/markdown-mode.git
