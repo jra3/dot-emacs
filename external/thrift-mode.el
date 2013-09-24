@@ -1,3 +1,4 @@
+
 (require 'font-lock)
 
 (defvar thrift-mode-hook nil)
@@ -10,8 +11,9 @@
 (defconst thrift-font-lock-keywords
   (list
    '("#.*$" . font-lock-comment-face)  ;; perl style comments
-   '("\\<\\(include\\|struct\\|exception\\|typedef\\|cpp_namespace\\|java_package\\|php_namespace\\|const\\|enum\\|service\\|extends\\|void\\|async\\|throws\\)\\>" . font-lock-keyword-face)  ;; keywords
+   '("\\<\\(include\\|struct\\|union\\|namespace\\|exception\\|typedef\\|php_namespace\\|const\\|enum\\|service\\|extends\\|void\\|async\\|throws\\|optional\\|required\\)\\>" . font-lock-keyword-face)  ;; keywords
    '("\\<\\(bool\\|byte\\|i16\\|i32\\|i64\\|double\\|string\\|binary\\|map\\|list\\|set\\)\\>" . font-lock-type-face)  ;; built-in types
+   '("\\<\\([A-Z]\\w*\\)\\>" . font-lock-type-face)   ;; typenames (unions & structs)
    '("\\<\\([0-9]+\\)\\>" . font-lock-variable-name-face)   ;; ordinals
    '("\\<\\(\\w+\\)\\s-*(" (1 font-lock-function-name-face))  ;; functions
    )
@@ -104,4 +106,4 @@
   (run-hooks 'thrift-mode-hook)
   (set (make-local-variable 'indent-line-function) 'thrift-indent-line)
   )
-(provide 'thrift)
+(provide 'thrift-mode)
