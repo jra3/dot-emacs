@@ -30,3 +30,6 @@
 [submodule "external/grep-o-matic"]
 	path = external/grep-o-matic
 	url = git@github.com:ZungBang/emacs-grep-o-matic.git
+[submodule "external/repository-root"]
+	path = external/repository-root
+	url = git@github.com:ZungBang/emacs-repository-root.git

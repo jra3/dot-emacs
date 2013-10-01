@@ -32,6 +32,10 @@
 (global-set-key "\C-x\C-b" 'buffer-menu)
 (global-set-key "\M->" 'next-tag-definition)
 
+(require 'repository-root)
+(require 'grep-o-matic) ;; grep all the things!!!
+(global-set-key "M-g" 'grep-o-matic-repository)
+
 (global-set-key (kbd "C-x <right>") 'grow-horiz)
 (global-set-key (kbd "C-x <left>")  'shrink-horiz)
 (global-set-key (kbd "C-x <up>")    'grow-vert)
