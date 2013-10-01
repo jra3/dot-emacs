@@ -24,3 +24,6 @@
 [submodule "external/markdown"]
 	path = external/markdown
 	url = git://jblevins.org/git/markdown-mode.git
+[submodule "external/mc"]
+	path = external/mc
+	url = git@github.com:emacsmirror/multiple-cursors.git
