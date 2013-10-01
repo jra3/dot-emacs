@@ -34,7 +34,7 @@
 
 (require 'repository-root)
 (require 'grep-o-matic) ;; grep all the things!!!
-(global-set-key "M-g" 'grep-o-matic-repository)
+(global-set-key "\M-g" 'grep-o-matic-repository)
 
 (global-set-key (kbd "C-x <right>") 'grow-horiz)
 (global-set-key (kbd "C-x <left>")  'shrink-horiz)
@@ -53,6 +53,12 @@
 
 (global-set-key [(f6)] 'compile)
 (global-set-key [(f7)] 'next-error)
+
+(require 'multiple-cursors)
+(global-set-key (kbd "M-c") 'mc/edit-lines)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
 (defun increment-number-at-point ()
   (interactive)
