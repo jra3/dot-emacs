@@ -27,3 +27,6 @@
 [submodule "external/mc"]
 	path = external/mc
 	url = git@github.com:emacsmirror/multiple-cursors.git
+[submodule "external/grep-o-matic"]
+	path = external/grep-o-matic
+	url = git@github.com:ZungBang/emacs-grep-o-matic.git
