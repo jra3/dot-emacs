@@ -1,8 +1,8 @@
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(c-basic-offset 2)
  '(case-fold-search t)
  '(column-number-mode 1)
@@ -12,7 +12,7 @@
  '(current-language-environment "utf-8")
  '(default-frame-alist (quote ((left-fringe . 1) (right-fringe . 1) (vertical-scroll-bars) (menu-bar-lines . 0) (tool-bar-lines . 0) (font . "DejaVu Sans Mono-12"))))
  '(default-input-method "utf-8-prefix")
- '(default-major-mode (quote text-mode))
+ '(default-major-mode (quote text-mode) t)
  '(display-buffer-reuse-frames nil)
  '(espresso-indent-level 2)
  '(fill-column 78)
@@ -31,6 +31,7 @@
  '(js2-bounce-indent-p nil)
  '(large-file-warning-threshold nil)
  '(line-number-mode 1)
+ '(markdown-open-command "mark")
  '(mode-require-final-newline t)
  '(org-startup-folded (quote content))
  '(popwin:special-display-config (quote (("*magit-log*") ("*grep*") ("*Help*") ("*Completions*" :noselect t) ("*Occur*" :noselect t))))
@@ -46,10 +47,10 @@
 
 
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(flymake-errline ((((class color) (background dark)) (:background "DimGrey" :box nil))))
  '(isearch ((t (:background "blue" :foreground "white"))))
  '(lazy-highlight ((t (:background "yellow" :foreground "black")))))
