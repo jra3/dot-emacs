@@ -33,3 +33,9 @@
 [submodule "external/repository-root"]
 	path = external/repository-root
 	url = git@github.com:ZungBang/emacs-repository-root.git
+[submodule "external/magit"]
+	path = external/magit
+	url = git@github.com:magit/magit.git
+[submodule "external/git"]
+	path = external/git
+	url = git@github.com:magit/git-modes.git
