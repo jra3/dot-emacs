@@ -3,6 +3,7 @@
 
 (require 'j-completion)
 (require 'highlight-80+)
+
 (add-hook 'c++-mode-hook
           (lambda ()
             (setq compilation-auto-jump-to-first-error t)
