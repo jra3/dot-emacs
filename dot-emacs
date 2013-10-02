@@ -8,6 +8,7 @@
       (normal-top-level-add-subdirs-to-load-path)))
 
 (require 'j-terminal-compat)
+(require 'j-mc)
 (require 'j-util)
 (require 'j-globalkeys)
 (require 'j-colors)
@@ -25,6 +26,8 @@
 (require 'j-thrift)
 (require 'j-yaml)
 (require 'j-markdown)
+
+(require 'ess-site)
 
 (require 'j-smex)
 (require 'j-iswitchb)
