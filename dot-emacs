@@ -13,7 +13,6 @@
 (require 'j-colors)
 (require 'j-appearance)
 (require 'j-behavior)
-
 (require 'j-org)
 
 (require 'j-cpp)
