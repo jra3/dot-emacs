@@ -33,7 +33,7 @@
  '(line-number-mode 1)
  '(mode-require-final-newline t)
  '(org-startup-folded (quote content))
- '(popwin:special-display-config (quote (("*grep*") ("*Help*") ("*Completions*" :noselect t) ("*Occur*" :noselect t))))
+ '(popwin:special-display-config (quote (("*magit-log*") ("*grep*") ("*Help*") ("*Completions*" :noselect t) ("*Occur*" :noselect t))))
  '(py-basic-offset 4 t)
  '(remember-annotation-functions (quote (org-remember-annotation)))
  '(remember-handler-functions (quote (org-remember-handler)))

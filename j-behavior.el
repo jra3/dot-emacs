@@ -22,6 +22,11 @@
 (setq cua-enable-cua-keys nil)
 (cua-mode t)
 
+;; Save point position between sessions
+(require 'saveplace)
+(setq-default save-place t)
+(setq save-place-file (expand-file-name ".places" user-emacs-directory))
+
 (require 'popwin)
 (setq display-buffer-function 'popwin:display-buffer)
 
@@ -38,6 +43,8 @@
  kept-new-versions 6
  kept-old-versions 2
  version-control t)       ; use versioned backups
+
+(setq vc-make-backup-files t)
 
 (setq backup-directory-alist
       `((".*" . ,user-temporary-file-directory)))

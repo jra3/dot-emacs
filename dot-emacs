@@ -14,6 +14,7 @@
 (require 'j-appearance)
 (require 'j-behavior)
 (require 'j-org)
+(require 'j-git)
 
 (require 'j-cpp)
 (require 'j-php)
@@ -27,5 +28,4 @@
 
 (require 'j-smex)
 (require 'j-iswitchb)
-;; (require 'j-irc)
 (require 'j-completion)
