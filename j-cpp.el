@@ -10,7 +10,8 @@
             (define-key c++-mode-map (kbd "C-c o") 'ff-get-other-file)
             (highlight-80+-mode t)
             (subword-mode 1)
-            (c-set-offset  'arglist-intro '+)
+            (c-set-offset 'arglist-intro '+)
+            (c-set-offset 'innamespace '-)
             (setq require-final-newline t)))
 
 (provide 'j-cpp)
