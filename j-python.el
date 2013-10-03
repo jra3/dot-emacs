@@ -17,10 +17,16 @@
 
 (add-hook 'python-mode-hook
           (lambda ()
+            (local-set-key [f9] 'pytidy-whole-buffer)
             (flymake-mode t)
             (setq require-final-newline t)
-            (setq mode-name "Py")
-            (local-set-key "\C-c\C-r" 'revert-buffer)
             (c-set-offset  'arglist-intro '+)))
+
+;; PythonTidy does some annoying shit...
+(defun pytidy-whole-buffer ()
+  (interactive)
+  (let ((a (point)))
+    (shell-command-on-region (point-min) (point-max) "PythonTidy.py" t)
+    (goto-char a)))
 
 (provide 'j-python)

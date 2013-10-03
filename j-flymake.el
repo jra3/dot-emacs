@@ -16,18 +16,18 @@ message in the minibuffer"
   (let ((line-no (line-number-at-pos)))
     (dolist (elem flymake-err-info)
       (if (eq (car elem) line-no)
-	  (let ((err (car (second elem))))
-	    (message "%s" (fly-pyflake-determine-message err)))))))
+          (let ((err (car (second elem))))
+            (message "%s" (fly-pyflake-determine-message err)))))))
 
 (defun fly-pyflake-determine-message (err)
   "pyflake is flakey if it has compile problems, this adjusts the
 message to display, so there is one ;)"
   (cond ((not (or (eq major-mode 'Python) (eq major-mode 'python-mode) t)))
-	((null (flymake-ler-file err))
-	 ;; normal message do your thing
-	 (flymake-ler-text err))
-	(t ;; could not compile err
-	 (format "compile error, problem on line %s" (flymake-ler-line err)))))
+        ((null (flymake-ler-file err))
+         ;; normal message do your thing
+         (flymake-ler-text err))
+        (t ;; could not compile err
+         (format "compile error, problem on line %s" (flymake-ler-line err)))))
 
 (defadvice flymake-goto-next-error (after display-message activate compile)
   "Display the error in the mini-buffer rather than having to mouse over it"
@@ -44,5 +44,8 @@ displayed in the minibuffer (rather than having to mouse over
 it)"
   (set (make-local-variable 'post-command-hook)
        (cons 'show-fly-err-at-point post-command-hook)))
+
+(custom-set-faces '(flymake-errline ((((class color)) (:background "Gray30"))))
+                  '(flymake-warnline ((((class color)) (:background "Gray20")))))
 
 (provide 'j-flymake)
