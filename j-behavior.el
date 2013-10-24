@@ -27,8 +27,8 @@
 (setq-default save-place t)
 (setq save-place-file (expand-file-name ".places" user-emacs-directory))
 
-(require 'popwin)
-(setq display-buffer-function 'popwin:display-buffer)
+;; (require 'popwin)
+;; (setq display-buffer-function 'popwin:display-buffer)
 
 ;; make all backups in a single directory
 (defvar user-temporary-file-directory "~/tmp/saves/"

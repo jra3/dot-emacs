@@ -34,7 +34,7 @@
  '(markdown-open-command "mark")
  '(mode-require-final-newline t)
  '(org-startup-folded (quote content))
- '(popwin:special-display-config (quote (("*magit-log*") ("*grep*") ("*Help*") ("*Completions*" :noselect t) ("*Occur*" :noselect t))))
+ '(popwin:special-display-config (quote (("*magit-log*") ("*compilation*") ("*grep*") ("*Help*") ("*Completions*" :noselect t) ("*Occur*" :noselect t))))
  '(py-basic-offset 4 t)
  '(remember-annotation-functions (quote (org-remember-annotation)))
  '(remember-handler-functions (quote (org-remember-handler)))
@@ -52,5 +52,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(flymake-errline ((((class color) (background dark)) (:background "DimGrey" :box nil))))
+ '(flymake-warnline ((((class color)) (:background "Gray20"))))
  '(isearch ((t (:background "blue" :foreground "white"))))
  '(lazy-highlight ((t (:background "yellow" :foreground "black")))))
