@@ -1,47 +1,36 @@
 [submodule "external/solarized"]
         path = external/solarized
         url = git://github.com/sellout/emacs-color-theme-solarized.git
-
 [submodule "external/zenburn"]
         path = external/zenburn
         url = git://github.com/bbatsov/zenburn-emacs.git
-
 [submodule "external/popwin"]
         path = external/popwin
         url = https://github.com/m2ym/popwin-el.git
-
-[submodule "external/zencoding"]
-        path = external/zencoding
-        url = https://github.com/rooney/zencoding.git
-
 [submodule "external/org"]
         path = external/org
         url = git://orgmode.org/org-mode.git
-
 [submodule "external/js2-mode"]
         path = external/js2-mode
         url = https://github.com/mooz/js2-mode.git
 [submodule "external/markdown"]
-	path = external/markdown
-	url = git://jblevins.org/git/markdown-mode.git
+        path = external/markdown
+        url = git://jblevins.org/git/markdown-mode.git
 [submodule "external/mc"]
-	path = external/mc
-	url = git@github.com:emacsmirror/multiple-cursors.git
+        path = external/mc
+        url = git@github.com:emacsmirror/multiple-cursors.git
 [submodule "external/grep-o-matic"]
-	path = external/grep-o-matic
-	url = git@github.com:ZungBang/emacs-grep-o-matic.git
+        path = external/grep-o-matic
+        url = git@github.com:ZungBang/emacs-grep-o-matic.git
 [submodule "external/repository-root"]
-	path = external/repository-root
-	url = git@github.com:ZungBang/emacs-repository-root.git
+        path = external/repository-root
+        url = git@github.com:ZungBang/emacs-repository-root.git
 [submodule "external/magit"]
-	path = external/magit
-	url = git@github.com:magit/magit.git
+        path = external/magit
+        url = git@github.com:magit/magit.git
 [submodule "external/git"]
-	path = external/git
-	url = git@github.com:magit/git-modes.git
+        path = external/git
+        url = git@github.com:magit/git-modes.git
 [submodule "external/jade-mode"]
-	path = external/jade-mode
-	url = git@github.com:brianc/jade-mode.git
-[submodule "external/coffee-mode"]
-	path = external/coffee-mode
-	url = git@github.com:defunkt/coffee-mode.git
+        path = external/jade-mode
+        url = git@github.com:brianc/jade-mode.git
