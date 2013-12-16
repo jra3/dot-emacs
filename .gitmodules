@@ -39,3 +39,9 @@
 [submodule "external/git"]
 	path = external/git
 	url = git@github.com:magit/git-modes.git
+[submodule "external/jade-mode"]
+	path = external/jade-mode
+	url = git@github.com:brianc/jade-mode.git
+[submodule "external/coffee-mode"]
+	path = external/coffee-mode
+	url = git@github.com:defunkt/coffee-mode.git
