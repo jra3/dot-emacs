@@ -28,9 +28,6 @@
 [submodule "external/magit"]
         path = external/magit
         url = git@github.com:magit/magit.git
-[submodule "external/git"]
-        path = external/git
-        url = git@github.com:magit/git-modes.git
 [submodule "external/jade-mode"]
         path = external/jade-mode
         url = git@github.com:brianc/jade-mode.git
