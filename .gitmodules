@@ -1,21 +1,18 @@
 [submodule "external/popwin"]
         path = external/popwin
         url = https://github.com/m2ym/popwin-el.git
-[submodule "external/org"]
-        path = external/org
-        url = git://orgmode.org/org-mode.git
 [submodule "external/js2-mode"]
         path = external/js2-mode
         url = https://github.com/mooz/js2-mode.git
 [submodule "external/markdown"]
         path = external/markdown
-        url = git://jblevins.org/git/markdown-mode.git
+        url = https://github.com/defunkt/markdown-mode.git
 [submodule "external/mc"]
         path = external/mc
-        url = git@github.com:emacsmirror/multiple-cursors.git
+        url = https://github.com/emacsmirror/multiple-cursors.git
 [submodule "external/repository-root"]
         path = external/repository-root
-        url = git@github.com:ZungBang/emacs-repository-root.git
+        url = https://github.com/ZungBang/emacs-repository-root.git
 [submodule "external/magit"]
         path = external/magit
-        url = git@github.com:magit/magit.git
+        url = https://github.com/magit/magit.git
