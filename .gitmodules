@@ -16,3 +16,6 @@
 [submodule "external/magit"]
         path = external/magit
         url = https://github.com/magit/magit.git
+[submodule "external/grep-o-matic"]
+	path = external/grep-o-matic
+	url = https://github.com/ZungBang/emacs-grep-o-matic.git
