@@ -19,3 +19,6 @@
 [submodule "external/grep-o-matic"]
 	path = external/grep-o-matic
 	url = https://github.com/ZungBang/emacs-grep-o-matic.git
+[submodule "external/git-modes"]
+	path = external/git-modes
+	url = https://github.com/magit/git-modes.git
