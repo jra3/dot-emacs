@@ -1,8 +1,6 @@
 (require 'color-theme)
 (color-theme-initialize)
 (require 'color-theme-tangotango)
-(require 'color-theme-zenburn)
-(require 'color-theme-solarized)
 
 ;;
 ;; Note: Make sure iTerm2 is configured to use xterm-256colors
