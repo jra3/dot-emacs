@@ -7,6 +7,8 @@
       (add-to-list 'load-path my-lisp-dir)
       (normal-top-level-add-subdirs-to-load-path)))
 
+(add-to-list 'exec-path "/usr/local/bin")
+
 (require 'j-terminal-compat)
 (require 'j-mc)
 (require 'j-util)

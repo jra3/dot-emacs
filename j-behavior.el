@@ -25,7 +25,7 @@
 ;; Save point position between sessions
 (require 'saveplace)
 (setq-default save-place t)
-(setq save-place-file (expand-file-name ".places" user-emacs-directory))
+(setq save-place-file (expand-file-name ".places" "~/tmp/saves"))
 
 ;; (require 'popwin)
 ;; (setq display-buffer-function 'popwin:display-buffer)
