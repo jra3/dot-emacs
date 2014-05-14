@@ -4,6 +4,7 @@
 
 ;; set code checker here from "epylint", "pyflakes"
 (setq pycodechecker "pyflakes")
+
 (when (load "flymake" t)
   (defun flymake-pycodecheck-init ()
     (let* ((temp-file (flymake-init-create-temp-buffer-copy
@@ -28,5 +29,11 @@
   (let ((a (point)))
     (shell-command-on-region (point-min) (point-max) "PythonTidy.py" t)
     (goto-char a)))
+
+(elpy-enable)
+;; Fixing a key binding bug in elpy
+(define-key yas-minor-mode-map (kbd "C-c k") 'yas-expand)
+;; Fixing another key binding bug in iedit mode
+(define-key global-map (kbd "C-c o") 'iedit-mode)
 
 (provide 'j-python)
