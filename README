@@ -4,14 +4,6 @@ Install instructions
 
      export EMACS_DIR=~/git/dot-emacs
 
-2. Install pyflakes - http://pypi.python.org/pypi/pyflakes
+2. Install python deps
 
-     pip install pyflakes
-
-3. Byte compile js2 mode
-
-     M-x byte-compile-file RE path/to/js2.el RET
-
-4. Check out git submodules
-
-     git submodule update --init
+     pip install pyflakes jedi rope

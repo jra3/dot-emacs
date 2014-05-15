@@ -34,8 +34,6 @@
 (require 'j-yaml)
 (require 'j-markdown)
 
-;;(require 'ess-site)
-
 (require 'j-smex)
 (require 'j-iswitchb)
 (require 'j-completion)
