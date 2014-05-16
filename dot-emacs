@@ -10,9 +10,41 @@
 (add-to-list 'exec-path "/usr/local/bin")
 
 (require 'package)
-(require 'json)
-(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(setq package-list '(2048-game
+                     company
+                     smex
+                     thrift
+                     diminish
+                     elpy
+                     markdown-mode
+                     flymake-css
+                     flymake-cursor
+                     flymake-google-cpplint
+                     flymake-json
+                     flymake-shell
+                     flymake-yaml
+                     yaml-mode
+                     google-c-style
+                     js2-mode
+                     multiple-cursors
+                     magit
+                     nose
+                     popwin
+                     rainbow-mode
+                     tangotango-theme))
+
+(setq package-archives '(("elpa" . "http://tromey.com/elpa/")
+			 ("melpa" . "http://melpa.milkbox.net/packages/")
+                         ("gnu" . "http://elpa.gnu.org/packages/")
+                         ("marmalade" . "http://marmalade-repo.org/packages/")))
 (package-initialize)
+(or (file-exists-p package-user-dir)
+    (package-refresh-contents))
+
+;; install the missing packages
+(dolist (package package-list)
+  (unless (package-installed-p package)
+    (package-install package)))
 
 (require 'j-terminal-compat)
 (require 'j-mc)

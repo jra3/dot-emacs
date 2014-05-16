@@ -23,7 +23,6 @@
   (interactive "P")
   (set-window-dedicated-p (selected-window) nil))
 
-
 ;; add color to shells
 (require 'ansi-color)
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
@@ -31,18 +30,6 @@
 
 (setq custom-file (concat dot-emacs-dir "/j-custom.el"))
 (load custom-file)
-
-;; stolen from eugene
-(defun jallen-sort-init ()
-  "Sorts all paragraphs containing require_module (most useful in __init__.php)"
-  (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (while (and (not (eobp))
-                (search-forward "require_module(" nil t))
-      (jallen-sort-para)
-      (forward-paragraph))
-  ))
 
 (defun jallen-sort-para ()
   "Sorts the paragraph in which the point is located"
@@ -74,12 +61,5 @@
   (with-temp-buffer
     (insert-file-contents fpath)
     (split-string (buffer-string) "\n" t)))
-
-
-(defun jallen-insert-missing-requires ()
-  (interactive)
-  (insert
-   (shell-command-to-string (format "/home/jallen/www/flib/_bin/checkModule -w -s %s | grep ^require_module"
-                          buffer-file-name))))
 
 (provide 'j-util)

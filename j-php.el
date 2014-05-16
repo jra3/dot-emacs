@@ -3,31 +3,11 @@
 (require 'highlight-80+)
 
 
-
-(defun jallen-php-compile-command ()
-  "Set a buffer local compile command if buffer is under flib"
-  (set (make-local-variable 'compile-command)
-       (let ((is-in-flib (string-match "^.*/flib/" buffer-file-name)))
-         (let (
-               (checkModule-cmd "flib/_bin/checkModuleFast")
-               (checkModule-flags
-                (cond (is-in-flib "") ("-s"))
-                )
-               (module-or-path
-                (cond (is-in-flib
-                       (file-name-directory buffer-file-name))
-                      (buffer-file-name))))
-           (format "%s%s --emacs %s %s "
-                   (fb-find-www-root buffer-file-name)
-                   checkModule-cmd
-                   checkModule-flags
-                   module-or-path)))
-       ))
-
 ;; run php lint when press f8 key
 (defun phplint-thisfile ()
   (interactive)
   (compile (format "/usr/local/bin/php -l %s" (buffer-file-name))))
+
 (add-hook 'php-mode-hook
           '(lambda ()
              (local-set-key [f8] 'phplint-thisfile)))
@@ -44,8 +24,6 @@
             (c-set-offset  'arglist-intro '+)
             (setq require-final-newline t)
             ))
-
-(add-hook 'php-mode-hook 'jallen-php-compile-command)
 
 ;; PHP mode for .phpt files
 (autoload 'php-mode "php-mode" nil t nil)
@@ -65,7 +43,7 @@
                         (arglist-close . c-lineup-close-paren)
                         )))
   "Facebook's PHP Programming style"
-)
+  )
 (c-add-style "fb-php-style" fb-php-style)
 
 (add-hook 'php-mode-hook
@@ -81,7 +59,5 @@
             (highlight-80+-mode t)
             (visit-tags-table "~/www/TAGS")
             ))
-
-;; (load "/home/engshare/tools/pfff_php")
 
 (provide 'j-php)

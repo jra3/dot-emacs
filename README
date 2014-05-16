@@ -6,4 +6,4 @@ Install instructions
 
 2. Install python deps
 
-     pip install pyflakes jedi rope
+     pip install elpy jedi rope
