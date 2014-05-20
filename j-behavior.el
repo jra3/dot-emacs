@@ -22,13 +22,25 @@
 (setq cua-enable-cua-keys nil)
 (cua-mode t)
 
+;; show number of matches
+(global-anzu-mode +1)
+
+(ido-mode 1)
+(ido-everywhere 1)
+(flx-ido-mode 1)
+;; disable ido faces to see flx highlights.
+(setq ido-use-faces nil)
+
+;; Awesome repo navigation
+(projectile-global-mode)
+
 ;; Save point position between sessions
 (require 'saveplace)
 (setq-default save-place t)
 (setq save-place-file (expand-file-name ".places" "~/tmp/saves"))
 
-;; (require 'popwin)
-;; (setq display-buffer-function 'popwin:display-buffer)
+(require 'popwin)
+(setq display-buffer-function 'popwin:display-buffer)
 
 ;; make all backups in a single directory
 (defvar user-temporary-file-directory "~/tmp/saves/"
