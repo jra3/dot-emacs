@@ -1,4 +1,3 @@
-
 ;;============================================================
 ;; iswitchb
 ;;============================================================
@@ -21,12 +20,10 @@
 (add-to-list 'iswitchb-buffer-ignore "^ ")
 (add-to-list 'iswitchb-buffer-ignore "*Messages*")
 (add-to-list 'iswitchb-buffer-ignore "*ECB")
-(add-to-list 'iswitchb-buffer-ignore "*Buffer")
-(add-to-list 'iswitchb-buffer-ignore "*Pymacs")
+(add-to-list 'iswitchb-buffer-ignore "*IBuffer")
+(add-to-list 'iswitchb-buffer-ignore "*Pymacs*")
+(add-to-list 'iswitchb-buffer-ignore "*Occur*")
 (add-to-list 'iswitchb-buffer-ignore "*Completions")
-(add-to-list 'iswitchb-buffer-ignore "*ftp ")
-(add-to-list 'iswitchb-buffer-ignore "*bsh")
-(add-to-list 'iswitchb-buffer-ignore "*jde-log")
 (add-to-list 'iswitchb-buffer-ignore "^[tT][aA][gG][sS]$")
 
 ;;============================================================

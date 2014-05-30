@@ -28,6 +28,7 @@
 (ido-mode 1)
 (ido-everywhere 1)
 (flx-ido-mode 1)
+
 ;; disable ido faces to see flx highlights.
 (setq ido-use-faces nil)
 
@@ -41,6 +42,7 @@
 
 (require 'popwin)
 (setq display-buffer-function 'popwin:display-buffer)
+(define-key ibuffer-mode-map (kbd "RET") 'ibuffer-visit-buffer-other-window)
 
 ;; make all backups in a single directory
 (defvar user-temporary-file-directory "~/tmp/saves/"
@@ -74,6 +76,7 @@
 ;; use unstupid regex syntax
 (require 're-builder)
 (setq reb-re-syntax 'string)
+
 
 ;; ---------------- Tweak Variables ---------------------
 (setq make-backup-files t        ;; make backup files on save
