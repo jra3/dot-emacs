@@ -78,3 +78,25 @@
 (require 'j-completion)
 
 (put 'ido-exit-minibuffer 'disabled nil)
+
+(add-hook 'ediff-load-hook
+          (lambda ()
+            (flymake-mode nil)
+            (setq ediff-highlight-all-diffs nil)
+            (set-face-background
+             ediff-current-diff-face-A "#1e2424")
+            (set-face-background
+             ediff-current-diff-face-B "#1e2424")
+            (set-face-background
+             ediff-current-diff-face-C "#1e2424")
+            (make-face-italic
+             ediff-current-diff-face-A)
+            (make-face-italic
+             ediff-current-diff-face-B)
+            (make-face-italic
+             ediff-current-diff-face-C)))
+
+(add-hook 'ediff-prepare-buffer-hook
+          (lambda ()
+            (flymake-mode nil)
+            ))
