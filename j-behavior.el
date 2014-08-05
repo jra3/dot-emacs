@@ -35,6 +35,8 @@
 ;; Awesome repo navigation
 (projectile-global-mode)
 
+(require 'yasnippet)
+
 ;; Save point position between sessions
 (require 'saveplace)
 (setq-default save-place t)

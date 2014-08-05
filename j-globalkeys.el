@@ -39,6 +39,9 @@
                                        (shrink-window 4)))
 (windmove-default-keybindings)
 
+(global-set-key (kbd "C-c C-f") 'projectile-find-file)
+(global-set-key (kbd "M-g") 'projectile-grep)
+
 (require 'ibuffer)
 (global-set-key (kbd "C-x C-b") 'ibuffer-other-window)
 (setq ibuffer-default-sorting-mode 'major-mode)

@@ -16,6 +16,11 @@
  '(display-buffer-reuse-frames nil)
  '(ediff-highlight-all-diffs nil)
  '(elpy-default-minor-modes (quote (eldoc-mode flymake-mode yas-minor-mode auto-complete-mode)))
+ '(elpy-modules (quote (elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv elpy-module-yasnippet elpy-module-sane-defaults)))
+ '(elpy-project-ignored-directories (quote (".bzr" "CVS" ".git" ".hg" ".svn" ".tox" "build" "dist" ".cask" "third_party" "third_party_dev" "node_modules")))
+ '(elpy-project-root-finder-functions (quote (elpy-project-find-projectile-root)))
+ '(elpy-rgrep-ignored-directories (quote (".tox" "build" "dist" "third_party")))
+ '(elpy-rpc-python-command "python")
  '(espresso-indent-level 2)
  '(fill-column 78)
  '(flymake-no-changes-timeout 1)
@@ -34,6 +39,7 @@
  '(mode-require-final-newline t)
  '(org-startup-folded (quote content))
  '(popwin:special-display-config (quote (("*Ibuffer*" :position top :noselect t :height 30) ("*Python Check*" :position top :noselect t :height 30) ("*magit-log*") ("*compilation*") ("*grep*") ("*Help*") ("*Completions*" :noselect t) ("*Occur*" :noselect t))))
+ '(projectile-use-git-grep t)
  '(py-basic-offset 4 t)
  '(remember-annotation-functions (quote (org-remember-annotation)))
  '(remember-handler-functions (quote (org-remember-handler)))
@@ -42,7 +48,8 @@
  '(split-width-threshold 10000)
  '(transient-mark-mode t)
  '(use-dialog-box nil)
- '(use-file-dialog nil))
+ '(use-file-dialog nil)
+ '(yas-snippet-dirs (quote ("~/.dot-emacs/snippets")) nil (yasnippet)))
 
 
 (custom-set-faces
