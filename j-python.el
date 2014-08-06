@@ -1,15 +1,16 @@
 (require 'diminish)
 
+(eval-after-load 'elpy
+  '(progn
+     (define-key elpy-mode-map (kbd "C-c C-f") nil)  ;; unshadow projectile-find-file
+     (define-key elpy-mode-map (kbd "<C-down>") 'python-nav-forward-block)
+     (define-key elpy-mode-map (kbd "<C-up>") 'python-nav-backward-block)
+     (define-key elpy-mode-map (kbd "<C-left>") nil)
+     (define-key elpy-mode-map (kbd "<C-right>") nil)
+))
+
 (elpy-enable)
-;; (elpy-use-ipython)
-
 (setq elpy-rpc-backend "jedi")
-;; (setq python-check-command "flake8")
-
-;; (define-key ac-completing-map (kbd "<up>") nil)
-;; (define-key ac-completing-map (kbd "<down>") nil)
-;; (define-key ac-completing-map (kbd "RET") nil)
-;; (define-key ac-completing-map (kbd "<return>") nil)
 
 ;; Fixing a key binding bug in elpy
 ;;;;;;(define-key yas-minor-mode-map (kbd "C-c k") 'yas-expand)

@@ -16,6 +16,7 @@
  '(display-buffer-reuse-frames nil)
  '(ediff-highlight-all-diffs nil)
  '(elpy-default-minor-modes (quote (eldoc-mode flymake-mode yas-minor-mode auto-complete-mode)))
+ '(elpy-mode-hook (quote (subword-mode hl-line-mode)))
  '(elpy-modules (quote (elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv elpy-module-yasnippet elpy-module-sane-defaults)))
  '(elpy-project-ignored-directories (quote (".bzr" "CVS" ".git" ".hg" ".svn" ".tox" "build" "dist" ".cask" "third_party" "third_party_dev" "node_modules")))
  '(elpy-project-root-finder-functions (quote (elpy-project-find-projectile-root)))
