@@ -2,7 +2,7 @@
 
 (eval-after-load 'elpy
   '(progn
-     (define-key elpy-mode-map (kbd "C-c C-f") nil)  ;; unshadow projectile-find-file
+     (define-key elpy-mode-map (kbd "C-c C-f") 'projectile-find-file)  ;; unshadow projectile-find-file
      (define-key elpy-mode-map (kbd "<C-down>") 'python-nav-forward-block)
      (define-key elpy-mode-map (kbd "<C-up>") 'python-nav-backward-block)
      (define-key elpy-mode-map (kbd "<C-left>") nil)

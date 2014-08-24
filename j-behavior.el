@@ -14,9 +14,14 @@
 
 ;; Set +x on scripts stating with a shebang
 (add-hook 'after-save-hook
-          'executable-make-buffer-file-executable-if-script-p)
+	  'executable-make-buffer-file-executable-if-script-p)
 
 (add-hook 'before-save-hook 'whitespace-cleanup)
+
+(add-hook 'makefile-mode-hook
+	  (lambda ()
+	    (setq indent-tabs-mode t)
+	    ))
 
 ;; rectangular sections - C-<Enter>
 (setq cua-enable-cua-keys nil)
@@ -50,6 +55,8 @@
 (defvar user-temporary-file-directory "~/tmp/saves/"
   (concat temporary-file-directory user-login-name "/"))
 (make-directory user-temporary-file-directory t)
+
+
 
 (setq
  backup-by-copying t      ; don't clobber symlinks
