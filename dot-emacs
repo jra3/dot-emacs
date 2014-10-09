@@ -19,6 +19,7 @@
 (setq package-list '(2048-game
                      anzu
                      company
+                     color-identifiers-mode
                      smex
                      thrift
                      diminish
@@ -34,9 +35,16 @@
                      flymake-json
                      flymake-shell
                      flymake-yaml
+
+                     js-comint
+                     js2-mode
+                     ac-js2
+                     js2-refactor
+                     json-mode
+                     coffee-mode
+
                      yaml-mode
                      google-c-style
-                     js2-mode
                      multiple-cursors
                      magit
                      nose
