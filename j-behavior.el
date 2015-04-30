@@ -14,14 +14,14 @@
 
 ;; Set +x on scripts stating with a shebang
 (add-hook 'after-save-hook
-	  'executable-make-buffer-file-executable-if-script-p)
+          'executable-make-buffer-file-executable-if-script-p)
 
 (add-hook 'before-save-hook 'whitespace-cleanup)
 
 (add-hook 'makefile-mode-hook
-	  (lambda ()
-	    (setq indent-tabs-mode t)
-	    ))
+          (lambda ()
+            (setq indent-tabs-mode t)
+            ))
 
 ;; rectangular sections - C-<Enter>
 (setq cua-enable-cua-keys nil)
@@ -29,10 +29,6 @@
 
 ;; show number of matches
 (global-anzu-mode +1)
-
-(ido-mode 1)
-(ido-everywhere 1)
-(flx-ido-mode 1)
 
 ;; disable ido faces to see flx highlights.
 (setq ido-use-faces nil)

@@ -16,8 +16,6 @@
   (diminish 'flymake-mode "Fly"))
 (add-hook 'after-init-hook 'load-diminish)
 
-(global-rainbow-delimiters-mode)
-
 ;; unique buffer names using path
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'reverse)

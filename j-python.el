@@ -10,7 +10,7 @@
 ))
 
 (elpy-enable)
-(setq elpy-rpc-backend "jedi")
+(elpy-use-ipython)
 
 ;; Fixing a key binding bug in elpy
 ;;;;;;(define-key yas-minor-mode-map (kbd "C-c k") 'yas-expand)
