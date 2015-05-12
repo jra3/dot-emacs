@@ -53,6 +53,8 @@
 (make-directory user-temporary-file-directory t)
 
 
+(setq magit-auto-revert-mode nil)
+(setq magit-last-seen-setup-instructions "1.4.0")
 
 (setq
  backup-by-copying t      ; don't clobber symlinks
