@@ -18,11 +18,6 @@
 
 (add-hook 'before-save-hook 'whitespace-cleanup)
 
-(add-hook 'makefile-mode-hook
-          (lambda ()
-            (setq indent-tabs-mode t)
-            ))
-
 ;; rectangular sections - C-<Enter>
 (setq cua-enable-cua-keys nil)
 (cua-mode t)
