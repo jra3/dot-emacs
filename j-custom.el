@@ -35,7 +35,6 @@
  '(ido-enable-flex-matching t)
  '(ido-everywhere t)
  '(ido-mode (quote buffer) nil (ido))
- '(indent-tabs-mode nil)
  '(js2-basic-offset 4)
  '(js2-bounce-indent-p nil)
  '(large-file-warning-threshold nil)
