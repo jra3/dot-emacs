@@ -16,7 +16,7 @@
 (add-hook 'after-save-hook
           'executable-make-buffer-file-executable-if-script-p)
 
-(add-hook 'before-save-hook 'whitespace-cleanup)
+;; (add-hook 'before-save-hook 'whitespace-cleanup)
 
 ;; rectangular sections - C-<Enter>
 (setq cua-enable-cua-keys nil)
@@ -32,6 +32,8 @@
 (projectile-global-mode)
 
 (require 'yasnippet)
+(define-key yas-minor-mode-map (kbd "<shift TAB>") 'yas-expand)
+
 
 ;; Save point position between sessions
 (require 'saveplace)

@@ -35,16 +35,10 @@
 ;; Screw that, I kill it on save anyway
 (setq-default show-trailing-whitespace nil)
 
-;; Put mensch.ttf in ~/.fonts
-(defun jallen-font ()
-  (interactive)
-  (set-default-font "Mensch-12"))
-(defun jallen-font-no-contacts ()
-  (interactive)
-  (set-default-font "Mensch-18"))
-(defun jallen-blind ()
-  (interactive)
-  (set-default-font "Mensch-30"))
+(defun jallen-font () (interactive) (set-default-font "DejaVu Sans Mono-12"))
+(defun jallen-font-no-contacts () (interactive) (set-default-font "DejaVu Sans Mono-18"))
+(defun jallen-blind () (interactive) (set-default-font "DejaVu Sans Mono-30"))
+
 
 (add-hook 'after-make-window-system-frame-hooks 'jallen-font)
 
