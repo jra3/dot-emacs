@@ -87,7 +87,6 @@
 (require 'j-markdown)
 
 (require 'j-smex)
-(require 'j-iswitchb)
 (require 'j-completion)
 
 (put 'ido-exit-minibuffer 'disabled nil)
