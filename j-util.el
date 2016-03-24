@@ -52,7 +52,7 @@
   "Autocompletes engineer unixnames for insertion at point"
   (interactive)
   (insert
-   (ido-completing-read "Engineer: "
+   (ido-completing-read "Reviewers: "
                         (jallen-read-lines "~/.engineers"))
    ))
 

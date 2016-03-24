@@ -53,8 +53,9 @@
 		     projectile
 		     rainbow-mode
 		     rainbow-delimiters
-		     tangotango-theme))
-
+		     tangotango-theme
+                     web-mode
+		     ))
 
 (package-initialize)
 
@@ -74,7 +75,6 @@
 (require 'j-appearance)
 (require 'j-behavior)
 (require 'j-org)
-;;(require 'j-git)
 
 (require 'j-cpp)
 (require 'j-php)
@@ -88,6 +88,7 @@
 
 (require 'j-smex)
 (require 'j-completion)
+(require 'j-web)
 
 (put 'ido-exit-minibuffer 'disabled nil)
 

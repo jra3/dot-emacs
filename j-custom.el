@@ -83,6 +83,16 @@
  '(transient-mark-mode t)
  '(use-dialog-box nil)
  '(use-file-dialog nil)
+ '(web-mode-code-indent-offset 2)
+ '(web-mode-css-indent-offset 2)
+ '(web-mode-enable-auto-closing t)
+ '(web-mode-enable-auto-indentation t)
+ '(web-mode-enable-auto-opening t)
+ '(web-mode-enable-auto-pairing t)
+ '(web-mode-enable-auto-quoting t)
+ '(web-mode-markup-indent-offset 2)
+ '(web-mode-script-padding 2)
+ '(web-mode-style-padding 2)
  '(yas-snippet-dirs (quote ("~/.dot-emacs/snippets")) nil (yasnippet)))
 
 

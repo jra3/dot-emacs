@@ -1,6 +1,8 @@
 ;; alias y to yes and n to no
 (defalias 'yes-or-no-p 'y-or-n-p)
 
+(ido-mode t)
+
 (setq tags-case-fold-search nil)
 
 ;; spell checking in comments & strings
@@ -24,9 +26,6 @@
 
 ;; show number of matches
 (global-anzu-mode +1)
-
-
-(icomplete-mode 99)
 
 ;; disable ido faces to see flx highlights.
 (setq ido-use-faces nil)
