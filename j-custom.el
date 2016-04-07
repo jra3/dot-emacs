@@ -61,6 +61,7 @@
  '(line-number-mode 1)
  '(markdown-open-command "mark")
  '(mode-require-final-newline t)
+ '(org-publish-use-timestamps-flag nil)
  '(org-startup-folded (quote content))
  '(popwin:special-display-config
    (quote
