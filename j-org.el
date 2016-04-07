@@ -2,7 +2,14 @@
 
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (setq org-directory "~/org")
-(setq org-replace-disputed-keys t)
+(setq org-default-notes-file (concat org-directory "/notes.org"))
+
+;(setq org-replace-disputed-keys t)
+
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cc" 'org-capture)
+(global-set-key "\C-cb" 'org-iswitchb)
 
 ;; (setq org-agenda-files (quote ("~/org/work.org" "~/org/personal.org" "~/org/irc.org")))
 
