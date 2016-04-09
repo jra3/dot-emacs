@@ -30,6 +30,7 @@
 		     gitignore-mode
 		     flx-ido
 		     markdown-mode
+                     
 		     flymake-css
 		     flymake-cursor
 		     flymake-google-cpplint
@@ -55,6 +56,9 @@
 		     rainbow-delimiters
 		     tangotango-theme
                      web-mode
+
+                     org-bullets
+                     org-pomodoro
 		     ))
 
 (package-initialize)

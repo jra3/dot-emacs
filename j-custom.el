@@ -61,6 +61,9 @@
  '(line-number-mode 1)
  '(markdown-open-command "mark")
  '(mode-require-final-newline t)
+ '(org-agenda-files (quote ("~/org/notes.org")))
+ '(org-bullets-bullet-list (quote ("◉" "○" "♥" "✈")))
+ '(org-pomodoro-start-sound-p t)
  '(org-publish-use-timestamps-flag nil)
  '(org-startup-folded (quote content))
  '(popwin:special-display-config
