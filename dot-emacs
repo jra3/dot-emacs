@@ -3,7 +3,7 @@
 
 (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
     (let* ((my-lisp-dir dot-emacs-dir)
-	   (default-directory my-lisp-dir))
+           (default-directory my-lisp-dir))
       (add-to-list 'load-path my-lisp-dir)
       (normal-top-level-add-subdirs-to-load-path)))
 
@@ -12,54 +12,59 @@
 
 (require 'package)
 (setq package-archives '(("elpa" . "http://tromey.com/elpa/")
-			 ("melpa" . "http://melpa.milkbox.net/packages/")
-			 ("elpy" . "http://jorgenschaefer.github.io/packages/")
-			 ("gnu" . "http://elpa.gnu.org/packages/")
-			 ("marmalade" . "http://marmalade-repo.org/packages/")))
+                         ("melpa" . "http://melpa.milkbox.net/packages/")
+                         ("elpy" . "http://jorgenschaefer.github.io/packages/")
+                         ("gnu" . "http://elpa.gnu.org/packages/")
+                         ("marmalade" . "http://marmalade-repo.org/packages/")))
 
 (setq package-list '(2048-game
-		     anzu
-		     company
-		     color-identifiers-mode
-		     smex
-		     thrift
-		     diminish
-		     elpy
-		     crontab-mode
-		     gitconfig-mode
-		     gitignore-mode
-		     flx-ido
-		     markdown-mode
-                     
-		     flymake-css
-		     flymake-cursor
-		     flymake-google-cpplint
-		     flymake-json
-		     flymake-shell
-		     flymake-yaml
+                     anzu
+                     company
+                     color-identifiers-mode
+                     smex
+                     thrift
+                     diminish
+                     elpy
+                     crontab-mode
+                     gitconfig-mode
+                     gitignore-mode
 
-		     js-comint
-		     js2-mode
-		     ac-js2
-		     js2-refactor
-		     json-mode
-		     coffee-mode
+                     ido
+                     ido-ubiquitous
+                     flx-ido
+                     ido-vertical-mode
 
-		     yaml-mode
-		     google-c-style
-		     multiple-cursors
-		     magit
-		     nose
-		     popwin
-		     projectile
-		     rainbow-mode
-		     rainbow-delimiters
-		     tangotango-theme
+                     markdown-mode
+
+                     flymake-css
+                     flymake-cursor
+                     flymake-google-cpplint
+                     flymake-json
+                     flymake-shell
+                     flymake-yaml
+
+                     js-comint
+                     js2-mode
+                     ac-js2
+                     js2-refactor
+                     json-mode
+                     coffee-mode
+
+                     yaml-mode
+                     google-c-style
+                     multiple-cursors
+                     magit
+                     nose
+                     popwin
+                     projectile
+                     rainbow-mode
+                     rainbow-delimiters
+                     tangotango-theme
                      web-mode
 
                      org-bullets
                      org-pomodoro
-		     ))
+                     ))
 
 (package-initialize)
 
@@ -101,23 +106,23 @@
 (put 'ido-exit-minibuffer 'disabled nil)
 
 (add-hook 'ediff-load-hook
-	  (lambda ()
-	    (flymake-mode nil)
-	    (setq ediff-highlight-all-diffs nil)
-	    (set-face-background
-	     ediff-current-diff-face-A "#1e2424")
-	    (set-face-background
-	     ediff-current-diff-face-B "#1e2424")
-	    (set-face-background
-	     ediff-current-diff-face-C "#1e2424")
-	    (make-face-italic
-	     ediff-current-diff-face-A)
-	    (make-face-italic
-	     ediff-current-diff-face-B)
-	    (make-face-italic
-	     ediff-current-diff-face-C)))
+          (lambda ()
+            (flymake-mode nil)
+            (setq ediff-highlight-all-diffs nil)
+            (set-face-background
+             ediff-current-diff-face-A "#1e2424")
+            (set-face-background
+             ediff-current-diff-face-B "#1e2424")
+            (set-face-background
+             ediff-current-diff-face-C "#1e2424")
+            (make-face-italic
+             ediff-current-diff-face-A)
+            (make-face-italic
+             ediff-current-diff-face-B)
+            (make-face-italic
+             ediff-current-diff-face-C)))
 
 (add-hook 'ediff-prepare-buffer-hook
-	  (lambda ()
-	    (flymake-mode nil)
-	    ))
+          (lambda ()
+            (flymake-mode nil)
+            ))
