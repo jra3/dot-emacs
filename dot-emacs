@@ -94,8 +94,9 @@
 (require 'j-completion)
 (require 'j-web)
 
-(require 'remote-emacsclient)
-(update-tramp-emacs-server-port-forward tramp-default-method)
+;; Enable this, then connect to your remote host like M-x dired <RET> /user@remote:/
+;; (require 'remote-emacsclient)
+;; (update-tramp-emacs-server-port-forward tramp-default-method)
 
 (put 'ido-exit-minibuffer 'disabled nil)
 
