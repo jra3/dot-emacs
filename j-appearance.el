@@ -30,16 +30,13 @@
 
 (add-hook 'font-lock-mode-hook 'highlight-my-name)
 (defun highlight-my-name () ""
-  (font-lock-add-keywords nil '(("jallen" (0 'my-name-face t)))))
+       (font-lock-add-keywords nil '(("jallen" (0 'my-name-face t)))))
 
 ;; Screw that, I kill it on save anyway
 (setq-default show-trailing-whitespace nil)
 
-(defun jallen-font () (interactive) (set-default-font "DejaVu Sans Mono-12"))
-(defun jallen-font-no-contacts () (interactive) (set-default-font "DejaVu Sans Mono-18"))
-(defun jallen-blind () (interactive) (set-default-font "DejaVu Sans Mono-30"))
-
-
-(add-hook 'after-make-window-system-frame-hooks 'jallen-font)
+(defun jallen-font () (interactive) (set-frame-font "DejaVu Sans Mono-9"))
+(defun jallen-font-no-contacts () (interactive) (set-frame-font "DejaVu Sans Mono-18"))
+(defun jallen-blind () (interactive) (set-frame-font "DejaVu Sans Mono-30"))
 
 (provide 'j-appearance)

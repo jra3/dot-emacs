@@ -1,22 +1,22 @@
 ;; alias y to yes and n to no
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-(ido-mode t)
-(ido-everywhere t)
-(require 'ido-ubiquitous)
-(ido-ubiquitous-mode t)
-(require 'magit)
-(setq magit-completing-read-function 'magit-ido-completing-read)
-(require 'ido-vertical-mode)
-(ido-vertical-mode t)
-(setq ido-vertical-show-count t)
-(setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
+;; (ido-mode t)
+;; (ido-everywhere t)
+;; (require 'ido-ubiquitous)
+;; (ido-ubiquitous-mode t)
+;; (require 'magit)
+;; (setq magit-completing-read-function 'magit-ido-completing-read)
+;; (require 'ido-vertical-mode)
+;; (ido-vertical-mode t)
+;; (setq ido-vertical-show-count t)
+;; (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
 
-(require 'flx-ido)
-(flx-ido-mode t)
-(setq ido-enable-flex-matching t)
-;; disable ido faces to see flx highlights.
-(setq ido-use-faces nil)
+;; (require 'flx-ido)
+;; (flx-ido-mode t)
+;; (setq ido-enable-flex-matching t)
+;; ;; disable ido faces to see flx highlights.
+;; (setq ido-use-faces nil)
 
 (setq tags-case-fold-search nil)
 

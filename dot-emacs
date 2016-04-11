@@ -29,11 +29,25 @@
                      gitconfig-mode
                      gitignore-mode
 
-                     ido
-                     ido-ubiquitous
-                     flx-ido
-                     ido-vertical-mode
+                     ;; ido
+                     ;; ido-ubiquitous
+                     ;; flx-ido
+                     ;; ido-vertical-mode
 
+                     helm-c-yasnippet
+                     helm-commandlinefu
+                     helm-company
+                     helm-css-scss
+                     helm-descbinds
+                     helm-describe-modes
+                     helm-flx
+                     helm-flymake
+                     helm-orgcard
+                     helm-projectile
+                     helm-pydoc
+                     helm-swoop
+                     helm-unicode
+                     
                      markdown-mode
 
                      flymake-css
@@ -95,7 +109,8 @@
 (require 'j-yaml)
 (require 'j-markdown)
 
-(require 'j-smex)
+; (require 'j-smex)
+(require 'j-helm)
 (require 'j-completion)
 (require 'j-web)
 
