@@ -22,7 +22,7 @@
       (right-fringe . 1)
       (menu-bar-lines . 0)
       (tool-bar-lines . 0)
-      (font . "DejaVu Sans Mono-9"))))
+      (font . "DejaVu Sans Mono-12"))))
  '(default-input-method "utf-8-prefix")
  '(default-major-mode (quote text-mode) t)
  '(display-buffer-reuse-frames nil)

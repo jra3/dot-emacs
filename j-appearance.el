@@ -35,7 +35,7 @@
 ;; Screw that, I kill it on save anyway
 (setq-default show-trailing-whitespace nil)
 
-(defun jallen-font () (interactive) (set-frame-font "DejaVu Sans Mono-9"))
+(defun jallen-font () (interactive) (set-frame-font "DejaVu Sans Mono-12"))
 (defun jallen-font-no-contacts () (interactive) (set-frame-font "DejaVu Sans Mono-18"))
 (defun jallen-blind () (interactive) (set-frame-font "DejaVu Sans Mono-30"))
 
