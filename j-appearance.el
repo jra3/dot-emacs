@@ -1,13 +1,28 @@
 ;; default to better frame titles
 (setq frame-title-format (concat  "%b - emacs@" system-name))
 
+(setq default-frame-alist
+      (quote
+       ((left-fringe . 1)
+        (right-fringe . 1)
+        (menu-bar-lines . 0)
+        (tool-bar-lines . 0)
+        (font . "DejaVu Sans Mono-12"))))
+
+;; highlight matcing parens when cursor is on one
+(show-paren-mode t)
+
 ;; hide n00b UI elements
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-(setq inhibit-splash-screen t)
-(setq inhibit-startup-message t)
-(setq inhibit-startup-echo-area-message t)
+
+(setq inhibit-splash-screen t
+      inhibit-startup-message t
+      inhibit-startup-echo-area-message t)
+
+;; (require 'fringe-mode)
+;; (setq fringe-mode (quote (1 . 1)) nil (fringe))
 
 ;; diminish mode
 (require 'diminish)

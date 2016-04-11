@@ -114,11 +114,8 @@
 (require 'j-completion)
 (require 'j-web)
 
-;; Enable this, then connect to your remote host like M-x dired <RET> /user@remote:/
-;; (require 'remote-emacsclient)
-;; (update-tramp-emacs-server-port-forward tramp-default-method)
-
-(put 'ido-exit-minibuffer 'disabled nil)
+(if (file-exists-p "~/.local-overrides.el")
+    (load-file "~/.local-overrides.el"))
 
 (add-hook 'ediff-load-hook
           (lambda ()

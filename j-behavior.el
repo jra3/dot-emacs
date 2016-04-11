@@ -1,3 +1,5 @@
+(require 'highlight-80+)
+
 ;; alias y to yes and n to no
 (defalias 'yes-or-no-p 'y-or-n-p)
 
@@ -27,7 +29,51 @@
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control))))
 
 (setq scroll-step 1
-      scroll-conservatively 10000)
+      scroll-conservatively 10000
+      
+      split-height-threshold 10000
+      split-width-threshold 10000
+
+      large-file-warning-threshold nil
+      
+      case-fold-search t
+      transient-mark-mode t
+
+      use-dialog-box nil
+      use-file-dialog nil
+      line-number-mode 1
+      
+      fill-column 78
+      highlight-80+-columns 119
+      
+      indent-tabs-mode nil
+
+      current-language-environment "utf-8"
+      default-input-method "utf-8-prefix"
+      c-basic-offset 2 ;; this is used by so much, don't put it in j-cpp
+      global-auto-revert-mode t
+      compilation-ask-about-save nil
+      display-buffer-reuse-frames nil
+      ediff-highlight-all-diffs nil
+      
+      flymake-no-changes-timeout 1
+
+      alert-user-configuration (quote ((nil notifier nil)))
+      )
+
+(setq popwin:special-display-config
+      (quote
+       (("*Ibuffer*" :position top :noselect t :height 30)
+        ("*Python Check*" :position top :noselect t :height 30)
+        ("*magit-log*")
+        ("*compilation*")
+        ("*Python Doc*")
+        ("*grep*")
+        ("*Help*")
+        ("*Completions*" :noselect t)
+        ("*Occur*" :noselect t))))
+
+
 
 ;; Set +x on scripts stating with a shebang
 (add-hook 'after-save-hook
@@ -44,6 +90,7 @@
 
 ;; Awesome repo navigation
 (projectile-global-mode)
+(setq projectile-use-git-grep t)
 
 (require 'yasnippet)
 (define-key yas-minor-mode-map (kbd "<shift TAB>") 'yas-expand)

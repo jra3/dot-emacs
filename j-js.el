@@ -7,6 +7,10 @@
 (setq-default js2-indent-on-enter-key t)
 (setq-default js2-mode-indent-ignore-first-tab t)
 
+(setq js2-basic-offset 4
+      js2-bounce-indent-p nil)
+
+
 (setq-default js2-global-externs '("$" "module" "require" "buster" "sinon" "assert" "refute" "setTimeout" "clearTimeout" "setInterval" "clearInterval" "location" "__dirname" "console" "JSON" "localStorage" "ActiveXObject"))
 
 ;; We'll let fly do the error parsing...
@@ -25,7 +29,6 @@
 
 (autoload 'flymake-jshint "flymake-jshint"
   "Error and linting support mode for JavaScript." t nil)
-
 
 (add-hook 'js-mode-hook
           (lambda () (flymake-mode 1)))

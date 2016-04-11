@@ -56,8 +56,7 @@
 (global-set-key (kbd "C-c C-f") 'helm-projectile)  ;; unshadow projectile-find-file
 (helm-mode 1)
 
-(global-set-key (kbd "C-s") 'helm-swoop)
-(global-set-key (kbd "C-S-s") 'helm-multi-swoop-all)
-
+;; (global-set-key (kbd "C-s") 'helm-swoop)
+;; (global-set-key (kbd "C-S-s") 'helm-multi-swoop-all)
 
 (provide 'j-helm)
