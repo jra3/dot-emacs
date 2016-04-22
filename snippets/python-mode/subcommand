@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: subcommand
+# key: scomm
+# group: jallen
+# --
+class ${1:Object}${2:Action}(SubCommandHandler):
+
+    name = '${2:$(downcase yas-text)}'
+    description = '${3:help_string}'
+
+    def parser_setup(self, sps):
+        parser = self.init_parser(sps)
+        return parser

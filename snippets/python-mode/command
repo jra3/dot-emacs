@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: command
+# key: comm
+# group: jallen
+# --
+from base import CommandHandler, SubCommandHandler
+
+
+class ${1:name}Handler(CommandHandler):
+
+    name = '${1:$(downcase yas-text)}'
+    description = '${2:help_string}'
+
+    def __init__(self):
+        CommandHandler.__init__(self)
+
+
