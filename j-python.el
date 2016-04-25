@@ -7,6 +7,7 @@
      (define-key elpy-mode-map (kbd "<C-up>") 'python-nav-backward-block)
      (define-key elpy-mode-map (kbd "<C-left>") nil)
      (define-key elpy-mode-map (kbd "<C-right>") nil)
+     (define-key elpy-mode-map (kbd "C-c C-s") 'helm-projectile-grep)  ;; elpy-rgrep-symbol sucks
 ))
 
 (elpy-enable)
