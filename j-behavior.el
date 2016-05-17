@@ -28,6 +28,8 @@
 ;; mouse scroll
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control))))
 
+(global-auto-revert-mode t)
+
 (setq scroll-step 1
       scroll-conservatively 10000
       
@@ -51,7 +53,6 @@
       current-language-environment "utf-8"
       default-input-method "utf-8-prefix"
       c-basic-offset 2 ;; this is used by so much, don't put it in j-cpp
-      global-auto-revert-mode t
       compilation-ask-about-save nil
       display-buffer-reuse-frames nil
       ediff-highlight-all-diffs nil

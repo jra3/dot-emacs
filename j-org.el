@@ -19,7 +19,6 @@
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-cb" 'org-iswitchb)
 
-
 (setq
  org-directory "~/org"
 
