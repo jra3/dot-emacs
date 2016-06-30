@@ -34,6 +34,11 @@
                      ;; flx-ido
                      ;; ido-vertical-mode
 
+		     auto-complete
+		     exec-path-from-shell
+		     go-mode
+		     go-autocomplete
+		     
                      helm-c-yasnippet
                      helm-commandlinefu
                      helm-company
@@ -99,6 +104,7 @@
 (require 'j-behavior)
 (require 'j-org)
 
+(require 'j-go)
 (require 'j-cpp)
 (require 'j-php)
 (require 'j-python)
