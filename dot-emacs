@@ -36,9 +36,13 @@
 
 		     auto-complete
 		     exec-path-from-shell
+
 		     go-mode
+		     go-eldoc
 		     go-autocomplete
-		     
+		     go-rename
+		     go-dlv
+
                      helm-c-yasnippet
                      helm-commandlinefu
                      helm-company

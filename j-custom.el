@@ -15,6 +15,9 @@
  '(elpy-project-ignored-directories
    (quote
     (".bzr" "CVS" ".git" ".hg" ".svn" ".tox" "build" "dist" ".cask" "third_party" "third_party_dev" "node_modules" "interana_tailer/interana_tailer")))
+ '(org-agenda-files
+   (quote
+    ("~/org/gtd.org" "~/org/gtd.org_archive" "~/org/habits.org")))
  '(org-agenda-restore-windows-after-quit t)
  '(org-agenda-span (quote day))
  '(projectile-use-git-grep t))
