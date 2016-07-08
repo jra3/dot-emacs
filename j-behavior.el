@@ -62,6 +62,8 @@
       alert-user-configuration (quote ((nil notifier nil)))
       )
 
+(global-flycheck-mode)
+
 (setq popwin:special-display-config
       (quote
        (("*Ibuffer*" :position top :noselect t :height 30)

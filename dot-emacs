@@ -50,7 +50,6 @@
                      helm-descbinds
                      helm-describe-modes
                      helm-flx
-                     helm-flymake
                      helm-orgcard
                      helm-projectile
                      helm-pydoc
@@ -59,13 +58,8 @@
                      
                      markdown-mode
 
-                     flymake-css
-                     flymake-cursor
-                     flymake-google-cpplint
-                     flymake-json
-                     flymake-shell
-                     flymake-yaml
-
+		     flycheck
+		     
                      js-comint
                      js2-mode
                      ac-js2

@@ -15,11 +15,14 @@
   (whitespace-mode -1) ; don't highlight hard tabs
   (local-set-key (kbd "M-.") 'godef-jump)
   (auto-complete-mode 1)
-  (load-file "$HOME/go/src/golang.org/x/tools/cmd/oracle/oracle.el")
+  
+  ;; oracle is kinda heavy...
+  ;; (load-file "$HOME/go/src/golang.org/x/tools/cmd/oracle/oracle.el")
+
   (add-hook 'before-save-hook 'gofmt-before-save)
-  (if (not (string-match "go" compile-command))
-      (set (make-local-variable 'compile-command)
-           "go generate && go build -v && go test -v && go vet"))
+
+  (setq compile-command "go build -v && go test -v && go vet && golint")
+  
   (setq
    gofmt-command "goimports"
    tab-width 2         ; display tabs as two-spaces
@@ -34,6 +37,13 @@
 
 (require 'go-autocomplete)
 (require 'auto-complete-config)
+
+;;Configure golint
+(add-to-list 'load-path "~/go/src/github.com/golang/lint/misc/emacs")
+(require 'golint)
+
+(add-to-list 'load-path "~/go/src/github.com/dougm/goflymake")
+(require 'go-flycheck)
 
 (define-key ac-mode-map (kbd "<C-tab>") 'auto-complete)
 
