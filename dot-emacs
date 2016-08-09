@@ -37,6 +37,14 @@
 		     auto-complete
 		     exec-path-from-shell
 
+                     flymake-css
+                     flymake-cursor
+                     flymake-google-cpplint
+                     flymake-json
+                     flymake-shell
+                     flymake-yaml
+		     ;; flymake-go provided directly from go package
+		     
 		     go-mode
 		     go-eldoc
 		     go-autocomplete
@@ -50,6 +58,7 @@
                      helm-descbinds
                      helm-describe-modes
                      helm-flx
+		     helm-flymake
                      helm-orgcard
                      helm-projectile
                      helm-pydoc
@@ -57,8 +66,6 @@
                      helm-unicode
                      
                      markdown-mode
-
-		     flycheck
 		     
                      js-comint
                      js2-mode
@@ -117,6 +124,8 @@
 (require 'j-helm)
 (require 'j-completion)
 (require 'j-web)
+
+(require 'leg-mode)
 
 (if (file-exists-p "~/.local-overrides.el")
     (load-file "~/.local-overrides.el"))

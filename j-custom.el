@@ -20,4 +20,8 @@
     ("~/org/gtd.org" "~/org/gtd.org_archive" "~/org/habits.org")))
  '(org-agenda-restore-windows-after-quit t)
  '(org-agenda-span (quote day))
- '(projectile-use-git-grep t))
+ '(projectile-use-git-grep t)
+ '(safe-local-variable-values
+   (quote
+    ((eval setq default-directory
+	   (locate-dominating-file buffer-file-name ".dir-locals.el"))))))

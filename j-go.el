@@ -22,6 +22,8 @@
   (add-hook 'before-save-hook 'gofmt-before-save)
 
   (setq compile-command "go build -v && go test -v && go vet && golint")
+
+  (subword-mode 1)
   
   (setq
    gofmt-command "goimports"
@@ -43,7 +45,7 @@
 (require 'golint)
 
 (add-to-list 'load-path "~/go/src/github.com/dougm/goflymake")
-(require 'go-flycheck)
+(require 'go-flymake)
 
 (define-key ac-mode-map (kbd "<C-tab>") 'auto-complete)
 

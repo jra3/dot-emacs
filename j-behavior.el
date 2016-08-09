@@ -62,7 +62,8 @@
       alert-user-configuration (quote ((nil notifier nil)))
       )
 
-(global-flycheck-mode)
+;; I prefer flymake it seems
+;; (global-flycheck-mode)
 
 (setq popwin:special-display-config
       (quote

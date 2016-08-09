@@ -7,7 +7,7 @@
         (right-fringe . 1)
         (menu-bar-lines . 0)
         (tool-bar-lines . 0)
-        (font . "DejaVu Sans Mono-14"))))
+        (font . "DejaVu Sans Mono-16"))))
 
 ;; highlight matcing parens when cursor is on one
 (show-paren-mode t)
