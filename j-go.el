@@ -9,7 +9,6 @@
   (auto-complete-mode 1))
 (add-hook 'go-mode-hook 'auto-complete-for-go)
 
-
 ;;;; Golang support
 (defun my-go-mode-hook ()
   (whitespace-mode -1) ; don't highlight hard tabs
