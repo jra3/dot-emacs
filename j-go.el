@@ -14,9 +14,9 @@
   (whitespace-mode -1) ; don't highlight hard tabs
   (local-set-key (kbd "M-.") 'godef-jump)
   (auto-complete-mode 1)
-  
-  ;; oracle is kinda heavy...
-  ;; (load-file "$HOME/go/src/golang.org/x/tools/cmd/oracle/oracle.el")
+
+   ; Go oracle
+  (load-file "~/go/src/golang.org/x/tools/cmd/oracle/oracle.el")
 
   (add-hook 'before-save-hook 'gofmt-before-save)
 
