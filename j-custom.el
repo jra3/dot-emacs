@@ -16,15 +16,18 @@
    (quote
     (".bzr" "CVS" ".git" ".hg" ".svn" ".tox" "build" "dist" ".cask" "third_party" "third_party_dev" "node_modules" "interana_tailer/interana_tailer")))
  '(markdown-command "multimarkdown")
- '(org-agenda-files (quote ("~/org/gtd.org" "~/org/gtd.org_archive")))
  '(org-agenda-restore-windows-after-quit t)
- '(org-agenda-span (quote day))
+ '(org-stuck-projects
+   (quote
+    ("+project"
+     ("TODO NEXT")
+     ("action")
+     "\\<IGNORE\\>")))
  '(package-selected-packages
    (quote
-    (org-ac yaml-mode web-mode thrift tangotango-theme smex rainbow-mode rainbow-delimiters popwin org-pomodoro org-bullets nose markdown-mode magit json-mode js2-refactor js-comint helm-unicode helm-swoop helm-pydoc helm-projectile helm-orgcard helm-flymake helm-flx helm-describe-modes helm-descbinds helm-css-scss helm-company helm-commandlinefu helm-c-yasnippet google-c-style go-rename go-eldoc go-dlv go-autocomplete gitignore-mode gitconfig-mode flymake-yaml flymake-shell flymake-json flymake-google-cpplint flymake-go flymake-cursor flymake-css flymake flycheck exec-path-from-shell elpy diminish crontab-mode color-identifiers-mode coffee-mode anzu ac-js2 2048-game)))
+    (org-mime puppet-mode org-ac yaml-mode web-mode thrift tangotango-theme smex rainbow-mode rainbow-delimiters popwin org-pomodoro org-bullets nose markdown-mode magit json-mode js2-refactor js-comint helm-unicode helm-swoop helm-pydoc helm-projectile helm-orgcard helm-flymake helm-flx helm-describe-modes helm-descbinds helm-css-scss helm-company helm-commandlinefu helm-c-yasnippet google-c-style go-rename go-eldoc go-dlv go-autocomplete gitignore-mode gitconfig-mode flymake-yaml flymake-shell flymake-json flymake-google-cpplint flymake-go flymake-cursor flymake-css flymake flycheck exec-path-from-shell elpy diminish crontab-mode color-identifiers-mode coffee-mode anzu ac-js2 2048-game)))
  '(projectile-use-git-grep t)
  '(safe-local-variable-values
    (quote
-    (
-     (eval setq default-directory
+    ((eval setq default-directory
 	   (locate-dominating-file buffer-file-name ".dir-locals.el"))))))

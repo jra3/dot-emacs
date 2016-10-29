@@ -28,7 +28,9 @@
                      crontab-mode
                      gitconfig-mode
                      gitignore-mode
-
+		     realgud
+		     htmlize
+		     
                      ;; ido
                      ;; ido-ubiquitous
                      ;; flx-ido

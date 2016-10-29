@@ -1,6 +1,8 @@
 (with-eval-after-load 'go-mode
    (require 'go-autocomplete))
 
+(require 'go-dlv)
+
 (when (memq window-system '(mac ns))
   (exec-path-from-shell-initialize)
   (exec-path-from-shell-copy-env "GOPATH"))
@@ -8,6 +10,23 @@
 (defun auto-complete-for-go ()
   (auto-complete-mode 1))
 (add-hook 'go-mode-hook 'auto-complete-for-go)
+
+(defun string/starts-with (s begins)
+  "Return non-nil if string S starts with BEGINS."
+  (cond ((>= (length s) (length begins))
+	 (string-equal (substring s 0 (length begins)) begins))
+	(t nil)))
+
+(defun go-oracle-set-main ()
+  "set the scope to the current main package"
+  (interactive)
+
+  (let d (expand-file-name (pwd))
+       (message d)
+       (if (string/starts-with d (concat (getenv "GOPATH") "src/"))
+	   (message "win"))
+       )
+  )
 
 ;;;; Golang support
 (defun my-go-mode-hook ()
