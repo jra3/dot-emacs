@@ -7,6 +7,42 @@
 (add-to-list 'auto-mode-alist '("\\.org_archive\\'" . org-mode))
 
 (require 'org-protocol)
+(add-to-list 'org-protocol-protocol-alist
+             '("Hello World" :protocol "hello-world"
+               :function my-hello-world
+	       :kill-client t
+	       ))
+;; org-protocol:/hello-world:/
+
+(defun my-hello-world (data)
+  "Say hello to the world."
+  (message data)
+  (sit-for 3)
+  nil)
+
+(defadvice org-capture
+    (after make-full-window-frame activate)
+  "Advise capture to be the only window when used as a popup"
+  (if (equal "emacs-capture" (frame-parameter nil 'name))
+      (delete-other-windows)))
+
+(defadvice org-capture-finalize
+    (after delete-capture-frame activate)
+  "Advise capture-finalize to close the frame"
+  (if (equal "emacs-capture" (frame-parameter nil 'name))
+      (delete-frame)))
+
+
+(defun make-orgcapture-frame ()
+  "Create a new frame and run org-capture."
+  (interactive)
+  (make-frame '((name . "remember") (width . 80) (height . 16)
+                (top . 400) (left . 300)
+                (font . "-apple-Monaco-medium-normal-normal-*-13-*-*-*-m-0-iso10646-1")
+                ))
+  (select-frame-by-name "remember")
+  (org-capture))
+
 (require 'org-habit)
 (setq org-habit-preceding-days 7
       org-habit-following-days 1
@@ -21,7 +57,6 @@
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-cb" 'org-iswitchb)
-
 
 (setq org-stuck-projects '("project" ("TODO NEXT") ("action") "\\<IGNORE\\>" ))
 (setq org-tags-exclude-from-inheritance '("project"))
@@ -68,7 +103,13 @@
 			  "* %?\nLearned on %U :til:\n  %i\n  %a")
 
 			 )
+ 
+ ;; Fontify src blocks
+ org-src-fontify-natively t
 
+ org-export-html-style-include-scripts nil
+ org-export-html-style-include-default nil
+ 
  org-outline-path-complete-in-steps nil
 
  org-refile-use-outline-path t
@@ -122,7 +163,7 @@
  org-export-backends '(ascii beamer html texinfo latex)
  ;;most of these modules let you store links to various stuff in org
 
- org-modules '(org-bbdb org-gnus org-info man org-habit org-mime org-clock org-crypt org-bullets org-id)
+ org-modules '(org-bbdb org-gnus org-info man org-habit org-mime org-clock org-crypt org-bullets org-id org-protocol)
 
  ;; load in the org-modules
  ;;org-load-modules-maybe t

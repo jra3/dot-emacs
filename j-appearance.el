@@ -12,6 +12,8 @@
 ;; highlight matcing parens when cursor is on one
 (show-paren-mode t)
 
+(require 'htmlize)
+
 ;; hide n00b UI elements
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))

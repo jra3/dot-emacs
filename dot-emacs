@@ -28,7 +28,6 @@
                      crontab-mode
                      gitconfig-mode
                      gitignore-mode
-		     realgud
 		     htmlize
 		     
                      ;; ido
@@ -88,7 +87,6 @@
                      tangotango-theme
                      web-mode
 
-                     org-bullets
                      org-pomodoro
                      ))
 
