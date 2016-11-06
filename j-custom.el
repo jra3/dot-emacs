@@ -21,6 +21,9 @@
    (quote
     (("en" "<p class=\"author\">Author: %a (%e)</p>
 powered by <p class=\"creator\">%c</p><p class=\"validation\">%v</p>"))))
+ '(org-modules
+   (quote
+    (org-bbdb org-bibtex org-crypt org-gnus org-habit org-id org-info org-protocol org-bookmark)))
  '(org-stuck-projects
    (quote
     ("+project"

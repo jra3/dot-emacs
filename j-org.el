@@ -1,53 +1,31 @@
-;; (require 'org-install)
-
 (require 'org-ac)
 (org-ac/config-default)
 
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (add-to-list 'auto-mode-alist '("\\.org_archive\\'" . org-mode))
 
-(require 'org-protocol)
-(add-to-list 'org-protocol-protocol-alist
-             '("Hello World" :protocol "hello-world"
-               :function my-hello-world
-	       :kill-client t
-	       ))
-;; org-protocol:/hello-world:/
+;; (require 'org-protocol)
 
-(defun my-hello-world (data)
-  "Say hello to the world."
-  (message data)
-  (sit-for 3)
-  nil)
+;; An example of how custom sub-protocols work
 
-(defadvice org-capture
-    (after make-full-window-frame activate)
-  "Advise capture to be the only window when used as a popup"
-  (if (equal "emacs-capture" (frame-parameter nil 'name))
-      (delete-other-windows)))
+;; (add-to-list 'org-protocol-protocol-alist
+;;              '("Hello World" :protocol "hello-world"
+;;                :function my-hello-world
+;; 	       :kill-client t
+;; 	       ))
+;; ;; org-protocol:/hello-world:/
 
-(defadvice org-capture-finalize
-    (after delete-capture-frame activate)
-  "Advise capture-finalize to close the frame"
-  (if (equal "emacs-capture" (frame-parameter nil 'name))
-      (delete-frame)))
-
-
-(defun make-orgcapture-frame ()
-  "Create a new frame and run org-capture."
-  (interactive)
-  (make-frame '((name . "remember") (width . 80) (height . 16)
-                (top . 400) (left . 300)
-                (font . "-apple-Monaco-medium-normal-normal-*-13-*-*-*-m-0-iso10646-1")
-                ))
-  (select-frame-by-name "remember")
-  (org-capture))
+;; (defun my-hello-world (data)
+;;   "Say hello to the world."
+;;   (message data)
+;;   (sit-for 3)
+;;   nil)
 
 (require 'org-habit)
-(setq org-habit-preceding-days 7
+(setq org-habit-preceding-days 14
       org-habit-following-days 1
-      org-habit-graph-column 80
       org-habit-show-habits-only-for-today t
+      org-habit-graph-column 70
       org-habit-show-all-today t)
 
 ; I prefer return to activate a link
@@ -66,7 +44,16 @@
       '(
 	("w" todo "WAITING" nil ("waiting.txt")) 
 	("n" todo "NEXT" nil ("next.html"))
-	("d" "Agenda + Next Actions" ((agenda) (todo "NEXT"))))
+	("d" "Agenda + Next Actions" ((agenda) (todo "NEXT")))
+
+	("D" "Daily Action List"
+	 (
+	  (agenda "" ((org-agenda-ndays 1)
+		      (org-agenda-sorting-strategy
+		       (quote ((agenda time-up priority-down tag-up) )))
+		      (org-deadline-warning-days 0)
+		      ))))
+	)
       )
 
 (defun gtd ()
@@ -102,8 +89,16 @@
 			 ("l" "TIL" entry (file+datetree "~/org/journal.org" "TIL")
 			  "* %?\nLearned on %U :til:\n  %i\n  %a")
 
+					; 5-minute journal. Morning entry
+			 ("m" "5min morning" entry (file+datetree "~/org/5-min-journal.org")
+			  "* Morning\n  I am grateful for...\n  - %?\n  - \n  - \n\n  What will I do to make today great?\n  - \n  - \n  - \n\n  I am ...")
+					; 5-minute journal. Evening entry
+			 ("e" "5min evening" entry (file+datetree "~/org/5-min-journal.org")
+			  "* Evening\n  3 amazing things that happened today...\n  - %?\n  - \n  - \n\n  How could I have made today even better?\n  - \n")
+			 
 			 )
- 
+
+
  ;; Fontify src blocks
  org-src-fontify-natively t
 
@@ -119,12 +114,10 @@
  org-default-notes-file (concat org-directory "/notes.org")
  org-agenda-files (list "~/org/gtd.org"			
 			"~/org/work.org"
-			"~/org/personal.org")
+			"~/org/personal.org"
+			"~/org/habits.org")
 
-
- org-agenda-include-all-todo t 
- org-pomodoro-start-sound-p t
- 
+  org-pomodoro-start-sound-p t
  org-publish-use-timestamps-flag nil
  org-startup-folded (quote content))
 
@@ -139,7 +132,7 @@
  org-agenda-use-time-grid nil
  
   ;; whenever I change state from TODO to DONE org will log that timestamp. Let's put that in a drawer
- org-log-into-drawer t
+ org-log-into-drawer nil
 
  ;; make org-mode record the date when you finish a task
  org-log-done 'time
@@ -151,8 +144,7 @@
  ;; make the agenda start on today not wednesday
  org-agenda-start-on-weekday nil
 
- ;; don't make the agenda only show saturday and Sunday if today is saturday. Make it show 7 days
- org-agenda-span 7
+ org-agenda-span 1
  ;; this tells the agenda to take up the whole window and hide all other buffers
  org-agenda-window-setup 'current-window
  ;; this tells org-mode to only quit selecting tags for things when you tell it that you are done with it
@@ -161,9 +153,6 @@
  org-export-kill-product-buffer-when-displayed t
  ;; are there more backends that I can use?
  org-export-backends '(ascii beamer html texinfo latex)
- ;;most of these modules let you store links to various stuff in org
-
- org-modules '(org-bbdb org-gnus org-info man org-habit org-mime org-clock org-crypt org-bullets org-id org-protocol)
 
  ;; load in the org-modules
  ;;org-load-modules-maybe t
@@ -193,8 +182,8 @@
 
 ;; Change task state to STARTED when clocking in
 (setq org-clock-in-switch-to-state "STARTED")
-;; Save clock data and notes in the LOGBOOK drawer
-(setq org-clock-into-drawer t)
+;; ;; Save clock data and notes in the LOGBOOK drawer
+;; (setq org-clock-into-drawer t)
 ;; Removes clocked tasks with 0:00 duration
 (setq org-clock-out-remove-zero-time-clocks t)
 
@@ -202,41 +191,17 @@
 (setq org-time-clocksum-format
       '(:hours "%d" :require-hours t :minutes ":%02d" :require-minutes t))
 
-;; Show the clocked-in task - if any - in the header line
-(defun sanityinc/show-org-clock-in-header-line ()
-  (setq-default header-line-format '((" " org-mode-line-string " "))))
+;; ;; Show the clocked-in task - if any - in the header line
+;; (defun sanityinc/show-org-clock-in-header-line ()
+;;   (setq-default header-line-format '((" " org-mode-line-string " "))))
 
-(defun sanityinc/hide-org-clock-from-header-line ()
-  (setq-default header-line-format nil))
+;; (defun sanityinc/hide-org-clock-from-header-line ()
+;;   (setq-default header-line-format nil))
 
-(add-hook 'org-clock-in-hook #'sanityinc/show-org-clock-in-header-line)
-(add-hook 'org-clock-out-hook #'sanityinc/hide-org-clock-from-header-line)
-(add-hook 'org-clock-cancel-hook #'sanityinc/hide-org-clock-from-header-line)
-
-;; (eval-after-load 'org-clock
-;;   (define-key org-clock-mode-line-map [header-line mouse-2] #'org-clock-goto)
-;;   (define-key org-clock-mode-line-map [header-line mouse-1] #'org-clock-menu))
-
+;; (add-hook 'org-clock-in-hook #'sanityinc/show-org-clock-in-header-line)
+;; (add-hook 'org-clock-out-hook #'sanityinc/hide-org-clock-from-header-line)
+;; (add-hook 'org-clock-cancel-hook #'sanityinc/hide-org-clock-from-header-line)
 
  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defadvice capture-finalize (after delete-capture-frame activate)
-  "Advise capture-finalize to close the frame if it is the capture frame"
-  (if (equal "capture" (frame-parameter nil 'name))
-      (delete-frame)))
-
-(defadvice capture-destroy (after delete-capture-frame activate)
-  "Advise capture-destroy to close the frame if it is the rememeber frame"
-  (if (equal "capture" (frame-parameter nil 'name))
-      (delete-frame)))
-
-(defun make-capture-frame ()
-  "Create a new frame and run org-capture."
-  (interactive)
-  (make-frame '((name . "capture")))
-  (select-frame-by-name "capture")
-  (delete-other-windows)
-  (org-capture)
-  )
 
 (provide 'j-org)
