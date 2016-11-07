@@ -58,12 +58,12 @@
 (require 'go-autocomplete)
 (require 'auto-complete-config)
 
-;;Configure golint
-(add-to-list 'load-path "~/go/src/github.com/golang/lint/misc/emacs")
-(require 'golint)
+;; ;;Configure golint
+;; (add-to-list 'load-path "~/go/src/github.com/golang/lint/misc/emacs")
+;; (require 'golint)
 
-(add-to-list 'load-path "~/go/src/github.com/dougm/goflymake")
-(require 'go-flymake)
+;; (add-to-list 'load-path "~/go/src/github.com/dougm/goflymake")
+;; (require 'go-flymake)
 
 (define-key ac-mode-map (kbd "<C-tab>") 'auto-complete)
 

@@ -11,7 +11,7 @@
 ))
 
 (elpy-enable)
-(elpy-use-ipython)
+;(elpy-use-ipython)
 
 (setq elpy-default-minor-modes (quote
                                 (eldoc-mode flymake-mode yas-minor-mode auto-complete-mode))

@@ -87,6 +87,7 @@
                      tangotango-theme
                      web-mode
 
+		     org-ac
                      org-pomodoro
                      ))
 
