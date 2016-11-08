@@ -22,11 +22,11 @@
 ;;   nil)
 
 (require 'org-habit)
-(setq org-habit-preceding-days 14
-      org-habit-following-days 1
+(setq org-habit-preceding-days 7
+      org-habit-following-days 3
       org-habit-show-habits-only-for-today t
       org-habit-graph-column 70
-      org-habit-show-all-today t)
+      org-habit-show-all-today nil)
 
 ; I prefer return to activate a link
 (setq org-return-follows-link t)
