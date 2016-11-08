@@ -19,6 +19,7 @@
 
 (setq package-list '(2048-game
                      anzu
+		     bbdb
                      company
                      color-identifiers-mode
                      smex

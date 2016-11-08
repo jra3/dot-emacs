@@ -35,16 +35,15 @@
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-cb" 'org-iswitchb)
-
 (setq org-stuck-projects '("project" ("TODO NEXT") ("action") "\\<IGNORE\\>" ))
 (setq org-tags-exclude-from-inheritance '("project"))
 
 ; http://www.brool.com/post/using-org-mode-with-gtd/
 (setq org-agenda-custom-commands 
       '(
-	("w" todo "WAITING" nil ("waiting.txt")) 
-	("n" todo "NEXT" nil ("next.html"))
-	("d" "Agenda + Next Actions" ((agenda) (todo "NEXT")))
+	;; ("w" todo "WAITING" nil ("waiting.txt")) 
+	;; ("n" todo "NEXT" nil ("next.html"))
+	;; ("d" "Agenda + Next Actions" ((agenda) (todo "NEXT")))
 
 	("D" "Daily Action List"
 	 (
@@ -56,6 +55,11 @@
 	)
       )
 
+(defun org-id-finish (id)
+  (org-id-goto id)
+  (org-todo "DONE")
+  )
+
 (defun gtd ()
    (interactive)
    (find-file "~/org/gtd.org")
@@ -65,39 +69,42 @@
  org-directory "~/org"
 
  org-capture-templates '(
-					; New inbox item to be processed
-			 ("t" "Todo" entry (file+headline "~/org/gtd.org" "Inbox")
+
+			 ("t" "Todo" entry ; New inbox item to be processed
+			  (file+headline "~/org/gtd.org" "Inbox")
 			  "* TODO %?\n  %i\n  %a")
-			 
-					; Generic notebook entry
-			 ("n" "notes" entry (file+datetree "~/org/notes.org")
-			  "* %? %U\n")
-			 
-					; Create a new project entry
-			 ("p" "project" entry (file+headline "~/org/gtd.org" "Projects")
+
+			 ("p" "Project" entry ; Create a new project entry
+			  (file+headline "~/org/gtd.org" "Projects")
 			  "* %? :project:\n  %i\n")
 
-					; New inbox item to be processed
-			 ("a" "action" entry (file+headline "~/org/gtd.org" "Inbox")
+			 ("a" "Action" entry ; New inbox item to be processed
+			  (file+datetree "~/org/gtd.org" "Inbox")
 			  "* TODO %? :action:\n  %i\n")
 
-					; Freeform journal entry
-			 ("j" "Journal" entry (file+datetree "~/org/journal.org")
-			  "* %?\nEntered on %U\n  %i\n  %a")
-			 
-					; Breif TIL journal entry
-			 ("l" "TIL" entry (file+datetree "~/org/journal.org" "TIL")
+			 ("j" "Journal Entries")			 			 
+			 ("jm" "Precious Memory" entry ; Freeform journal entry
+			  (file+datetree "~/org/journal.org")
+			  "* %? :memory:\n  %i\n  %a")
+			 ("jl" "Today I Learned" entry ; Breif TIL journal entry
+			  (file+datetree "~/org/journal.org" "TIL")
 			  "* %?\nLearned on %U :til:\n  %i\n  %a")
+			 ("j." "Journal" entry ; Freeform journal entry
+			  (file+datetree "~/org/journal.org")
+			  "* %?\nEntered on %U\n  %i\n  %a")
 
-					; 5-minute journal. Morning entry
-			 ("m" "5min morning" entry (file+datetree "~/org/5-min-journal.org")
+			 ("5" "5 Minute Journal")
+			 ("5m" "Morning Entry" entry (file+datetree "~/org/5-min-journal.org")
 			  "* Morning\n  I am grateful for...\n  - %?\n  - \n  - \n\n  What will I do to make today great?\n  - \n  - \n  - \n\n  I am ...")
 					; 5-minute journal. Evening entry
-			 ("e" "5min evening" entry (file+datetree "~/org/5-min-journal.org")
+			 ("5e" "Evening Entry" entry (file+datetree "~/org/5-min-journal.org")
 			  "* Evening\n  3 amazing things that happened today...\n  - %?\n  - \n  - \n\n  How could I have made today even better?\n  - \n")
-			 
-			 )
 
+			 ("n" "notes" entry ; Generic notebook entry
+			  (file+datetree "~/org/notes.org")
+			  "* %? %U\n")
+
+			 )
 
  ;; Fontify src blocks
  org-src-fontify-natively t
@@ -115,12 +122,14 @@
  org-agenda-files (list "~/org/gtd.org"			
 			"~/org/work.org"
 			"~/org/personal.org"
+			"~/org/diary.org"
 			"~/org/habits.org")
 
-  org-pomodoro-start-sound-p t
+ org-pomodoro-start-sound-p t
  org-publish-use-timestamps-flag nil
  org-startup-folded (quote content))
 
+;(add-hook 'org-capture-after-finalize-hook (lambda () (org-id-finish "D51323BB-B5A3-4D22-B232-3182ED2A371A")))
 
 (setq
  org-hide-leading-stars t

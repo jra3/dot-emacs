@@ -1,24 +1,10 @@
 (require 'highlight-80+)
 
+(require 'bbdb)
+(bbdb-initialize 'gnus 'message)
+
 ;; alias y to yes and n to no
 (defalias 'yes-or-no-p 'y-or-n-p)
-
-;; (ido-mode t)
-;; (ido-everywhere t)
-;; (require 'ido-ubiquitous)
-;; (ido-ubiquitous-mode t)
-;; (require 'magit)
-;; (setq magit-completing-read-function 'magit-ido-completing-read)
-;; (require 'ido-vertical-mode)
-;; (ido-vertical-mode t)
-;; (setq ido-vertical-show-count t)
-;; (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
-
-;; (require 'flx-ido)
-;; (flx-ido-mode t)
-;; (setq ido-enable-flex-matching t)
-;; ;; disable ido faces to see flx highlights.
-;; (setq ido-use-faces nil)
 
 (setq tags-case-fold-search nil)
 
@@ -59,8 +45,7 @@
       
       flymake-no-changes-timeout 1
 
-      alert-user-configuration (quote ((nil notifier nil)))
-      )
+      alert-user-configuration (quote ((nil notifier nil))))
 
 ;; I prefer flymake it seems
 ;; (global-flycheck-mode)
@@ -76,8 +61,6 @@
         ("*Help*")
         ("*Completions*" :noselect t)
         ("*Occur*" :noselect t))))
-
-
 
 ;; Set +x on scripts stating with a shebang
 (add-hook 'after-save-hook
@@ -99,7 +82,6 @@
 (require 'yasnippet)
 (define-key yas-minor-mode-map (kbd "<shift TAB>") 'yas-expand)
 
-
 ;; Save point position between sessions
 (require 'saveplace)
 (setq-default save-place t)
@@ -113,7 +95,6 @@
 (defvar user-temporary-file-directory "~/tmp/saves/"
   (concat temporary-file-directory user-login-name "/"))
 (make-directory user-temporary-file-directory t)
-
 
 (setq magit-auto-revert-mode nil)
 (setq magit-last-seen-setup-instructions "1.4.0")
@@ -145,7 +126,6 @@
 ;; use unstupid regex syntax
 (require 're-builder)
 (setq reb-re-syntax 'string)
-
 
 ;; ---------------- Tweak Variables ---------------------
 (setq make-backup-files t        ;; make backup files on save

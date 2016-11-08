@@ -12,9 +12,14 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(calendar-mark-holidays-flag t)
+ '(calendar-view-holidays-initially-flag t)
  '(elpy-project-ignored-directories
    (quote
     (".bzr" "CVS" ".git" ".hg" ".svn" ".tox" "build" "dist" ".cask" "third_party" "third_party_dev" "node_modules" "interana_tailer/interana_tailer")))
+ '(holiday-bahai-holidays nil)
+ '(holiday-islamic-holidays nil)
+ '(holiday-oriental-holidays nil)
  '(markdown-command "multimarkdown")
  '(org-agenda-restore-windows-after-quit t)
  '(org-html-postamble-format
@@ -23,7 +28,7 @@
 powered by <p class=\"creator\">%c</p><p class=\"validation\">%v</p>"))))
  '(org-modules
    (quote
-    (org-bbdb org-bibtex org-crypt org-gnus org-habit org-id org-info org-protocol org-bookmark)))
+    (org-bbdb org-bibtex org-crypt org-gnus org-habit org-id org-info org-protocol)))
  '(org-stuck-projects
    (quote
     ("+project"
@@ -37,4 +42,5 @@ powered by <p class=\"creator\">%c</p><p class=\"validation\">%v</p>"))))
  '(safe-local-variable-values
    (quote
     ((eval setq default-directory
-	   (locate-dominating-file buffer-file-name ".dir-locals.el"))))))
+	   (locate-dominating-file buffer-file-name ".dir-locals.el")))))
+ '(send-mail-function (quote smtpmail-send-it)))
