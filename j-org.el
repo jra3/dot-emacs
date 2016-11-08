@@ -35,7 +35,8 @@
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-cb" 'org-iswitchb)
-(setq org-stuck-projects '("project" ("TODO NEXT") ("action") "\\<IGNORE\\>" ))
+
+(setq org-stuck-projects '("+project" ("TODO" "NEXT") () "\\<IGNORE\\>" ))
 (setq org-tags-exclude-from-inheritance '("project"))
 
 ; http://www.brool.com/post/using-org-mode-with-gtd/

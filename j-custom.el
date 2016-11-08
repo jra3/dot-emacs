@@ -29,12 +29,6 @@ powered by <p class=\"creator\">%c</p><p class=\"validation\">%v</p>"))))
  '(org-modules
    (quote
     (org-bbdb org-bibtex org-crypt org-gnus org-habit org-id org-info org-protocol)))
- '(org-stuck-projects
-   (quote
-    ("+project"
-     ("TODO NEXT")
-     ("action")
-     "\\<IGNORE\\>")))
  '(package-selected-packages
    (quote
     (org-mac-link org-mac-iCal org-mime puppet-mode org-ac yaml-mode web-mode thrift tangotango-theme smex rainbow-mode rainbow-delimiters popwin org-pomodoro org-bullets nose markdown-mode magit json-mode js2-refactor js-comint helm-unicode helm-swoop helm-pydoc helm-projectile helm-orgcard helm-flymake helm-flx helm-describe-modes helm-descbinds helm-css-scss helm-company helm-commandlinefu helm-c-yasnippet google-c-style go-rename go-eldoc go-dlv go-autocomplete gitignore-mode gitconfig-mode flymake-yaml flymake-shell flymake-json flymake-google-cpplint flymake-go flymake-cursor flymake-css flymake flycheck exec-path-from-shell elpy diminish crontab-mode color-identifiers-mode coffee-mode anzu ac-js2 2048-game)))
