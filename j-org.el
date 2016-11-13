@@ -44,7 +44,6 @@
       '(
 	;; ("w" todo "WAITING" nil ("waiting.txt")) 
 	;; ("n" todo "NEXT" nil ("next.html"))
-	;; ("d" "Agenda + Next Actions" ((agenda) (todo "NEXT")))
 
 	("D" "Daily Action List"
 	 (
@@ -53,6 +52,16 @@
 		       (quote ((agenda time-up priority-down tag-up) )))
 		      (org-deadline-warning-days 0)
 		      ))))
+	
+	("d" "Agenda + Next Actions"
+	 (
+	  (agenda "honker" ((org-agenda-ndays 1)
+		      (org-agenda-sorting-strategy
+		       (quote ((agenda time-up priority-down tag-up) )))
+		      (org-deadline-warning-days 0)
+		      ))
+	  (todo "NEXT"))
+	 )
 	)
       )
 
