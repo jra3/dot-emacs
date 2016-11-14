@@ -23,7 +23,7 @@
 
 (require 'org-habit)
 (setq org-habit-preceding-days 14
-      org-habit-following-days 3
+      org-habit-following-days 1
       org-habit-show-habits-only-for-today t
       org-habit-graph-column 66
       org-habit-show-all-today nil)
@@ -71,7 +71,16 @@
 		      (org-deadline-warning-days 0)
 		      ))
 	  (todo "NEXT")) nil ("week.html")
-	 )
+	  )
+
+	("W" "Weekly Review"
+	 ((agenda "" ((org-agenda-ndays 7))) ;; review upcoming deadlines and appointments
+	  ;; type "l" in the agenda to review logged items 
+	  (stuck "") ;; review stuck projects as designated by org-stuck-projects
+	  (tags-todo "project") ;; review all projects
+	  (todo "MAYBE") ;; review someday/maybe items
+	  (todo "WAITING"))) ;; review waiting items 
+	       
 	)
       )
 
