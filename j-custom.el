@@ -6,7 +6,9 @@
  '(flymake-errline ((((class color) (background dark)) (:background "DimGrey" :box nil))))
  '(flymake-warnline ((((class color)) (:background "Gray20"))))
  '(isearch ((t (:background "blue" :foreground "white"))))
- '(lazy-highlight ((t (:background "yellow" :foreground "black")))))
+ '(lazy-highlight ((t (:background "yellow" :foreground "black"))))
+ '(org-level-1 ((t (:foreground "dodger blue" :weight bold :height 1.0))))
+ '(org-level-2 ((t (:foreground "#edd400" :weight bold :height 1.0)))))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
