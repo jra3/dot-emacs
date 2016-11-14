@@ -60,7 +60,17 @@
 		       (quote ((agenda time-up priority-down tag-up) )))
 		      (org-deadline-warning-days 0)
 		      ))
-	  (todo "NEXT"))
+	  (todo "NEXT")) nil ("next.html")
+	  )
+
+	("w" "Weekly Agenda + Next Actions"
+	 (
+	  (agenda "weekly" ((org-agenda-ndays 7)
+		      (org-agenda-sorting-strategy
+		       (quote ((agenda time-up priority-down tag-up) )))
+		      (org-deadline-warning-days 0)
+		      ))
+	  (todo "NEXT")) nil ("week.html")
 	 )
 	)
       )
