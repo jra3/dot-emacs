@@ -94,9 +94,6 @@
    (find-file "~/org/gtd.org")
 )
 
-(add-hook 'org-after-refile-insert-hook 'save-buffer)
-(add-hook 'org-capture-after-finalize-hook 'save-buffer)
-
 (setq
  org-directory "~/org"
  
