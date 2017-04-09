@@ -1,5 +1,11 @@
 ;; -*- Emacs-Lisp -*-
+
 (defvar dot-emacs-dir "~/.dot-emacs")
+
+;; Any customizations that are particular to the env
+;; e.g. shared work configs
+(if (file-exists-p "~/.local.el")
+    (load "~/.local.el"))
 
 (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
     (let* ((my-lisp-dir dot-emacs-dir)
@@ -17,8 +23,7 @@
                          ("gnu" . "http://elpa.gnu.org/packages/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")))
 
-(setq package-list '(2048-game
-                     anzu
+(setq package-list '(anzu
 		     bbdb
                      company
                      color-identifiers-mode
@@ -30,7 +35,7 @@
                      gitconfig-mode
                      gitignore-mode
 		     htmlize
-		     
+
                      ;; ido
                      ;; ido-ubiquitous
                      ;; flx-ido
@@ -46,7 +51,7 @@
                      flymake-shell
                      flymake-yaml
 		     ;; flymake-go provided directly from go package
-		     
+
 		     go-mode
 		     go-eldoc
 		     go-autocomplete
@@ -66,9 +71,9 @@
                      helm-pydoc
                      helm-swoop
                      helm-unicode
-                     
+
                      markdown-mode
-		     
+
                      js-comint
                      js2-mode
                      ac-js2
