@@ -44,14 +44,8 @@
 		     auto-complete
 		     exec-path-from-shell
 
-                     flymake-css
-                     flymake-cursor
-                     flymake-google-cpplint
-                     flymake-json
-                     flymake-shell
-                     flymake-yaml
-		     ;; flymake-go provided directly from go package
-
+		     flycheck
+		     
 		     go-mode
 		     go-eldoc
 		     go-autocomplete
@@ -65,7 +59,7 @@
                      helm-descbinds
                      helm-describe-modes
                      helm-flx
-		     helm-flymake
+		     helm-flycheck
                      helm-orgcard
                      helm-projectile
                      helm-pydoc
@@ -76,9 +70,9 @@
 
                      js-comint
                      js2-mode
-                     ac-js2
                      js2-refactor
                      json-mode
+                     ac-js2
                      coffee-mode
 
                      yaml-mode
@@ -127,7 +121,6 @@
 (require 'j-yaml)
 (require 'j-markdown)
 
-; (require 'j-smex)
 (require 'j-helm)
 (require 'j-completion)
 (require 'j-web)
@@ -137,9 +130,10 @@
 (if (file-exists-p "~/.local-overrides.el")
     (load-file "~/.local-overrides.el"))
 
+;; Sweet, sweet diffs
 (add-hook 'ediff-load-hook
           (lambda ()
-            (flymake-mode nil)
+            (flycheck-mode nil)
             (setq ediff-highlight-all-diffs nil)
             (set-face-background
              ediff-current-diff-face-A "#1e2424")
@@ -154,7 +148,8 @@
             (make-face-italic
              ediff-current-diff-face-C)))
 
+;; No thanks, flycheck
 (add-hook 'ediff-prepare-buffer-hook
           (lambda ()
-            (flymake-mode nil)
+            (flycheck-mode nil)
             ))

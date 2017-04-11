@@ -43,12 +43,9 @@
       display-buffer-reuse-frames nil
       ediff-highlight-all-diffs nil
       
-      flymake-no-changes-timeout 1
-
       alert-user-configuration (quote ((nil notifier nil))))
 
-;; I prefer flymake it seems
-;; (global-flycheck-mode)
+(global-flycheck-mode)
 
 (setq popwin:special-display-config
       (quote
@@ -108,6 +105,8 @@
  kept-old-versions 2
  version-control t)       ; use versioned backups
 
+; disable vc integration, the repos can just be too big
+(setq vc-handled-backends nil)
 (setq vc-make-backup-files t)
 
 (setq backup-directory-alist

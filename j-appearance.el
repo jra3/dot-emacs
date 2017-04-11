@@ -30,7 +30,7 @@
 (require 'diminish)
 (defun load-diminish ()
   (diminish 'abbrev-mode "Abv")
-  (diminish 'flymake-mode "Fly"))
+  (diminish 'flycheck-mode "Fly"))
 (add-hook 'after-init-hook 'load-diminish)
 
 ;; unique buffer names using path
@@ -65,7 +65,7 @@
     (anzu-mode . "")
     (helm-mode . " ⎈")
     (projectile-mode . " ⍴")
-    (flymake-mode . " ⾶")    
+    (flycheck-mode . " ⾶")
     ;; Major modes
     (lisp-interaction-mode . "λ")
     (hi-lock-mode . "")
@@ -93,21 +93,5 @@ want to use in the modeline *in lieu of* the original.")
 
 
 (add-hook 'after-change-major-mode-hook 'clean-mode-line)
-
-;;; alias the new `flymake-report-status-slim' to
-;;; `flymake-report-status'
-(defalias 'flymake-report-status 'flymake-report-status-slim)
-(defun flymake-report-status-slim (e-w &optional status)
-  "Show \"slim\" flymake status in mode line."
-  (when e-w
-    (setq flymake-mode-line-e-w e-w))
-  (when status
-    (setq flymake-mode-line-status status))
-  (let* ((mode-line " Φ"))
-    (when (> (length flymake-mode-line-e-w) 0)
-      (setq mode-line (concat mode-line ":" flymake-mode-line-e-w)))
-    (setq mode-line (concat mode-line flymake-mode-line-status))
-    (setq flymake-mode-line mode-line)
-    (force-mode-line-update)))
  
 (provide 'j-appearance)
