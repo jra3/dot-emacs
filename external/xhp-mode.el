@@ -2,12 +2,43 @@
 
 ;; Copyright 2004-present Facebook.  All Rights Reserved.
 
+(eval-when-compile
+  (when (fboundp #'byte-compile-disable-warning)
+    (byte-compile-disable-warning 'cl-functions)
+    (byte-compile-disable-warning 'obsolete)
+    (byte-compile-disable-warning 'interactive-only)))
+
+(require 'cl)
+(require 'cc-mode)
 (require 'php-mode)
+(require 'xhp-indent)
+(require 'hack-mode)
 
 (defcustom xhp-mode-hook nil
   "list of functions to be executed on entry to xhp-mode."
   :type 'hook
   :group 'php)
+
+
+(defcustom xhp-mode-use-xhp-indent-p t
+  "set to t to use the new xhp-indent library for indenting xhp"
+  :group 'php)
+
+;;;###autoload
+(setq auto-mode-alist
+      (nconc
+       (mapcar
+        (lambda (pat)
+          (cons pat 'xhp-mode))
+        '("\\.php[s34]?\\'" "\\.phtml\\'" "\\.inc\\'" "\\.phpt?$"))
+       auto-mode-alist))
+
+;;;###autoload
+(add-to-list 'interpreter-mode-alist '("php" . xhp-mode))
+
+(defcustom xhp-mode-use-xhp-find-tag-p t
+  "set to t to use the new xhp-mode-find-tag-at-point"
+  :group 'xhp)
 
 (defun xhp-mode-xhp-context-p (start end)
   "Does the range include some XHP?"
@@ -112,37 +143,158 @@
       (xhp-mode-indent-line))))
 
 (defconst xhp-mode-font-lock-keywords-1
-  php-font-lock-keywords-1 ;; nothing to add at this level
+  (list
+   ;; Keywords
+   (cons
+    (concat "[^_$]?\\<\\(" hack-keywords "\\)\\>[^_]?")
+    '(1 'hack-keyword))
+
+   ;; Builtins
+   (cons
+    (concat "[^_$]?\\<\\(" hack-builtins "\\)\\>[^_]?")
+    '(1 'hack-builtin))
+   
+   '("\\<\\(break\\|case\\|continue\\)\\>\\s-+\\(-?\\sw+\\)?"
+     (1 'hack-keyword) (2 'hack-constant t t))
+   '("^\\s-*\\(\\sw+\\):\\>" (1 'hack-constant nil t))
+
+   ;; PHP/Hack Tag including mode header
+   '("<\\?\\(?:php\\|hh\\)\\s-*?" (0 font-lock-preprocessor-face)
+     ("//\\s-+\\(partial\\|decl\\|strict\\)" nil nil (1 font-lock-warning-face t t))))
   "Level 1 Font Lock for XHP Mode.")
 
 (defconst xhp-mode-font-lock-keywords-2
   (append
-   (list
-    '("\\<\\(class\\|interface\\)\\s-+\\([:a-zA-Z][-:a-zA-Z0-9]*\\)?"
-      (1 font-lock-keyword-face) (2 font-lock-type-face nil t))
-    '("\\<\\(new\\|extends\\|implements\\)\\s-+\\$?\\([:a-zA-Z][-:a-zA-Z0-9]*\\)"
-      (1 font-lock-keyword-face) (2 font-lock-type-face))
-    ;; TODO: XHP declaration classes - 'attribute', 'children', 'category' keywords
-    )
    xhp-mode-font-lock-keywords-1
-   php-font-lock-keywords-2)
+   (list
+    ;; Class Attributes
+    '("<<\\([a-z_][a-z0-9_:]*\\>,\\s-*\\)*\\([a-z_][a-z0-9_:]*\\>\\)>>"
+     (1 'hack-type nil t)
+     (2 'hack-type nil t))
+    ;; Type declarations
+    '("\\<\\(class\\|interface\\|trait\\|type\\|newtype\\)\\s-+\\(:?\\sw+\\)?"
+      (1 'hack-keyword) (2 'hack-type nil t))
+    ;; Tokens following certain keywords are known to be types
+    `("\\<\\(new\\|extends\\)\\s-+" (1 'hack-keyword)
+      (,hack-type-regexp nil nil (0 'hack-type nil t)))
+    ;; implements takes a list of types, handle it separately
+    `("\\<\\(implements\\)\\s-+\\$?" (1 'hack-keyword t) 
+      (,hack-type-regexp nil nil (0 'hack-type nil t)))
+    ;; Traits
+    `("\\<\\(use\\)\\s-+\\$?" (1 'hack-keyword t) 
+      (,hack-type-regexp nil nil (0 'hack-type nil t)))
+    ;; async must come before function keyword
+    '("\\<\\(\\(?:async\\s-+\\)?function\\)\\s-*&?\\(\\sw+\\)?\\s-*("
+      (1 'hack-keyword)
+      (2 'hack-function-name nil t))
+    
+    '("\\(?:[^$]\\|^\\)\\<\\(self\\|parent\\|static\\)\\>" (1 'hack-special nil nil))
+    ;; method and variable attributes
+    '("\\<\\(private\\|protected\\|public\\|static\\)\\s-+\\$?\\sw+"      
+      (1 'hack-attribute t t))
+    ;; method attributes 
+    '("\\<\\(abstract\\|final\\)\\s-+"
+      (1 'hack-attribute t t))
+
+    (cons
+     (concat "[^_$]?\\<\\(" hack-types "\\)\\>[^_]?")
+     '(1 'hack-type))
+    ;; TODO: XHP declaration classes - 'attribute', 'children', 'category' keywords
+    ))
   "Level 2 Font Lock for XHP Mode.")
 
 (defconst xhp-mode-font-lock-keywords-3
   (append
+   xhp-mode-font-lock-keywords-2
    (list
     ;; XHP "<abcd ..." and "</abcd ..."
-    '("\\(</?\\)\\([a-zA-Z:\-]+\\)" (1 php-default-face) (2 font-lock-type-face))
+    '("\\(</?\\)\\([a-zA-Z:\-]+\\)" (1 hack-default) (2 font-lock-type-face))
 
     ;; XML entities
     '("&\\w+;" . font-lock-constant-face)
 
-    ;; TODO: XHP element attributes
+    '("\\<\\($\\)\\sw+\\>" (1 'hack-dollar))
+    '("\\$\\(this\\)" (1 'hack-special))
+    '("\\$\\(\\sw+\\)" (1 'hack-variable-name t))
+    '("\\<[0-9]+" . 'hack-constant)
+    '("->\\(\\sw+\\)" (1 'hack-field-name t t))
+    '("->\\(\\sw+\\)\\s-*(" (1 'hack-method-call t t))
+    '("\\<\\([a-z\\_][a-z0-9\\_]*\\)\\s-*[[(]" (1 'hack-function-call))
+
+    ;; Highlight types where they are easy to detect
+    ;; Return types
+    `(")\\s-*:\\s-*" (,hack-type-regexp nil nil (0 'hack-type nil t)))
+
+    ;; Highlight special methods
+    (cons
+     (concat "\\<function\\s-+\\(" hack-special-methods "\\)(")
+     '(1 'hack-special t t))
+    
     )
-   xhp-mode-font-lock-keywords-2
-   php-font-lock-keywords-3)
+   )
   "Level 3 Font Lock for XHP mode.")
 
+(defun xhp-syntactic-fontify-detect-xhp-quote (limit)
+  "This function is meant to be used in conjunction with the
+standard font-lock syntax table so that it selectively marks
+single quote characters to be font-locked as punctuation.
+
+The way this works is that the font lock syntax table defines
+single quotes as being class '|' which is emacs voodoo for
+'special quote character that can be overridden', and then this
+function figures out which quotes to mark as punctuation. (See
+`font-lock-fontify-syntactic-keywords-region)
+
+This function possibly cheats in that it sets the punctuation
+property on all single-quotes in the range rather than returning
+t or nil and letting font-lock-fontify-syntactically-region do
+that, but performance requirements lead me to taking this
+approach.
+
+NOTE: this function assumes that it is never invoked with its
+point inside an xhp block.
+See `xhp-mode-font-lock-extend-region-around-xhp
+"
+  ;; useful debugging message, as you can't debug during display phase
+  ;; (message "point %i limit %i" (point) limit)
+  (let
+      (
+       (xhp-syntax)
+       (res)
+       )
+    ;; if we find something that might be the start of xhp begin
+    ;; looking for single quote in xhp
+    (while (re-search-forward xhp-start-regex limit t)
+      ;; while we're in xhp, markup any single quotes
+      (while (and
+              (re-search-forward "'" limit t)
+              (save-match-data
+                (backward-char) ;; move point to actual quote
+                (setq xhp-syntax (xhp-indent-xhp-detect))
+                (forward-char)
+                (xhp-indent-syntax-has-attribute xhp-syntax 'xhp-indent-in-xhp)))
+        ;; check that we're not between braces, i.e. in a single-line
+        ;; php statement within xhp.
+        (unless (xhp-indent-syntax-has-attribute xhp-syntax 'xhp-indent-php-in-xhp)
+          (font-lock-apply-syntactic-highlight '(0 ".")))))
+    ;; t means apply highlight, but we're already doing that in here, so always return false
+    ;; the reason for this is that the expected way to use this is to return t for every quote and let
+    ;; font-lock-fontify-syntactic-keywords-region apply the face, but that just isn't efficient.
+    nil))
+
+(defvar font-lock-beg)
+
+(defun xhp-mode-font-lock-extend-region-above-xhp ()
+  "Move fontification boundaries above any xhp block to make xhp parsing simpler"
+  (save-match-data
+    (let (xhp-start-pos changed-beg)
+      ;; idea: if beg/end is in xhp , move back/forward until we're outside
+      (goto-char font-lock-beg)
+      (if (setq xhp-start-pos (xhp-indent-start-pos))
+          (setq
+           font-lock-beg xhp-start-pos
+           changed-beg t))
+      changed-beg)))
 
 ;;;###autoload
 (define-derived-mode xhp-mode php-mode "XHP"
@@ -157,12 +309,77 @@
            xhp-mode-font-lock-keywords-3)
           nil                               ; KEYWORDS_ONLY
           t                                 ; CASE-FOLD
-          (("_" . "w") (?# . "< b"))        ; SYNTAX-ALIST
-          nil))                             ; SYNTAX-BEGIN
-
+          (("_" . "w") (?# . "< b")
+           ("'" . "|")
+           ("`" . "\"")
+           ("$" . ".")
+           ("#" . "< b")
+           ("/" . ". 124b")
+           ("*" . ". 23")
+           (?\n . "> b"))
+          ;; (("_" . "w") (?# . "< b")         ; SYNTAX-ALIST
+          ;;  ("'" . "|")) ;; treat single quote as special string
+          nil                               ; SYNTAX-BEGIN
+          ; OTHER-VARS
+          (font-lock-syntactic-keywords
+           . ((xhp-syntactic-fontify-detect-xhp-quote 0 ".")))
+          (font-lock-extend-region-functions
+           . (xhp-mode-font-lock-extend-region-above-xhp))))
   (setq indent-line-function 'xhp-mode-indent-line)
   (setq indent-region-function 'xhp-mode-indent-region)
+  (modify-syntax-entry ?< "_") ;; Treat '<' and '>' as syntactic whitespace
+  (modify-syntax-entry ?> "_") ;; band-aid fix for user attributes on classes
+
+  (when xhp-mode-use-xhp-indent-p
+    (require 'xhp-indent)
+    (xhp-indent-keybinds)
+    (setq indent-line-function 'xhp-indent-line-or-region)
+    (setq indent-region-function 'xhp-indent-line-or-region)
+    ;; c-mode overrides indent-for-tab-command for some reason
+    ;; (they even have a comment with 'is this the right thing to
+    ;; do?' there). if we want xhp indentation to work for regions
+    ;; as well we have to set this back. (previously this just used
+    ;; c-indent AFAICT, so this bug was hidden)
+    (substitute-key-definition
+     'c-indent-line-or-region
+     'indent-for-tab-command
+     xhp-mode-map)
+    )
+
+  (when xhp-mode-use-xhp-find-tag-p
+    (put 'xhp-mode 'find-tag-default-function 'xhp-mode-find-tag-at-point))
 
   (run-hooks 'xhp-mode-hook))
+
+;; A variation of find-tag-default that enables <xhp:tags:like:this to match.
+(defun xhp-mode-find-tag-at-point ()
+  "Determine default tag to search for, based on text at point.
+If there is no plausible default, return nil."
+  (let* ((xhp "\\(?:\\w\\|[_-]\\)") ;; xhp other than ':'
+         (re-symbol
+          (concat
+           ;; xhp (explicitly does not include "::")
+           ":?\\(?:\\(?1:\\(?::" xhp "\\|" xhp "\\)+\\)"
+           ;; optional static var after xhp class
+           "\\(?:::\\(?2:\\(?:\\w\\|_\\)+\\)\\)?\\)\\|"
+           ;; typical symbol (includes Static::refs)
+           "\\(?1:\\(\\w\\|_\\)+\\)\\(?:::\\(?2:\\(?:\\w\\|_\\)+\\)\\)?"))
+         (symbol-chars "a-zA-Z$_:-")
+         (non-chars (concat "^" symbol-chars)))
+    (flet ((skip-backward ()
+             (skip-chars-backward non-chars (line-beginning-position)))
+           (skip-forward ()
+             (skip-chars-forward non-chars (line-end-position)))
+           (test (initial-skip)
+             (save-excursion
+               (funcall initial-skip)
+               (skip-chars-backward symbol-chars (line-beginning-position))
+               (looking-at re-symbol))))
+      (when (or (test (lambda ()))
+                (test #'skip-backward)
+                (test #'skip-forward))
+        (let ((group (if (and (< (match-end 1) (point)) (match-end 2)) 2 1)))
+          (buffer-substring-no-properties
+           (match-beginning group) (match-end group)))))))
 
 (provide 'xhp-mode)

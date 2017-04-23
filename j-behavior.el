@@ -8,8 +8,13 @@
 
 (setq tags-case-fold-search nil)
 
-;; spell checking in comments & strings
-;;(add-hook ‘prog-mode-hook ‘flyspell-prog-mode)
+;; subword mode for all programming languages
+(add-hook 'prog-mode-hook 'subword-mode)
+
+;; ;; spell checking in comments & strings
+;; (add-hook ‘prog-mode-hook ‘flyspell-prog-mode)
+
+(add-hook 'before-save-hook whitespace-cleanup nil 'local)
 
 ;; mouse scroll
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control))))
@@ -45,7 +50,7 @@
       
       alert-user-configuration (quote ((nil notifier nil))))
 
-(global-flycheck-mode)
+;(global-flycheck-mode)
 
 (setq popwin:special-display-config
       (quote
@@ -72,9 +77,9 @@
 ;; show number of matches
 (global-anzu-mode +1)
 
-;; Awesome repo navigation
-(projectile-global-mode)
-(setq projectile-use-git-grep t)
+;; ;; Awesome repo navigation
+;; (projectile-global-mode)
+;; (setq projectile-use-git-grep t)
 
 (require 'yasnippet)
 (define-key yas-minor-mode-map (kbd "<shift TAB>") 'yas-expand)

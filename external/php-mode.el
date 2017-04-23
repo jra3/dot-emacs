@@ -279,7 +279,7 @@ See `php-beginning-of-defun'."
           (php-check-html-for-indentation))
       (funcall 'c-indent-line)))
 
-(defconst php-tags '("<?php" "?>" "<?" "<?="))
+(defconst php-tags '("<?php" "?>" "<?" "<?=" "<?hh"))
 (defconst php-tags-key (regexp-opt php-tags))
 
 (defconst php-block-stmt-1-kwds '("do" "else" "finally" "try"))
@@ -291,7 +291,7 @@ See `php-beginning-of-defun'."
 (defconst php-block-stmt-2-key
   (regexp-opt php-block-stmt-2-kwds))
 
-(defconst php-class-decl-kwds '("class" "interface"))
+(defconst php-class-decl-kwds '("class" "interface" "trait"))
 
 (defconst php-class-key
   (concat
@@ -315,7 +315,7 @@ See `php-beginning-of-defun'."
   (set (make-local-variable 'c-opt-cpp-prefix) php-tags-key)
 
   (c-set-offset 'cpp-macro 0)
-  
+
 ;;   (c-lang-defconst c-block-stmt-1-kwds php php-block-stmt-1-kwds)
 ;;   (c-lang-defvar c-block-stmt-1-kwds (c-lang-const c-block-stmt-1-kwds))
   (set (make-local-variable 'c-block-stmt-1-key) php-block-stmt-1-key)
@@ -341,7 +341,7 @@ See `php-beginning-of-defun'."
            php-font-lock-keywords-3)
           nil                               ; KEYWORDS-ONLY
           t                                 ; CASE-FOLD
-          (("_" . "w"))                    ; SYNTAX-ALIST
+          (("_" . "w") (?# . "< b"))        ; SYNTAX-ALIST
           nil))                             ; SYNTAX-BEGIN
 
   ;; Electric behaviour must be turned off, they do not work since
@@ -390,6 +390,11 @@ See `php-beginning-of-defun'."
        "^\\s-*function\\s-+&?\\s-*\\(\\(\\sw\\|\\s_\\)+\\)\\s-*")
   (set (make-local-variable 'add-log-current-defun-header-regexp)
        php-beginning-of-defun-regexp)
+
+  ;; Tell php-mode to use // comments.  (Without this, it can't wrap //-style
+  ;; comments correctly.)
+  (setq comment-start "// "
+        comment-end "")
 
   (run-hooks 'php-mode-hook))
 
@@ -940,13 +945,13 @@ current `tags-file-name'."
   (eval-when-compile
     (regexp-opt
      ;; "class", "new" and "extends" get special treatment
-     ;; "case" and "default" get special treatment elsewhere
-     '("and" "as" "break" "continue" "declare" "do" "echo" "else" "elseif"
-       "endfor" "endforeach" "endif" "endswitch" "endwhile" "exit"
+     ;; "case" gets special treatment elsewhere
+     '("and" "as" "break" "continue" "declare" "default" "do" "echo" "else"
+       "elseif" "endfor" "endforeach" "endif" "endswitch" "endwhile" "exit"
        "extends" "for" "foreach" "global" "if" "include" "include_once"
        "next" "or" "require" "require_once" "return" "static" "switch"
        "then" "var" "while" "xor" "throw" "catch" "try"
-       "instanceof" "catch all" "finally")))
+       "instanceof" "catch all" "finally" "yield" "use" "namespace" "goto")))
   "PHP keywords.")
 
 (defconst php-identifier
@@ -958,7 +963,7 @@ current `tags-file-name'."
   (eval-when-compile
     (regexp-opt '("array" "bool" "boolean" "char" "const" "double" "float"
                   "int" "integer" "long" "mixed" "object" "real"
-                  "string")))
+                  "string" "void")))
   "PHP types.")
 
 (defconst php-superglobals
@@ -981,8 +986,8 @@ current `tags-file-name'."
     '(1 font-lock-keyword-face))
 
    ;; Fontify keywords and targets, and case default tags.
-   (list "\\<\\(break\\|case\\|continue\\)\\>\\s-+\\(-?\\sw+\\)?"
-         '(1 font-lock-keyword-face) '(2 font-lock-constant-face t t))
+   (list "\\<\\(break\\|case\\|continue\\|default\\)\\>\\s-+\\(-?\\sw+\\)?"
+         '(1 font-lock-keyword-face) '(2 font-lock-constant-face keep t))
    ;; This must come after the one for keywords and targets.
    '(":" ("^\\s-+\\(\\sw+\\)\\s-+\\s-+$"
           (beginning-of-line) (end-of-line)
@@ -1008,7 +1013,7 @@ current `tags-file-name'."
    (list
 
     ;; class declaration
-    '("\\<\\(class\\|interface\\)\\s-+\\(\\sw+\\)?"
+    '("\\<\\(class\\|interface\\|trait\\)\\s-+\\(\\sw+\\)?"
       (1 font-lock-keyword-face) (2 font-lock-type-face nil t))
     ;; handle several words specially, to include following word,
     ;; thereby excluding it from unknown-symbol checks later
@@ -1018,7 +1023,7 @@ current `tags-file-name'."
       (1 font-lock-keyword-face) (2 font-lock-type-face))
 
     ;; function declaration
-    '("\\<\\(function\\)\\s-+&?\\(\\sw+\\)\\s-*("
+    '("\\<\\(function\\)\\b\\s-*&?\\(\\sw+\\)?\\s-*("
       (1 font-lock-keyword-face)
       (2 font-lock-function-name-face nil t))
 
@@ -1026,17 +1031,20 @@ current `tags-file-name'."
     '("\\<\\(self\\|parent\\)\\>" (1 font-lock-constant-face nil nil))
 
     ;; method and variable features
-    '("\\<\\(private\\|protected\\|public\\)\\s-+\\$?\\sw+"
-      (1 font-lock-keyword-face))
+    '("\\<\\(private\\|protected\\|public\\)\\s-+\\([?]?\\sw+\\)?\\s-+\\$?\\sw+"
+      (1 font-lock-keyword-face)
+      (2 font-lock-type-face)
+      )
 
     ;; method features
-    '("^\\s-*\\(abstract\\|static\\|final\\)\\s-+\\$?\\sw+"
+    '("\\s-*\\(abstract\\|static\\|final\\)\\s-+\\$?\\sw+"
       (1 font-lock-keyword-face))
 
     ;; variable features
-    '("^\\s-*\\(static\\|const\\)\\s-+\\$?\\sw+"
-      (1 font-lock-keyword-face))
-    ))
+    '("^\\s-*\\(static\\|const\\)\\s-+\\([?]?\\sw+\\)?\\s-+\\$?\\sw+"
+      (1 font-lock-keyword-face)
+      (2 font-lock-type-face)
+    )))
   "Medium level highlighting for PHP mode.")
 
 (defconst php-font-lock-keywords-3
@@ -1048,14 +1056,14 @@ current `tags-file-name'."
     ;;'("</?\\sw+[^> ]*>" . font-lock-constant-face)
     ;;'("</?\\sw+[^>]*" . font-lock-constant-face)
     ;;'("<!DOCTYPE" . font-lock-constant-face)
-    '("</?[a-z!:]+" . font-lock-constant-face)
+    ;;'("</?[a-z!:]+" . font-lock-constant-face)
 
     ;; HTML >
-    '("<[^>]*\\(>\\)" (1 font-lock-constant-face))
+    ;;'("<[^>]*\\(>\\)" (1 font-lock-constant-face))
 
     ;; HTML tags
-    '("\\(<[a-z]+\\)[[:space:]]+\\([a-z:]+=\\)[^>]*?" (1 font-lock-constant-face) (2 font-lock-constant-face) )
-    '("\"[[:space:]]+\\([a-z:]+=\\)" (1 font-lock-constant-face))
+    ;;'("\\(<[a-z]+\\)[[:space:]]+\\([a-z:]+=\\)[^>]*?" (1 font-lock-constant-face) (2 font-lock-constant-face) )
+    ;;'("\"[[:space:]]+\\([a-z:]+=\\)" (1 font-lock-constant-face))
 
     ;; HTML entities
     ;;'("&\\w+;" . font-lock-variable-name-face)
@@ -1077,16 +1085,25 @@ current `tags-file-name'."
       1 font-lock-type-face)
 
     ;; PHP5: function declarations may contain classes as parameters type
-    `(,(concat "[(,]\\s-*\\(\\sw+\\)\\s-+&?\\$\\sw+\\>")
+    `(,(concat "[(,]\\s-*[?]?\\(\\sw+\\)\\s-+&?\\$\\sw+\\>")
       1 font-lock-type-face)
+
+    ;; return type annotations: remove the space edition
+    '("[)]\\(\\s-+:\\)\\s-+\\([?]?\\sw+\\)\\s-+[{]"
+       (1 font-lock-warning-face)
+       (2 font-lock-type-face))
+
+    ;; return type annotations: you got the ":" right edition
+     '("[)]:\\s-+\\([?]?\\sw+\\)\\s-+[{]"
+       (1 font-lock-type-face))
 
     ;; Fontify variables and function calls
     '("\\$\\(this\\|that\\)\\W" (1 font-lock-constant-face nil nil))
     `(,(concat "\\$\\(" php-superglobals "\\)\\W")
       (1 font-lock-constant-face nil nil)) ;; $_GET & co
     '("\\$\\(\\sw+\\)" (1 font-lock-variable-name-face)) ;; $variable
-    '("->\\(\\sw+\\)" (1 font-lock-variable-name-face t t)) ;; ->variable
-    '("->\\(\\sw+\\)\\s-*(" . (1 php-default-face t t)) ;; ->function_call
+    '("->\\(\\sw+\\)\\s-*(" . (1 php-default-face keep t)) ;; ->function_call
+    '("->\\(\\sw+\\)" (1 font-lock-variable-name-face keep t)) ;; ->variable
     '("\\(\\sw+\\)::\\sw+\\s-*(?" . (1 font-lock-type-face)) ;; class::member
     '("::\\(\\sw+\\>[^(]\\)" . (1 php-default-face)) ;; class::constant
     '("\\<\\sw+\\s-*[[(]" . php-default-face) ;; word( or word[

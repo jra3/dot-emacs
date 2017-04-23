@@ -2,16 +2,18 @@
 
 (defvar dot-emacs-dir "~/.dot-emacs")
 
-;; Any customizations that are particular to the env
-;; e.g. shared work configs
-(if (file-exists-p "~/.local.el")
-    (load "~/.local.el"))
-
 (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
     (let* ((my-lisp-dir dot-emacs-dir)
            (default-directory my-lisp-dir))
       (add-to-list 'load-path my-lisp-dir)
       (normal-top-level-add-subdirs-to-load-path)))
+
+(require 'xhp-mode)
+
+;; Any customizations that are particular to the env
+;; e.g. shared work configs
+(if (file-exists-p "~/.local.el")
+    (load "~/.local.el"))
 
 (add-to-list 'exec-path "/usr/local/bin")
 (add-to-list 'exec-path "~/.local/bin")
@@ -23,73 +25,79 @@
                          ("gnu" . "http://elpa.gnu.org/packages/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")))
 
-(setq package-list '(anzu
-		     bbdb
-                     company
-                     color-identifiers-mode
-                     smex
-                     thrift
-                     diminish
-                     elpy
-                     crontab-mode
-                     gitconfig-mode
-                     gitignore-mode
-		     htmlize
+(defvar package-list
+  '(
+    ag  ; the silver searcher!
+    anzu
+    bbdb
+    company
+    color-identifiers-mode
+    smex
+    thrift
+    diminish
+    elpy
+    crontab-mode
+    gitconfig-mode
+    gitignore-mode
+    htmlize
 
-                     ;; ido
-                     ;; ido-ubiquitous
-                     ;; flx-ido
-                     ;; ido-vertical-mode
+    rtags
+    helm-rtags
+    company-rtags
+    flycheck-rtags
+    
+    ;; ido
+    ;; ido-ubiquitous
+    ;; flx-ido
+    ;; ido-vertical-mode
 
-		     auto-complete
-		     exec-path-from-shell
+    auto-complete
+    exec-path-from-shell
 
-		     flycheck
-		     
-		     go-mode
-		     go-eldoc
-		     go-autocomplete
-		     go-rename
-		     go-dlv
+    flycheck
+    
+    go-mode
+    go-eldoc
+    go-autocomplete
+    go-rename
+    go-guru
+    
+    helm-c-yasnippet
+    helm-commandlinefu
+    helm-company
+    helm-css-scss
+    helm-descbinds
+    helm-describe-modes
+    helm-flx
+    helm-flycheck
+    helm-orgcard
+    helm-projectile
+    helm-pydoc
+    helm-swoop
+    helm-unicode
 
-                     helm-c-yasnippet
-                     helm-commandlinefu
-                     helm-company
-                     helm-css-scss
-                     helm-descbinds
-                     helm-describe-modes
-                     helm-flx
-		     helm-flycheck
-                     helm-orgcard
-                     helm-projectile
-                     helm-pydoc
-                     helm-swoop
-                     helm-unicode
+    markdown-mode
 
-                     markdown-mode
+    js-comint
+    js2-mode
+    js2-refactor
+    json-mode
+    coffee-mode
 
-                     js-comint
-                     js2-mode
-                     js2-refactor
-                     json-mode
-                     ac-js2
-                     coffee-mode
+    yaml-mode
+    google-c-style
+    multiple-cursors
+    magit
+    nose
+    popwin
+    projectile
+    rainbow-mode
+    rainbow-delimiters
+    tangotango-theme
+    web-mode
 
-                     yaml-mode
-                     google-c-style
-                     multiple-cursors
-                     magit
-                     nose
-                     popwin
-                     projectile
-                     rainbow-mode
-                     rainbow-delimiters
-                     tangotango-theme
-                     web-mode
-
-		     org-ac
-                     org-pomodoro
-                     ))
+    org-pomodoro
+    ))
 
 (package-initialize)
 
@@ -130,6 +138,9 @@
 (if (file-exists-p "~/.local-overrides.el")
     (load-file "~/.local-overrides.el"))
 
+(with-eval-after-load 'flycheck
+  (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+
 ;; Sweet, sweet diffs
 (add-hook 'ediff-load-hook
           (lambda ()
@@ -147,9 +158,3 @@
              ediff-current-diff-face-B)
             (make-face-italic
              ediff-current-diff-face-C)))
-
-;; No thanks, flycheck
-(add-hook 'ediff-prepare-buffer-hook
-          (lambda ()
-            (flycheck-mode nil)
-            ))
