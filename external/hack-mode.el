@@ -29,6 +29,11 @@
   :prefix "hack-"
   :group 'languages)
 
+(defcustom hack-fontify-function-calls t
+  "Fontify function and method calls if this is non-nil."
+  :type 'boolean
+  :group 'hack)
+
 (defface hack-default
   '((default
       (:inherit default)))
@@ -107,122 +112,213 @@
   "Face for method call expressions"
   :group 'hack)
 
-(defconst hack-keywords
-  (eval-when-compile
-    (regexp-opt
-     '("exit" "die" "const" "return" "yield" "try" "catch" "finally"
-       "throw" "if" "else" "while" "do" "for" "foreach" "instanceof"
-       "as" "switch" "default" "goto" "attribute" "category"
-       "children" "enum" "clone" "include" "include_once" "require"
-       "require_once" "namespace" "use" "global" "await")))
-  "Hack Keywords.")
-
 (defconst hack-builtins
-  (eval-when-compile
-    (regexp-opt
-     '("echo" "tuple" "list" "empty" "isset" "unset")))
+  '("echo" "tuple" "list" "empty" "isset" "unset")
   "Hack builtins.")
 
-(defconst hack-type-regexp
-  "\\(?::\\|\\<\\)[a-z_][a-z0-9_:]*\\>")
+(defconst hack-keywords
+  '("exit" "die" "const" "return" "yield" "try" "catch" "finally"
+    "throw" "if" "else" "while" "do" "for" "foreach" "instanceof"
+    "as" "switch" "default" "goto" "attribute" "category"
+    "children" "enum" "clone" "include" "include_once" "require"
+    "require_once" "namespace" "use" "global" "await")
+  "Hack Keywords.")
 
-(defconst hack-attribute-regexp
-  (concat "\\\\<\\\\<\\(" hack-type-regexp ",\s-*\\)*\\(" hack-type-regexp "\\)\\\\>\\\\>"))
+(defconst hack-keywords-2
+  '("case" "continue")
+  "Hack flow control"
+  )
+
+(defconst hack-special-methods
+  '("__construct" "__destruct" "__toString" "__clone" "__sleep" "__wakeup")
+  "Special Hack methods.")
+
+(defconst hack-identifier-regexp "[[:alpha:]][[:alnum:]_:]*")
+(defconst hack-label-regexp hack-identifier-regexp)
+(defconst hack-func-regexp (concat "\\_<function\\_>[[:space:]]*\\(" hack-identifier-regexp "\\)"))
+
+;; types allow more chars than other things
+(defconst hack-type-regexp "\\(?::\\|\\<\\)[[:alpha:]:_][[:alnum:]-:_]*")
+
+;; (defconst hack-attribute-regexp
+;;   (concat "\\\\<\\\\<\\(" hack-type-regexp ",\s-*\\)*\\(" hack-type-regexp "\\)\\\\>\\\\>"))
+
+(defconst hack-constants '("null" "true" "false"))
 
 (defconst hack-types
   (eval-when-compile
-    (regexp-opt '("array" "bool" "char" "float" "int" "mixed" "string" "void")))
+    (regexp-opt '("array" "bool" "char" "float" "int" "mixed" "string" "void"
+                  "Vector" "Map" "Set"
+                  "vec" "dict" "keyset")))
   "Hack types.")
 
-(defconst hack-special-methods
-  (eval-when-compile
-    (regexp-opt '("__construct" "__destruct" "__toString" "__clone" "__sleep" "__wakeup")))
-  "Special Hack methods.")
+(defvar hack-mode-syntax-table
+  (let ((st (make-syntax-table)))
+    (modify-syntax-entry ?_  "w" st)
+    (modify-syntax-entry ?\' "\"" st)
+    (modify-syntax-entry ?`  "\"" st)
 
-(defconst hack-font-lock-keywords-1
-  (list
-   ;; Keywords
-   (cons
-    (concat "[^_$]?\\<\\(" hack-keywords "\\)\\>[^_]?")
-    '(1 'hack-keyword))
+    (modify-syntax-entry ?$  "." st)
+    (modify-syntax-entry ?#  "< b" st)    
+    
+    (modify-syntax-entry ?+  "." st)
+    (modify-syntax-entry ?-  "." st)
+    (modify-syntax-entry ?%  "." st)
+    (modify-syntax-entry ?&  "." st)
+    (modify-syntax-entry ?|  "." st)
+    (modify-syntax-entry ?^  "." st)
+    (modify-syntax-entry ?!  "." st)
+    (modify-syntax-entry ?=  "." st)
+    (modify-syntax-entry ?<  "." st)
+    (modify-syntax-entry ?>  "." st)
+    (modify-syntax-entry ?/  ". 124b" st)
+    (modify-syntax-entry ?*  ". 23" st)
+    (modify-syntax-entry ?\n "> b" st)
+    (modify-syntax-entry ?\" "\"" st)
+    (modify-syntax-entry ?\\ "\\" st)
+    st)
+  "Syntax table for Hack mode.")
 
-   ;; Builtins
-   (cons
-    (concat "[^_$]?\\<\\(" hack-builtins "\\)\\>[^_]?")
-    '(1 'hack-builtin))
-   
-   '("\\<\\(break\\|case\\|continue\\)\\>\\s-+\\(-?\\sw+\\)?"
-     (1 'hack-keyword) (2 'hack-constant t t))
-   '("^\\s-*\\(\\sw+\\):\\>" (1 'hack-constant nil t))
 
-   ;; PHP/Hack Tag including mode header
-   '("<\\?\\(?:php\\|hh\\)\\s-*?" (0 font-lock-preprocessor-face)
-     ("//\\s-+\\(partial\\|decl\\|strict\\)" nil nil (1 font-lock-warning-face t t))))
-  "Minimal highlighting for Hack mode.")
+    ;; TODO make _ a symbol constituent now that xemacs is gone
 
-(defconst hack-font-lock-keywords-2
+;; (defun hack--match-func (end)
+;;   "Search for identifiers used as type names from a function
+;; parameter list, and set the identifier positions as the results
+;; of last search.  Return t if search succeeded."
+;;   (when (re-search-forward "\\_<func\\_>" end t)
+;;     (let ((regions (hack--match-func-type-names end)))
+;;       (if (null regions)
+;;           ;; Nothing to highlight. This can happen if the current func
+;;           ;; is "func()". Try next one.
+;;           (hack--match-func end)
+;;         ;; There are something to highlight. Set those positions as
+;;         ;; last search results.
+;;         (setq regions (hack--filter-match-data regions end))
+;;         (when regions
+;;           (set-match-data (hack--make-match-data regions))
+;;           t)))))
+
+;; (defun hack--match-func-type-names (end)
+;;   (cond
+;;    ;; Function declaration (e.g. "func foo(")
+;;    ((looking-at (concat "[[:space:]\n]*" go-identifier-regexp "[[:space:]\n]*("))
+;;     (goto-char (match-end 0))
+;;     (nconc (hack--match-parameter-list end)
+;;            (hack--match-function-result end)))
+;;    ;; Method declaration, function literal, or function type
+;;    ((looking-at "[[:space:]]*(")
+;;     (goto-char (match-end 0))
+;;     (let ((regions (hack--match-parameter-list end)))
+;;       ;; Method declaration (e.g. "func (x y) foo(")
+;;       (when (looking-at (concat "[[:space:]]*" go-identifier-regexp "[[:space:]\n]*("))
+;;         (goto-char (match-end 0))
+;;         (setq regions (nconc regions (hack--match-parameter-list end))))
+;;       (nconc regions (hack--match-function-result end))))))
+
+(require 'php-mode)
+
+(defconst hack-mode-font-lock-keywords-1
   (append
-   hack-font-lock-keywords-1
    (list
+
+    ;; keywords
+    (cons
+     (concat "\\_<" (regexp-opt hack-keywords t) "\\_>") 'font-lock-keyword-face)
+    
+    ;; case, goto...
+    (cons
+     (concat "\\(\\_<" (regexp-opt hack-keywords-2 t) "\\_>\\)[[:space:]]+\\(-?[[:word:]]+\\)?")      
+     '('(1 'hack-keyword)
+       '(2 'hack-constant t t)))
+
+    ;; builtins
+    (cons
+     (concat "\\(\\_<" (regexp-opt hack-builtins t) "\\_>\\)[[:space:]]*(")
+     '(1 font-lock-builtin-face)) 
+    ;; '((concat "\\_<" (regexp-opt hack-constants t) "\\_>") . font-lock-constant-face)                  ;; constants
+
+    ;; PHP/Hack Tag including mode header
+    '("<\\?\\(?:php\\|hh\\)[[:space:]]*?" (0 font-lock-preprocessor-face)
+      ("//[[:space:]]+\\(partial\\|decl\\|strict\\)" nil nil (1 font-lock-warning-face t t)))
+
+    )
+   php-font-lock-keywords-1 
+   )
+  "Level 1 Font Lock extending php-mode"
+  )
+
+(defconst hack-mode-font-lock-keywords-2
+  (append
+   (list
+
     ;; Class Attributes
-    '("<<\\([a-z_][a-z0-9_:]*\\>,\\s-*\\)*\\([a-z_][a-z0-9_:]*\\>\\)>>"
-     (1 'hack-type nil t)
-     (2 'hack-type nil t))
+    (cons
+     (concat "<<\\(?:\\(" hack-type-regexp "\\),[[:space:]]*\\)*\\(" hack-type-regexp "\\)>>")
+     '((1 'hack-type nil t)
+       (2 'hack-type nil t)))
+
     ;; Type declarations
-    '("\\<\\(class\\|interface\\|trait\\|type\\|newtype\\)\\s-+\\(:?\\sw+\\)?"
-      (1 'hack-keyword) (2 'hack-type nil t))
+    (cons
+     (concat "\\<\\(class\\|interface\\|trait\\|type\\|newtype\\)[[:space:]]+\\(" hack-type-regexp "\\)")
+     '((1 'hack-keyword)
+       (2 'hack-type nil t)))
+    
     ;; Tokens following certain keywords are known to be types
-    `("\\<\\(new\\|extends\\)\\s-+" (1 'hack-keyword)
+    '("\\<\\(new\\|extends\\)[[:space:]]+" (1 'hack-keyword)
       (,hack-type-regexp nil nil (0 'hack-type nil t)))
+
     ;; implements takes a list of types, handle it separately
-    `("\\<\\(implements\\)\\s-+\\$?" (1 'hack-keyword t)
+    '("\\<\\(implements\\)[[:space:]]+\\$?" (1 'hack-keyword t)
       (,hack-type-regexp nil nil (0 'hack-type- nil t)))
+
+    ;; ;; function
+    ;; (cons
+    ;;  hack-func-regexp 1 font-lock-function-name-face)
+
     ;; async must come before function keyword
-    '("\\<\\(\\(?:async\\s-+\\)?function\\)\\s-*&?\\(\\sw+\\)?\\s-*("
+    '("\\<\\(\\(?:async[[:space:]]+\\)?function\\)[[:space:]]*&?\\(\\sw+\\)?[[:space:]]*("
       (1 'hack-keyword)
       (2 'hack-function-name nil t))
-    
-    
-    '("\\(?:[^$]\\|^\\)\\<\\(self\\|parent\\|static\\)\\>" (1 'hack-special nil nil))
-    ;; method and variable attributes
-    '("\\<\\(private\\|protected\\|public\\|static\\)\\s-+\\$?\\sw+"      
-      (1 'hack-attribute t t))
-    ;; method attributes 
-    '("\\<\\(abstract\\|final\\)\\s-+"
+
+    '("\\(?:[^$]\\|^\\)\\<\\(self\\|parent\\|static\\)\\>" (1 'hack-special nil nil))     
+
+    '("\\<\\(private\\|protected\\|public\\|static\\)[[:space:]]+\\$?\\sw+"      
       (1 'hack-attribute t t))
 
+    '("\\<\\(abstract\\|final\\)[[:space:]]+"
+      (1 'hack-attribute t t))
     
-    ;; '("\\<\\(final\\)\\s-+\\sw+"
-    ;;   (1 'hack-attribute t t))
+    )
+   hack-mode-font-lock-keywords-1
+   php-font-lock-keywords-2)
+  "Level 2 Font Lock extending php-mode"
+  )
 
-    (cons
-     (concat "[^_$]?\\<\\(" hack-types "\\)\\>[^_]?")
-     '(1 'hack-type))
-    ))
-  "Medium highlighting for Hack mode.")
-
-(defconst hack-font-lock-keywords-3
+(defconst hack-mode-font-lock-keywords-3
   (append
-   hack-font-lock-keywords-2
    (list
-    '("\\<\\($\\)\\sw+\\>" (1 'hack-dollar))
-    '("\\$\\(this\\)" (1 'hack-special))
-    '("\\$\\(\\sw+\\)" (1 'hack-variable-name t))
+    ;; XHP "<abcd ..." and "</abcd ..."
+    '("\\(</?\\)\\([a-zA-Z:\-]+\\)" (1 'hack-default) (2 'hack-type))
+
+    ;; XML entities
+    '("&\\w+;" . font-lock-constant-face)
+    
+    ;; Fontify variables and function calls
+    '("\\$\\(this\\|that\\)\\W" (1 'hack-special))
+    '("\\$\\(\\sw+\\)" (1 'hack-variable-name t)) ;; $variable
+    '("->\\(\\sw+\\)\\s-*(" . (1 'hack-method-call t t)) ;; ->function_call
+    '("->\\(\\sw+\\)" (1 'hack-field-name t t)) ;; ->variable
+    '("::\\(\\sw+\\>[^(]\\)" . (1 'hack-field-name t t)) ;; class::constant
+    '("\\(\\sw+\\)::\\sw+\\s-*(?" . (1 'hack-type)) ;; class::member
+    '("\\<\\sw+\\s-*[[(]" . 'hack-default) ;; word( or word[
     '("\\<[0-9]+" . 'hack-constant)
-    '("->\\(\\sw+\\)" (1 'hack-field-name t t))
-    '("->\\(\\sw+\\)\\s-*(" (1 'hack-method-call t t))
-    '("\\<\\([a-z\\_][a-z0-9\\_]*\\)\\s-*[[(]" (1 'hack-function-call))
-    
-    ;; Highlight types where they are easy to detect
-    ;; Return types
-    `(")\\s-*:\\s-*" (,hack-type-regexp nil nil (0 'hack-type nil t)))
-    
-    ;; Highlight special methods
-    (cons
-     (concat "\\<function\\s-+\\(" hack-special-methods "\\)(")
-     '(1 'hack-special t t))
-    ))
-  "Full highlighting for Hack mode.")
+ 
+    )
+   hack-mode-font-lock-keywords-2
+   php-font-lock-keywords-3)
+  "Level 3 Font Lock extending php-mode"
+)   
 
 (defconst hack-block-stmt-1-kwds '("do" "else" "finally" "try"))
 (defconst hack-block-stmt-2-kwds
@@ -237,10 +333,16 @@
 
 (defconst hack-class-key
   (concat
-   "\\(" (regexp-opt hack-class-decl-kwds) "\\)\\s-+"
+   "\\(" (regexp-opt hack-class-decl-kwds) "\\)\\[[:space:]]+"
    (c-lang-const c-symbol-key c)                ;; Class name.
-   "\\(\\s-+extends\\s-+" (c-lang-const c-symbol-key c) "\\)?" ;; Name of superclass.
-   "\\(\\s-+implements\\s-+[^{]+{\\)?")) ;; List of any adopted protocols.
+   "\\([[:space:]]+extends[[:space:]]+" (c-lang-const c-symbol-key c) "\\)?" ;; Name of superclass.
+   "\\([[:space:]]+implements[[:space:]]+[^{]+{\\)?")) ;; List of any adopted protocols.
+
+
+  ;; (if hack-fontify-function-calls
+  ;;     `((,(concat "\\(" hack-identifier-regexp "\\)[[:space:]]*(") 1 font-lock-function-name-face) ;; function call/method name
+  ;;       (,(concat "[^[:word:][:multibyte:]](\\(" hack-identifier-regexp "\\))[[:space:]]*(") 1 font-lock-function-name-face)) ;; bracketed function call
+  ;;   `((,hack-func-meth-regexp 2 font-lock-function-name-face))) ;; method name
 
 (defconst hack-client-binary "hh_client"
   "Hack client binary.")
@@ -312,8 +414,8 @@
   (c-init-language-vars hack-mode)
   (c-common-init 'hack-mode)
 
-  (setq-local c-opt-cpp-start "<\\?\\(?:php\\|hh\\)\\s-*?")
-  (setq-local c-opt-cpp-prefix "<\\?\\(?:php\\|hh\\)\\s-*?")
+  (setq-local c-opt-cpp-start "<\\?\\(?:php\\|hh\\)[[:space:]]*?")
+  (setq-local c-opt-cpp-prefix "<\\?\\(?:php\\|hh\\)[[:space:]]*?")
 
   (c-set-offset 'cpp-macro 0)
 
@@ -322,21 +424,19 @@
   
   (setq-local c-class-key hack-class-key)
 
-  (setq-local font-lock-defaults
-              '((hack-font-lock-keywords-1
-                 hack-font-lock-keywords-2
-                 hack-font-lock-keywords-3)
-                nil
-                t
-                (("_" . "w")
-                 ("'" . "\"")
-                 ("`" . "\"")
-                 ("$" . ".")
-                 ("#" . "< b")
-                 ("/" . ". 124b")
-                 ("*" . ". 23")
-                 (?\n . "> b"))
-                nil))
+  (set (make-local-variable 'font-lock-defaults)
+       '((hack-mode-font-lock-keywords-1
+          hack-mode-font-lock-keywords-2
+          ;; Comment-out the next line if the font-coloring is too
+          ;; extreme/ugly for you.
+          hack-mode-font-lock-keywords-3
+         )
+         
+         ;; keywords-only
+         nil
+         ;; case-fold
+         t
+         ))
   
   (setq font-lock-maximum-decoration t)
   (setq case-fold-search t)
@@ -345,6 +445,18 @@
   
   (add-hook 'completion-at-point-functions 'hack-completion nil t) 
 
+  (modify-syntax-entry ?< "_") ;; Treat '<' and '>' as syntactic whitespace
+  (modify-syntax-entry ?> "_") ;; band-aid fix for user attributes on classes
+  
+  (require 'xhp-indent)
+  (xhp-indent-keybinds)
+  (setq indent-line-function 'xhp-indent-line-or-region)
+  (setq indent-region-function 'xhp-indent-line-or-region)
+  (substitute-key-definition
+   'c-indent-line-or-region
+   'indent-for-tab-command
+   hack-mode-map)
+  
   (run-hooks 'hack-mode-hooks))
 
 (provide 'hack-mode)

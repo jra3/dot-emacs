@@ -8,7 +8,10 @@
       (add-to-list 'load-path my-lisp-dir)
       (normal-top-level-add-subdirs-to-load-path)))
 
-(require 'xhp-mode)
+;;(require 'xhp-mode)
+(require 'hack-mode)
+(setq auto-mode-alist (append '(("\\.phpt?$" . hack-mode))
+                              auto-mode-alist))
 
 ;; Any customizations that are particular to the env
 ;; e.g. shared work configs
@@ -96,6 +99,7 @@
     tangotango-theme
     web-mode
 
+    wanderlust
     org-pomodoro
     ))
 

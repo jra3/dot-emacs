@@ -14,7 +14,7 @@
 ;; ;; spell checking in comments & strings
 ;; (add-hook ‘prog-mode-hook ‘flyspell-prog-mode)
 
-(add-hook 'before-save-hook whitespace-cleanup nil 'local)
+;; (add-hook 'before-save-hook whitespace-cleanup nil 'local)
 
 ;; mouse scroll
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control))))
