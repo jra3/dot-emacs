@@ -119,13 +119,13 @@
 (defconst hack-keywords
   '("exit" "die" "const" "return" "yield" "try" "catch" "finally"
     "throw" "if" "else" "while" "do" "for" "foreach" "instanceof"
-    "as" "switch" "default" "goto" "attribute" "category"
+    "as" "switch" "default" "attribute" "category"
     "children" "enum" "clone" "include" "include_once" "require"
     "require_once" "namespace" "use" "global" "await")
   "Hack Keywords.")
 
 (defconst hack-keywords-2
-  '("case" "continue")
+  '("goto" "case" "continue")
   "Hack flow control"
   )
 
@@ -134,53 +134,20 @@
   "Special Hack methods.")
 
 (defconst hack-identifier-regexp "[[:alpha:]][[:alnum:]_:]*")
+(defconst hack-xhp-identifier-regexp "[[:alpha:]][[:alnum:]-_:]*")
 (defconst hack-label-regexp hack-identifier-regexp)
 (defconst hack-func-regexp (concat "\\_<function\\_>[[:space:]]*\\(" hack-identifier-regexp "\\)"))
 
 ;; types allow more chars than other things
-(defconst hack-type-regexp "\\(?::\\|\\<\\)[[:alpha:]:_][[:alnum:]-:_]*")
-
-;; (defconst hack-attribute-regexp
-;;   (concat "\\\\<\\\\<\\(" hack-type-regexp ",\s-*\\)*\\(" hack-type-regexp "\\)\\\\>\\\\>"))
+(defconst hack-type-regexp "\\(?:\\<[[:alpha:]][[:alnum:]]*[\\]\\)?\\(?::\\|\\<\\)[[:alpha:]:_][[:alnum:]-:_]*")
 
 (defconst hack-constants '("null" "true" "false"))
 
 (defconst hack-types
-  (eval-when-compile
-    (regexp-opt '("array" "bool" "char" "float" "int" "mixed" "string" "void"
-                  "Vector" "Map" "Set"
-                  "vec" "dict" "keyset")))
+  '("array" "bool" "char" "float" "int" "mixed" "string" "void"
+    "Vector" "Map" "Set"
+    "vec" "dict" "keyset")
   "Hack types.")
-
-(defvar hack-mode-syntax-table
-  (let ((st (make-syntax-table)))
-    (modify-syntax-entry ?_  "w" st)
-    (modify-syntax-entry ?\' "\"" st)
-    (modify-syntax-entry ?`  "\"" st)
-
-    (modify-syntax-entry ?$  "." st)
-    (modify-syntax-entry ?#  "< b" st)    
-    
-    (modify-syntax-entry ?+  "." st)
-    (modify-syntax-entry ?-  "." st)
-    (modify-syntax-entry ?%  "." st)
-    (modify-syntax-entry ?&  "." st)
-    (modify-syntax-entry ?|  "." st)
-    (modify-syntax-entry ?^  "." st)
-    (modify-syntax-entry ?!  "." st)
-    (modify-syntax-entry ?=  "." st)
-    (modify-syntax-entry ?<  "." st)
-    (modify-syntax-entry ?>  "." st)
-    (modify-syntax-entry ?/  ". 124b" st)
-    (modify-syntax-entry ?*  ". 23" st)
-    (modify-syntax-entry ?\n "> b" st)
-    (modify-syntax-entry ?\" "\"" st)
-    (modify-syntax-entry ?\\ "\\" st)
-    st)
-  "Syntax table for Hack mode.")
-
-
-    ;; TODO make _ a symbol constituent now that xemacs is gone
 
 ;; (defun hack--match-func (end)
 ;;   "Search for identifiers used as type names from a function
@@ -224,20 +191,28 @@
 
     ;; keywords
     (cons
-     (concat "\\_<" (regexp-opt hack-keywords t) "\\_>") 'font-lock-keyword-face)
+     (concat "\\(\\_<" (regexp-opt hack-keywords t) "\\_>\\)")
+     '(1 'hack-keyword))
     
     ;; case, goto...
     (cons
      (concat "\\(\\_<" (regexp-opt hack-keywords-2 t) "\\_>\\)[[:space:]]+\\(-?[[:word:]]+\\)?")      
-     '('(1 'hack-keyword)
-       '(2 'hack-constant t t)))
+     '(
+       (1 'hack-keyword)
+       (2 'hack-constant nil t)
+       ))
 
-    ;; builtins
     (cons
      (concat "\\(\\_<" (regexp-opt hack-builtins t) "\\_>\\)[[:space:]]*(")
-     '(1 font-lock-builtin-face)) 
-    ;; '((concat "\\_<" (regexp-opt hack-constants t) "\\_>") . font-lock-constant-face)                  ;; constants
+     '(1 'hack-builtin)) 
 
+    (cons
+     (concat "\\(\\_<" (regexp-opt hack-constants t) "\\_>\\)")
+     '(1 'hack-constant nil t))
+
+    (cons
+     (concat "\\_<" (regexp-opt hack-types t) "\\_>") '(0 'hack-type nil t))
+    
     ;; PHP/Hack Tag including mode header
     '("<\\?\\(?:php\\|hh\\)[[:space:]]*?" (0 font-lock-preprocessor-face)
       ("//[[:space:]]+\\(partial\\|decl\\|strict\\)" nil nil (1 font-lock-warning-face t t)))
@@ -255,26 +230,33 @@
     ;; Class Attributes
     (cons
      (concat "<<\\(?:\\(" hack-type-regexp "\\),[[:space:]]*\\)*\\(" hack-type-regexp "\\)>>")
-     '((1 'hack-type nil t)
-       (2 'hack-type nil t)))
+     '(
+       (1 'hack-type nil t)
+       (2 'hack-type nil t)
+       ))
 
     ;; Type declarations
     (cons
-     (concat "\\<\\(class\\|interface\\|trait\\|type\\|newtype\\)[[:space:]]+\\(" hack-type-regexp "\\)")
-     '((1 'hack-keyword)
-       (2 'hack-type nil t)))
+     (concat "\\<\\(class\\|interface\\|trait\\|type\\|newtype\\)[[:space:]]+\\(" hack-type-regexp "\\)?")
+     '(
+       (1 'hack-keyword)
+       (2 'hack-type nil t)
+       ))
     
     ;; Tokens following certain keywords are known to be types
-    '("\\<\\(new\\|extends\\)[[:space:]]+" (1 'hack-keyword)
-      (,hack-type-regexp nil nil (0 'hack-type nil t)))
+    (cons
+     (concat "\\<\\(new\\|extends\\|implements\\)[[:space:]]+\\$?\\(" hack-type-regexp "\\)")
+     '(
+       (1 'hack-keyword)
+       (2 'hack-type nil t)
+       ))
 
-    ;; implements takes a list of types, handle it separately
-    '("\\<\\(implements\\)[[:space:]]+\\$?" (1 'hack-keyword t)
-      (,hack-type-regexp nil nil (0 'hack-type- nil t)))
+    ;; ;; implements takes a list of types, handle it separately
+    ;; '("\\<\\(implements\\)[[:space:]]+\\$?" (1 'hack-keyword t)
+    ;;   (,hack-type-regexp nil nil (0 'hack-type- nil t)))
 
-    ;; ;; function
-    ;; (cons
-    ;;  hack-func-regexp 1 font-lock-function-name-face)
+    ;; function
+    (cons hack-func-regexp '(1 font-lock-function-name-face))
 
     ;; async must come before function keyword
     '("\\<\\(\\(?:async[[:space:]]+\\)?function\\)[[:space:]]*&?\\(\\sw+\\)?[[:space:]]*("
@@ -288,6 +270,13 @@
 
     '("\\<\\(abstract\\|final\\)[[:space:]]+"
       (1 'hack-attribute t t))
+
+    (cons
+     (concat "\\(\\<use\\)[[:space:]]+\\(" hack-type-regexp "\\)")
+     '(
+      (1 'hack-keyword)
+      (2 'hack-type nil t))       
+     )
     
     )
    hack-mode-font-lock-keywords-1
@@ -299,26 +288,45 @@
   (append
    (list
     ;; XHP "<abcd ..." and "</abcd ..."
-    '("\\(</?\\)\\([a-zA-Z:\-]+\\)" (1 'hack-default) (2 'hack-type))
+    (cons
+     (concat "</?\\(" hack-type-regexp "\\)") '(1 'hack-type))
 
     ;; XML entities
     '("&\\w+;" . font-lock-constant-face)
     
-    ;; Fontify variables and function calls
+    ;; fontify variables and function calls
     '("\\$\\(this\\|that\\)\\W" (1 'hack-special))
+    (cons
+     (concat "\\(" hack-type-regexp "\\)[[:space:]]+\\$\\(\\sw+\\)")
+     '((1 'hack-type t t)
+       (2 'hack-variable-name t)
+       )) ;; type $variable
     '("\\$\\(\\sw+\\)" (1 'hack-variable-name t)) ;; $variable
     '("->\\(\\sw+\\)\\s-*(" . (1 'hack-method-call t t)) ;; ->function_call
+    (cons
+     (concat "->:\\(" hack-xhp-identifier-regexp "\\)")
+     '(1 'hack-field-name t t))
     '("->\\(\\sw+\\)" (1 'hack-field-name t t)) ;; ->variable
-    '("::\\(\\sw+\\>[^(]\\)" . (1 'hack-field-name t t)) ;; class::constant
-    '("\\(\\sw+\\)::\\sw+\\s-*(?" . (1 'hack-type)) ;; class::member
-    '("\\<\\sw+\\s-*[[(]" . 'hack-default) ;; word( or word[
+    '("::\\(\\sw+\\>\\)[^(]" . (1 'hack-field-name t t)) ;; class::constant
+    (cons
+     (concat "\\(" hack-type-regexp"\\)::\\sw+\\s-*(?")  '(1 'hack-type)) ;; class::member
+    ;; '("\\<\\sw+\\s-*[[(]" . 'hack-default) ;; word( or word[
     '("\\<[0-9]+" . 'hack-constant)
- 
+
+    ;; ;; Highlight types where they are easy to detect
+    `(")\\s-*:\\s-*" (,hack-type-regexp nil nil (0 'hack-type nil t)))
+    
+    ;; Highlight special methods
+    (cons
+     (concat "\\<function\\s-+\\(" (regexp-opt hack-special-methods t) "\\)(")
+     '(1 'hack-special t t))
+    
     )
    hack-mode-font-lock-keywords-2
-   php-font-lock-keywords-3)
+   php-font-lock-keywords-3
+   )
   "Level 3 Font Lock extending php-mode"
-)   
+)
 
 (defconst hack-block-stmt-1-kwds '("do" "else" "finally" "try"))
 (defconst hack-block-stmt-2-kwds
@@ -338,11 +346,89 @@
    "\\([[:space:]]+extends[[:space:]]+" (c-lang-const c-symbol-key c) "\\)?" ;; Name of superclass.
    "\\([[:space:]]+implements[[:space:]]+[^{]+{\\)?")) ;; List of any adopted protocols.
 
+(defun xhp-syntactic-fontify-attributes (limit)
+  "This function finds the attributes set within xhp tags and
+applies a font face"
 
-  ;; (if hack-fontify-function-calls
-  ;;     `((,(concat "\\(" hack-identifier-regexp "\\)[[:space:]]*(") 1 font-lock-function-name-face) ;; function call/method name
-  ;;       (,(concat "[^[:word:][:multibyte:]](\\(" hack-identifier-regexp "\\))[[:space:]]*(") 1 font-lock-function-name-face)) ;; bracketed function call
-  ;;   `((,hack-func-meth-regexp 2 font-lock-function-name-face))) ;; method name
+  ;; useful debugging message, as you can't debug during display phase
+  (message "point %i limit %i" (point) limit)
+  (let
+      (
+       (xhp-syntax)
+       (res)
+       )
+    (while (re-search-forward xhp-start-regex limit t)
+      ;; while we're in xhp, markup any attributes
+      (while (re-search-forward "class=" limit t)
+        (font-lock-apply-syntactic-highlight '(0 hack-type))
+        )
+      
+
+      )
+    )
+  )
+
+(defun xhp-syntactic-fontify-detect-xhp-quote (limit)
+  "This function is meant to be used in conjunction with the
+standard font-lock syntax table so that it selectively marks
+single quote characters to be font-locked as punctuation.
+
+The way this works is that the font lock syntax table defines
+single quotes as being class '|' which is emacs voodoo for
+'special quote character that can be overridden', and then this
+function figures out which quotes to mark as punctuation. (See
+`font-lock-fontify-syntactic-keywords-region)
+
+This function possibly cheats in that it sets the punctuation
+property on all single-quotes in the range rather than returning
+t or nil and letting font-lock-fontify-syntactically-region do
+that, but performance requirements lead me to taking this
+approach.
+
+NOTE: this function assumes that it is never invoked with its
+point inside an xhp block.
+See `xhp-mode-font-lock-extend-region-around-xhp
+"
+  ;; useful debugging message, as you can't debug during display phase
+  ;; (message "point %i limit %i" (point) limit)
+  (let
+      (
+       (xhp-syntax)
+       (res)
+       )
+    ;; if we find something that might be the start of xhp begin
+    ;; looking for single quote in xhp
+    (while (re-search-forward xhp-start-regex limit t)
+      ;; while we're in xhp, markup any single quotes
+      (while (and
+              (re-search-forward "'" limit t)
+              (save-match-data
+                (backward-char) ;; move point to actual quote
+                (setq xhp-syntax (xhp-indent-xhp-detect))
+                (forward-char)
+                (xhp-indent-syntax-has-attribute xhp-syntax 'xhp-indent-in-xhp)))
+        ;; check that we're not between braces, i.e. in a single-line
+        ;; php statement within xhp.
+        (unless (xhp-indent-syntax-has-attribute xhp-syntax 'xhp-indent-php-in-xhp)
+          (font-lock-apply-syntactic-highlight '(0 ".")))))
+    ;; t means apply highlight, but we're already doing that in here, so always return false
+    ;; the reason for this is that the expected way to use this is to return t for every quote and let
+    ;; font-lock-fontify-syntactic-keywords-region apply the face, but that just isn't efficient.
+    nil))
+
+(defvar font-lock-beg)
+
+(defun xhp-mode-font-lock-extend-region-above-xhp ()
+  "Move fontification boundaries above any xhp block to make xhp parsing simpler"
+  (save-match-data
+    (let (xhp-start-pos changed-beg)
+      ;; idea: if beg/end is in xhp , move back/forward until we're outside
+      (goto-char font-lock-beg)
+      (if (setq xhp-start-pos (xhp-indent-start-pos))
+          (setq
+           font-lock-beg xhp-start-pos
+           changed-beg t))
+      changed-beg)))
 
 (defconst hack-client-binary "hh_client"
   "Hack client binary.")
@@ -413,40 +499,70 @@
   (c-initialize-cc-mode t)
   (c-init-language-vars hack-mode)
   (c-common-init 'hack-mode)
-
-  (setq-local c-opt-cpp-start "<\\?\\(?:php\\|hh\\)[[:space:]]*?")
-  (setq-local c-opt-cpp-prefix "<\\?\\(?:php\\|hh\\)[[:space:]]*?")
+  
+  (setq-local c-opt-cpp-start "<\\?\\(?:php\\|hh\\)\\s-*?")
+  (setq-local c-opt-cpp-prefix "<\\?\\(?:php\\|hh\\)\\s-*?")
 
   (c-set-offset 'cpp-macro 0)
 
   (setq-local c-block-stmt-1-key hack-block-stmt-1-key)
   (setq-local c-block-stmt-2-key hack-block-stmt-2-key)
-  
-  (setq-local c-class-key hack-class-key)
 
-  (set (make-local-variable 'font-lock-defaults)
+  (setq-local c-class-key hack-class-key)
+  
+  (setq-local font-lock-defaults
        '((hack-mode-font-lock-keywords-1
           hack-mode-font-lock-keywords-2
           ;; Comment-out the next line if the font-coloring is too
           ;; extreme/ugly for you.
           hack-mode-font-lock-keywords-3
          )
-         
          ;; keywords-only
          nil
          ;; case-fold
          t
+         ;; syntax-table
+         (
+          ("_" . "w")
+          ("`" . "\"")
+
+          ("$" . ".")
+          ("#" . "< b")
+
+          ("+" . ".")
+          ("-" . ".")
+          ("%" . ".")
+          ("&" . ".")
+          ("|" . ".")    
+          ("^" . ".")          
+          ("!" . ".")          
+          ("=" . ".")
+          ("/" . ". 124b")
+          ("*" . ". 23")
+          ("\n" . "> b")
+          ("\"" . "\"")
+          ("\\" . "\\")
+
+          ;; XHP specific
+          ("\'" . "|")
+          ("<" . "_")
+          (">" . "_")
+          
+          )
+         
+         (font-lock-syntactic-keywords
+          . ((xhp-syntactic-fontify-detect-xhp-quote 0 ".")
+             (xhp-syntactic-fontify-attributes 0 ".")
+             ))
+
+         (font-lock-extend-region-functions
+          . (xhp-mode-font-lock-extend-region-above-xhp))
+
          ))
-  
-  (setq font-lock-maximum-decoration t)
-  (setq case-fold-search t)
   
   (setq-local compile-command (concat hack-client-binary " --from emacs"))
   
   (add-hook 'completion-at-point-functions 'hack-completion nil t) 
-
-  (modify-syntax-entry ?< "_") ;; Treat '<' and '>' as syntactic whitespace
-  (modify-syntax-entry ?> "_") ;; band-aid fix for user attributes on classes
   
   (require 'xhp-indent)
   (xhp-indent-keybinds)
@@ -456,6 +572,8 @@
    'c-indent-line-or-region
    'indent-for-tab-command
    hack-mode-map)
+
+  ;(setq xhp-indent-debug-on t)
   
   (run-hooks 'hack-mode-hooks))
 

@@ -146,7 +146,7 @@ BAR;"
   this")
 
 (defun xhp-indent-xhp-detect ()
-  "determine if xhp around or above point will affect indentation"
+  "Determine if xhp around or above point will affect indentation"
   (save-excursion
     (c-save-buffer-state
         (
@@ -192,7 +192,7 @@ BAR;"
                   (beginning-of-line)
                   (or
                    (re-search-forward "</" (line-end-position) t)
-                   (re-search-forward "/> *$" max t)
+                   (re-search-forward "/> *,?$" max t)
                    (re-search-forward "--> *$" max t)))
                 0)
                ;; DEFAULT: increase indent
@@ -332,7 +332,7 @@ returns a list of (indent-amount syntax-infos ...)
       ((indent (xhp-indent-detect)))
     (if indent
         (progn
-          (xhp-indent-debug "xhp indent!!!")
+          (xhp-indent-debug "xhp indent!!! %s" indent)
           ;; this is better than indent-to and indent-line-to because
           ;; it sets the point properly in a few different contexts.
           ;; e.g. when you've typed stuff, keep the point
