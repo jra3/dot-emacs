@@ -146,21 +146,21 @@
   (list
    ;; Keywords
    (cons
-    (concat "[^_$]?\\<\\(" hack-keywords "\\)\\>[^_]?")
+    (concat "[^_$]?\\<\\(" (regexp-opt hack-keywords t) "\\)\\>[^_]?")
     '(1 'hack-keyword))
 
    ;; Builtins
    (cons
-    (concat "[^_$]?\\<\\(" hack-builtins "\\)\\>[^_]?")
+    (concat "[^_$]?\\<\\(" (regexp-opt hack-builtins t) "\\)\\>[^_]?")
     '(1 'hack-builtin))
-   
+
    '("\\<\\(break\\|case\\|continue\\)\\>\\s-+\\(-?\\sw+\\)?"
-     (1 'hack-keyword) (2 'hack-constant t t))
+     (1 'hack-keyword) (2 'hack-constant nil t))
    '("^\\s-*\\(\\sw+\\):\\>" (1 'hack-constant nil t))
 
    ;; PHP/Hack Tag including mode header
    '("<\\?\\(?:php\\|hh\\)\\s-*?" (0 font-lock-preprocessor-face)
-     ("//\\s-+\\(partial\\|decl\\|strict\\)" nil nil (1 font-lock-warning-face t t))))
+     ("//\\s-+\\(partial\\|decl\\|strict\\)" nil nil (1 font-lock-warning-face nil t))))
   "Level 1 Font Lock for XHP Mode.")
 
 (defconst xhp-mode-font-lock-keywords-2
@@ -168,36 +168,36 @@
    xhp-mode-font-lock-keywords-1
    (list
     ;; Class Attributes
-    '("<<\\([a-z_][a-z0-9_:]*\\>,\\s-*\\)*\\([a-z_][a-z0-9_:]*\\>\\)>>"
+    '("<<\\([a-z_][a-z0-9_:]*\\>,\\s-*\\)*\\([a-z_][a-z0-9_:]*\\>\\)>>" ;; TODO use type regex
      (1 'hack-type nil t)
      (2 'hack-type nil t))
     ;; Type declarations
-    '("\\<\\(class\\|interface\\|trait\\|type\\|newtype\\)\\s-+\\(:?\\sw+\\)?"
+    '("\\<\\(class\\|interface\\|trait\\|type\\|newtype\\)\\s-+\\(\\sw+\\)?" ;; TODO use type regex
       (1 'hack-keyword) (2 'hack-type nil t))
     ;; Tokens following certain keywords are known to be types
     `("\\<\\(new\\|extends\\)\\s-+" (1 'hack-keyword)
       (,hack-type-regexp nil nil (0 'hack-type nil t)))
     ;; implements takes a list of types, handle it separately
-    `("\\<\\(implements\\)\\s-+\\$?" (1 'hack-keyword t) 
+    `("\\<\\(implements\\)\\s-+\\$?" (1 'hack-keyword t)
       (,hack-type-regexp nil nil (0 'hack-type nil t)))
     ;; Traits
-    `("\\<\\(use\\)\\s-+\\$?" (1 'hack-keyword t) 
+    `("\\<\\(use\\)\\s-+\\$?" (1 'hack-keyword t)   ;; TODO support a list of types (syntactically?)
       (,hack-type-regexp nil nil (0 'hack-type nil t)))
     ;; async must come before function keyword
-    '("\\<\\(\\(?:async\\s-+\\)?function\\)\\s-*&?\\(\\sw+\\)?\\s-*("
+    '("\\<\\(\\(?:async\\s-+\\)?function\\)\\s-*&?\\(\\sw+\\)?\\s-*("  ;; TODO use hack-identifier regex
       (1 'hack-keyword)
       (2 'hack-function-name nil t))
-    
+
     '("\\(?:[^$]\\|^\\)\\<\\(self\\|parent\\|static\\)\\>" (1 'hack-special nil nil))
     ;; method and variable attributes
-    '("\\<\\(private\\|protected\\|public\\|static\\)\\s-+\\$?\\sw+"      
-      (1 'hack-attribute t t))
-    ;; method attributes 
+    '("\\<\\(private\\|protected\\|public\\|static\\)\\s-+\\$?\\sw+"
+      (1 'hack-attribute nil t))
+    ;; method attributes
     '("\\<\\(abstract\\|final\\)\\s-+"
-      (1 'hack-attribute t t))
+      (1 'hack-attribute nil t))
 
     (cons
-     (concat "[^_$]?\\<\\(" hack-types "\\)\\>[^_]?")
+     (concat "[^_$]?\\<\\(" (regexp-opt hack-types t) "\\)\\>[^_]?")
      '(1 'hack-type))
     ;; TODO: XHP declaration classes - 'attribute', 'children', 'category' keywords
     ))
@@ -208,17 +208,20 @@
    xhp-mode-font-lock-keywords-2
    (list
     ;; XHP "<abcd ..." and "</abcd ..."
-    '("\\(</?\\)\\([a-zA-Z:\-]+\\)" (1 hack-default) (2 font-lock-type-face))
+    '("\\(</?\\)\\([a-zA-Z:\-]+\\)" (1 'hack-default) (2 font-lock-type-face))
 
     ;; XML entities
     '("&\\w+;" . font-lock-constant-face)
 
+    ;; Allow => and ==> but warn if longer
+    '("===+>" . font-lock-warning-face)
+
     '("\\<\\($\\)\\sw+\\>" (1 'hack-dollar))
     '("\\$\\(this\\)" (1 'hack-special))
-    '("\\$\\(\\sw+\\)" (1 'hack-variable-name t))
+    '("\\$\\(\\sw+\\)" (1 'hack-variable-name))
     '("\\<[0-9]+" . 'hack-constant)
-    '("->\\(\\sw+\\)" (1 'hack-field-name t t))
-    '("->\\(\\sw+\\)\\s-*(" (1 'hack-method-call t t))
+    '("->\\(\\sw+\\)" (1 'hack-field-name))
+    '("->\\(\\sw+\\)\\s-*(" (1 'hack-method-call))
     '("\\<\\([a-z\\_][a-z0-9\\_]*\\)\\s-*[[(]" (1 'hack-function-call))
 
     ;; Highlight types where they are easy to detect
@@ -227,10 +230,11 @@
 
     ;; Highlight special methods
     (cons
-     (concat "\\<function\\s-+\\(" hack-special-methods "\\)(")
-     '(1 'hack-special t t))
-    
+     (concat "\\<function\\s-+\\(" (regexp-opt hack-special-methods t) "\\)(")
+     '(1 'hack-special nil t))
+
     )
+
    )
   "Level 3 Font Lock for XHP mode.")
 
@@ -306,11 +310,12 @@ See `xhp-mode-font-lock-extend-region-around-xhp
   (setq font-lock-defaults
         '((xhp-mode-font-lock-keywords-1
            xhp-mode-font-lock-keywords-2
-           xhp-mode-font-lock-keywords-3)
+           xhp-mode-font-lock-keywords-3
+           )
           nil                               ; KEYWORDS_ONLY
           t                                 ; CASE-FOLD
           (("_" . "w") (?# . "< b")
-           ("'" . "|")
+           ("'" . "\"")
            ("`" . "\"")
            ("$" . ".")
            ("#" . "< b")

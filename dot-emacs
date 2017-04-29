@@ -8,13 +8,9 @@
       (add-to-list 'load-path my-lisp-dir)
       (normal-top-level-add-subdirs-to-load-path)))
 
-(require 'xhp-indent)
-(require 'hack-mode)
-(setq auto-mode-alist (append '(("\\.phpt?$" . hack-mode))
-                              auto-mode-alist))
-
 ;; Any customizations that are particular to the env
 ;; e.g. shared work configs
+
 (if (file-exists-p "~/.local.el")
     (load "~/.local.el"))
 
