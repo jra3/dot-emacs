@@ -240,7 +240,7 @@ BAR;"
                      ;;   <xhp>
                      ;; );
                      ((save-excursion
-                        (re-search-forward "^ *);" (line-end-position) t))
+                        (re-search-forward "^ *)*;" (line-end-position) t))
                       (list (+ base-indent -2) 'xhp-indent-in-closing-stmt))
                      ;; DEFAULT: no modification.
                      (t (list base-indent))))

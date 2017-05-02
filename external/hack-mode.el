@@ -133,7 +133,7 @@
   '("__construct" "__destruct" "__toString" "__clone" "__sleep" "__wakeup")
   "Special Hack methods.")
 
-(defconst hack-identifier-regexp "[[:alpha:]][[:alnum:]_:]*")
+(defconst hack-identifier-regexp "[[:alpha:]][[:alnum:]_]*")
 (defconst hack-xhp-identifier-regexp "[[:alpha:]][[:alnum:]-_:]*")
 (defconst hack-label-regexp hack-identifier-regexp)
 (defconst hack-func-regexp (concat "\\_<function\\_>[[:space:]]*\\(" hack-identifier-regexp "\\)"))
@@ -393,63 +393,29 @@
   (setq-local c-class-key hack-class-key)
 
   (setq-local font-lock-defaults
-       '((hack-mode-font-lock-keywords-1
-          hack-mode-font-lock-keywords-2
-          ;; Comment-out the next line if the font-coloring is too
-          ;; extreme/ugly for you.
-          hack-mode-font-lock-keywords-3
-         )
-         ;; keywords-only
-         nil
-         ;; case-fold
-         t
-         ;; syntax-table
-         (
-          ("_" . "w")
-          ("`" . "\"")
+			  '((hack-font-lock-keywords-1
+				 hack-font-lock-keywords-2
+				 hack-font-lock-keywords-3)
+				nil
+				t
+				(("_" . "w")
+				 ("'" . "\"")
+				 ("`" . "\"")
+				 ("$" . ".")
+				 ("#" . "< b")
+				 ("/" . ". 124b")
+				 ("*" . ". 23")
+				 (?\n . "> b"))
+				nil))
 
-          ("$" . ".")
-          ("#" . "< b")
-
-          ("+" . ".")
-          ("-" . ".")
-          ("%" . ".")
-          ("&" . ".")
-          ("|" . ".")
-          ("^" . ".")
-          ("!" . ".")
-          ("=" . ".")
-          ("/" . ". 124b")
-          ("*" . ". 23")
-          ("\n" . "> b")
-          ("\"" . "\"")
-          ("\\" . "\\")
-
-          ;; XHP specific
-          ("\'" . "|")
-          ("<" . "_")
-          (">" . "_")
-
-          )
-         ))
+  (setq font-lock-maximum-decoration t)
+  (setq case-fold-search t)
 
   (setq-local compile-command (concat hack-client-binary " --from emacs"))
 
   (add-hook 'completion-at-point-functions 'hack-completion nil t)
 
-  (require 'xhp-indent)
-  (xhp-indent-keybinds)
-  (setq indent-line-function 'xhp-indent-line-or-region)
-  (setq indent-region-function 'xhp-indent-line-or-region)
-  (substitute-key-definition
-   'c-indent-line-or-region
-   'indent-for-tab-command
-   hack-mode-map)
-
-  ;(setq xhp-indent-debug-on t)
-
   (run-hooks 'hack-mode-hooks))
-
 (provide 'hack-mode)
 
 ;;; hack-mode.el ends here

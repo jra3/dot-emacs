@@ -2,40 +2,40 @@
 ;; (require 'xhp-mode)
 ;; (require 'highlight-80+)
 
+(require 'js2-mode)
 (require 'xhp-mode)
+(require 'hack-mode)
 (require 'highlight-80+)
-(let
-    ((mode-hook (lambda ()
-                  (c-set-style "fb-php-style")
-                  (highlight-80+-mode t)
-                  (set (make-local-variable 'require-final-newline) t)
-                  )))
-  (add-hook 'xhp-mode-hook mode-hook))
 
-;; (add-hook 'php-mode-hook
-;;           (lambda ()
-;;             (highlight-80+-mode t)
-;;             (subword-mode 1)
-;;             (define-key php-mode-map (kbd "M-g") 'tbgs)
-;;             (local-set-key (kbd "RET") 'c-context-line-break)
-;;             (local-set-key (kbd "C-c a") 'php-array-align)
-;;             (local-set-key (kbd "C-M-T") 'pfff-infer-type-at-point)
-;;             (c-set-offset 'case-label 2)
-;;             (c-set-offset  'arglist-intro '+)
-;;             (setq require-final-newline t)
-;;             ))
+(defun ywb-php-lineup-arglist-intro (langelem)
+  (save-excursion
+    (goto-char (cdr langelem))
+    (vector (+ (current-column) c-basic-offset))))
 
-;; ;; Set PHP mode based on the #! line
-;; (add-to-list 'interpreter-mode-alist '("php" . php-mode))
+(defun ywb-php-lineup-arglist-close (langelem)
+  (save-excursion
+    (goto-char (cdr langelem))
+    (vector (current-column))))
 
 (defconst fb-php-style
   '((c-basic-offset . 2)
-    (c-offsets-alist . ((arglist-intro . +)
-                        (case-label . +)
-                        (substatement-open . 0)
-                        (arglist-close . c-lineup-close-paren))))
+    (c-offsets-alist . ((substatement-open . 0)
+                        )))
   "Facebook's PHP Programming style")
-
 (c-add-style "fb-php-style" fb-php-style)
+
+(let
+    ((mode-hook (lambda ()
+                  (c-set-style "fb-php-style")
+                  (c-set-offset 'arglist-intro 'ywb-php-lineup-arglist-intro)
+                  (c-set-offset 'arglist-close 'ywb-php-lineup-arglist-close)
+                  
+                  (highlight-80+-mode t)
+                  (set (make-local-variable 'require-final-newline) t)
+                  )))
+
+  (add-hook 'xhp-mode-hook mode-hook)
+  (add-hook 'hack-mode-hook mode-hook)
+)
 
 (provide 'j-php)

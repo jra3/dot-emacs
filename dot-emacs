@@ -11,9 +11,6 @@
 ;; Any customizations that are particular to the env
 ;; e.g. shared work configs
 
-(require 'xhp-mode)
-(setq auto-mode-alist (append '(("\\.phpt?$" . xhp-mode))
-                              auto-mode-alist))
 
 ;; (if (file-exists-p "~/.local.el")
 ;;     (load "~/.local.el"))
@@ -30,6 +27,7 @@
 
 (defvar package-list
   '(
+    js2-mode
     ag  ; the silver searcher!
     anzu
     bbdb
@@ -112,6 +110,10 @@
 (dolist (package package-list)
   (unless (package-installed-p package)
     (package-install package)))
+
+(require 'xhp-mode)
+(setq auto-mode-alist (append '(("\\.phpt?$" . xhp-mode))
+                              auto-mode-alist))
 
 (require 'j-terminal-compat)
 (require 'j-mc)
