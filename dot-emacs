@@ -1,11 +1,11 @@
 ;; -*- Emacs-Lisp -*-
 
-;; setup proxy to talk to internet
-(setq url-proxy-services
-      '(("no_proxy" . "^\\(localhost\\|10.*\\)")
-	("http" . "fwdproxy:8080")
-	("https" . "fwdproxy:8080")))
-
+;; ;; setup proxy to talk to internet
+;; (setq url-proxy-services
+;;       '(("no_proxy" . "^\\(localhost\\|10.*\\)")
+;; 	("http" . "fwdproxy:8080")
+;; 	("https" . "fwdproxy:8080")))
+ 
 (defvar dot-emacs-dir "~/.dot-emacs")
 
 (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
@@ -27,11 +27,9 @@
     (load "~/.local.el"))
 
 (require 'package)
-(setq package-archives '(("elpa" . "https://tromey.com/elpa/")
-                         ;; ("elpy" . "http://jorgenschaefer.github.io/packages/")
+(setq package-archives '(
                          ("gnu" . "https://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.milkbox.net/packages/")
-			 
+                         ("melpa" . "https://melpa.org/packages/")
                          ;;("marmalade" . "http://marmalade-repo.org/packages/")
                          ))
 
