@@ -1,5 +1,11 @@
 ;; -*- Emacs-Lisp -*-
 
+;; setup proxy to talk to internet
+(setq url-proxy-services
+      '(("no_proxy" . "^\\(localhost\\|10.*\\)")
+	("http" . "fwdproxy:8080")
+	("https" . "fwdproxy:8080")))
+
 (defvar dot-emacs-dir "~/.dot-emacs")
 
 (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
@@ -8,22 +14,26 @@
       (add-to-list 'load-path my-lisp-dir)
       (normal-top-level-add-subdirs-to-load-path)))
 
-;; Any customizations that are particular to the env
-;; e.g. shared work configs
-
-
-;; (if (file-exists-p "~/.local.el")
-;;     (load "~/.local.el"))
-
 (add-to-list 'exec-path "/usr/local/bin")
 (add-to-list 'exec-path "~/.local/bin")
 
+(require 'xhp-mode)
+(setq auto-mode-alist (append '(("\\.phpt?$" . xhp-mode))
+                              auto-mode-alist))
+
+;; Any customizations that are particular to the env
+;; e.g. shared work configs
+(if (file-exists-p "~/.local.el")
+    (load "~/.local.el"))
+
 (require 'package)
-(setq package-archives '(("elpa" . "http://tromey.com/elpa/")
-                         ("melpa" . "http://melpa.milkbox.net/packages/")
-                         ("elpy" . "http://jorgenschaefer.github.io/packages/")
-                         ("gnu" . "http://elpa.gnu.org/packages/")
-                         ("marmalade" . "http://marmalade-repo.org/packages/")))
+(setq package-archives '(("elpa" . "https://tromey.com/elpa/")
+                         ;; ("elpy" . "http://jorgenschaefer.github.io/packages/")
+                         ("gnu" . "https://elpa.gnu.org/packages/")
+                         ("melpa" . "https://melpa.milkbox.net/packages/")
+			 
+                         ;;("marmalade" . "http://marmalade-repo.org/packages/")
+                         ))
 
 (defvar package-list
   '(
@@ -80,7 +90,6 @@
     markdown-mode
 
     js-comint
-    js2-mode
     js2-refactor
     json-mode
     coffee-mode
@@ -98,7 +107,6 @@
     web-mode
 
     wanderlust
-    org-pomodoro
     ))
 
 (package-initialize)
@@ -111,9 +119,6 @@
   (unless (package-installed-p package)
     (package-install package)))
 
-(require 'xhp-mode)
-(setq auto-mode-alist (append '(("\\.phpt?$" . xhp-mode))
-                              auto-mode-alist))
 
 (require 'j-terminal-compat)
 (require 'j-mc)

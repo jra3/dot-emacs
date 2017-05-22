@@ -37,7 +37,7 @@
       line-number-mode 1
       
       fill-column 78
-      highlight-80+-columns 119
+      highlight-80+-columns 80
       
       indent-tabs-mode nil
 
@@ -61,6 +61,8 @@
         ("*Python Doc*")
         ("*grep*")
         ("*Help*")
+        ("*hh-client-definitions*" :noselect t)
+        ("*Completions*" :noselect t)
         ("*Completions*" :noselect t)
         ("*Occur*" :noselect t))))
 

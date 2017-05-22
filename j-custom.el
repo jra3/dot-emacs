@@ -19,6 +19,7 @@
  '(elpy-project-ignored-directories
    (quote
     (".bzr" "CVS" ".git" ".hg" ".svn" ".tox" "build" "dist" ".cask" "third_party" "third_party_dev" "node_modules" "interana_tailer/interana_tailer")))
+ '(elpy-rpc-python-command "python")
  '(holiday-bahai-holidays nil)
  '(holiday-islamic-holidays nil)
  '(holiday-oriental-holidays nil)

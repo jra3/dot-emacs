@@ -2,7 +2,7 @@
 (setq company-backends
       (quote
        (
-        company-hh-complete
+        ;; company-hh-complete
 	company-rtags
         company-nxml
         company-css
@@ -36,18 +36,18 @@
 (global-company-mode)
 (delete 'company-backends 'company-clang)
 
-;; nice keyboard shortcuts
-(define-key c-mode-base-map (kbd "<M-tab>")
-  (function company-complete))
-(define-key c-mode-base-map (kbd "M-.")
-  (function rtags-find-symbol-at-point))
-(define-key c-mode-base-map (kbd "M-,")
-  (function rtags-find-references-at-point))
+;; ;; nice keyboard shortcuts
+;; (define-key c-mode-base-map (kbd "<M-tab>")
+;;   (function company-complete))
+;; (define-key c-mode-base-map (kbd "M-.")
+;;   (function rtags-find-symbol-at-point))
+;; (define-key c-mode-base-map (kbd "M-,")
+;;   (function rtags-find-references-at-point))
 
-(define-key c-mode-base-map (kbd "<s-right>")
-  (function rtags-location-stack-forward))
-(define-key c-mode-base-map (kbd "<s-left>")
-  (function rtags-location-stack-back))
+;; (define-key c-mode-base-map (kbd "<s-right>")
+;;   (function rtags-location-stack-forward))
+;; (define-key c-mode-base-map (kbd "<s-left>")
+;;   (function rtags-location-stack-back))
 
 (when (require 'helm nil :noerror)
   (setq rtags-use-helm t)

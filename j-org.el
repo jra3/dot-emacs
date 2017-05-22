@@ -1,5 +1,5 @@
-(require 'org-ac)
-(org-ac/config-default)
+;; (require 'org-ac)
+;; (org-ac/config-default)
 
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (add-to-list 'auto-mode-alist '("\\.org_archive\\'" . org-mode))

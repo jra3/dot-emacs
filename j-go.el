@@ -1,8 +1,6 @@
 (with-eval-after-load 'go-mode
    (require 'go-autocomplete))
 
-(require 'go-dlv)
-
 (when (memq window-system '(mac ns))
   (exec-path-from-shell-initialize)
   (exec-path-from-shell-copy-env "GOPATH"))
