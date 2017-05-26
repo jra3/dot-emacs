@@ -1,31 +1,29 @@
 ;; -*- Emacs-Lisp -*-
- 
-(defvar dot-emacs-dir "~/.dot-emacs")
 
+(defvar dot-emacs-dir "~/.dot-emacs")
 (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
     (let* ((my-lisp-dir dot-emacs-dir)
-           (default-directory my-lisp-dir))
+	   (default-directory my-lisp-dir))
       (add-to-list 'load-path my-lisp-dir)
       (normal-top-level-add-subdirs-to-load-path)))
 
 (add-to-list 'exec-path "/usr/local/bin")
 (add-to-list 'exec-path "~/.local/bin")
 
-(require 'xhp-mode)
-(setq auto-mode-alist (append '(("\\.phpt?$" . xhp-mode))
-                              auto-mode-alist))
+(add-to-list 'load-path "~/fbsource/fbcode/experimental/jallen/hack-mode")
 
 ;; Any customizations that are particular to the env
 ;; e.g. shared work configs
 (if (file-exists-p "~/.local.el")
     (load "~/.local.el"))
 
+
 (require 'package)
 (setq package-archives '(
-                         ("gnu" . "https://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")
-                         ;;("marmalade" . "http://marmalade-repo.org/packages/")
-                         ))
+			 ("gnu" . "https://elpa.gnu.org/packages/")
+			 ("melpa" . "https://melpa.org/packages/")
+			 ;;("marmalade" . "http://marmalade-repo.org/packages/")
+			 ))
 
 (defvar package-list
   '(
@@ -48,7 +46,7 @@
     helm-rtags
     company-rtags
     flycheck-rtags
-    
+
     ;; ido
     ;; ido-ubiquitous
     ;; flx-ido
@@ -58,13 +56,13 @@
     exec-path-from-shell
 
     flycheck
-    
+
     go-mode
     go-eldoc
     go-autocomplete
     go-rename
     go-guru
-    
+
     helm-c-yasnippet
     helm-commandlinefu
     helm-company
@@ -111,7 +109,6 @@
   (unless (package-installed-p package)
     (package-install package)))
 
-
 (require 'j-terminal-compat)
 (require 'j-mc)
 (require 'j-util)
@@ -146,18 +143,18 @@
 
 ;; Sweet, sweet diffs
 (add-hook 'ediff-load-hook
-          (lambda ()
-            (flycheck-mode nil)
-            (setq ediff-highlight-all-diffs nil)
-            (set-face-background
-             ediff-current-diff-face-A "#1e2424")
-            (set-face-background
-             ediff-current-diff-face-B "#1e2424")
-            (set-face-background
-             ediff-current-diff-face-C "#1e2424")
-            (make-face-italic
-             ediff-current-diff-face-A)
-            (make-face-italic
-             ediff-current-diff-face-B)
-            (make-face-italic
-             ediff-current-diff-face-C)))
+	  (lambda ()
+	    (flycheck-mode nil)
+	    (setq ediff-highlight-all-diffs nil)
+	    (set-face-background
+	     ediff-current-diff-face-A "#1e2424")
+	    (set-face-background
+	     ediff-current-diff-face-B "#1e2424")
+	    (set-face-background
+	     ediff-current-diff-face-C "#1e2424")
+	    (make-face-italic
+	     ediff-current-diff-face-A)
+	    (make-face-italic
+	     ediff-current-diff-face-B)
+	    (make-face-italic
+	     ediff-current-diff-face-C)))
