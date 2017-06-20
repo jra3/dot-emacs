@@ -16,6 +16,8 @@
 
 ;; (add-hook 'before-save-hook whitespace-cleanup nil 'local)
 
+(add-hook 'before-save-hook 'whitespace-cleanup)
+
 ;; mouse scroll
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control))))
 
@@ -23,22 +25,22 @@
 
 (setq scroll-step 1
       scroll-conservatively 10000
-      
+
       split-height-threshold 10000
       split-width-threshold 10000
 
       large-file-warning-threshold nil
-      
+
       case-fold-search t
       transient-mark-mode t
 
       use-dialog-box nil
       use-file-dialog nil
       line-number-mode 1
-      
+
       fill-column 78
       highlight-80+-columns 80
-      
+
       indent-tabs-mode nil
 
       current-language-environment "utf-8"
@@ -47,7 +49,7 @@
       compilation-ask-about-save nil
       display-buffer-reuse-frames nil
       ediff-highlight-all-diffs nil
-      
+
       alert-user-configuration (quote ((nil notifier nil))))
 
 ;(global-flycheck-mode)

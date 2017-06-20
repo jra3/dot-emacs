@@ -2,16 +2,14 @@
 (setq company-backends
       (quote
        (
-        ;; company-hh-complete
-	company-rtags
+        company-rtags
         company-nxml
         company-css
-        company-xcode
-        company-cmake
-        company-capf
+        company-flow
+
         company-files
         company-dabbrev
-	)
+        )
        )
       )
 
@@ -31,7 +29,6 @@
 (setq rtags-completions-enabled t)
 
 ;; company integration
-(require 'company)
 (push 'company-rtags company-backends)
 (global-company-mode)
 (delete 'company-backends 'company-clang)

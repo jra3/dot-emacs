@@ -7,7 +7,8 @@
         (right-fringe . 1)
         (menu-bar-lines . 0)
         (tool-bar-lines . 0)
-        (font . "Menlo-16"))))
+        ;; (font . "Menlo-16")
+        )))
 
 ;; highlight matcing parens when cursor is on one
 (show-paren-mode t)
@@ -52,9 +53,9 @@
 ;; Screw that, I kill it on save anyway
 (setq-default show-trailing-whitespace nil)
 
-(defun jallen-font () (interactive) (set-frame-font "Menlo-14"))
-(defun jallen-font-no-contacts () (interactive) (set-frame-font "Menlo-18"))
-(defun jallen-blind () (interactive) (set-frame-font "Menlo-30"))
+;; (defun jallen-font () (interactive) (set-frame-font "Menlo-14"))
+;; (defun jallen-font-no-contacts () (interactive) (set-frame-font "Menlo-18"))
+;; (defun jallen-blind () (interactive) (set-frame-font "Menlo-30"))
 
 (defvar mode-line-cleaner-alist
   `((auto-complete-mode . " α")

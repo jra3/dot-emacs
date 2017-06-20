@@ -3,7 +3,7 @@
 (defvar dot-emacs-dir "~/.dot-emacs")
 (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
     (let* ((my-lisp-dir dot-emacs-dir)
-	   (default-directory my-lisp-dir))
+           (default-directory my-lisp-dir))
       (add-to-list 'load-path my-lisp-dir)
       (normal-top-level-add-subdirs-to-load-path)))
 
@@ -17,16 +17,18 @@
 (if (file-exists-p "~/.local.el")
     (load "~/.local.el"))
 
-
 (require 'package)
 (setq package-archives '(
-			 ("gnu" . "https://elpa.gnu.org/packages/")
-			 ("melpa" . "https://melpa.org/packages/")
-			 ;;("marmalade" . "http://marmalade-repo.org/packages/")
-			 ))
+                         ("gnu" . "https://elpa.gnu.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")
+                         ;;("marmalade" . "http://marmalade-repo.org/packages/")
+                         ))
 
 (defvar package-list
   '(
+    lsp-mode
+    lsp-python
+
     js2-mode
     ag  ; the silver searcher!
     anzu
@@ -45,6 +47,8 @@
     rtags
     helm-rtags
     company-rtags
+    company-flow
+
     flycheck-rtags
 
     ;; ido
@@ -96,7 +100,9 @@
     tangotango-theme
     web-mode
 
+    whitespace-cleanup-mode
     wanderlust
+
     ))
 
 (package-initialize)
@@ -135,6 +141,8 @@
 
 (require 'leg-mode)
 
+(require 'flow)
+
 (if (file-exists-p "~/.local-overrides.el")
     (load-file "~/.local-overrides.el"))
 
@@ -143,18 +151,18 @@
 
 ;; Sweet, sweet diffs
 (add-hook 'ediff-load-hook
-	  (lambda ()
-	    (flycheck-mode nil)
-	    (setq ediff-highlight-all-diffs nil)
-	    (set-face-background
-	     ediff-current-diff-face-A "#1e2424")
-	    (set-face-background
-	     ediff-current-diff-face-B "#1e2424")
-	    (set-face-background
-	     ediff-current-diff-face-C "#1e2424")
-	    (make-face-italic
-	     ediff-current-diff-face-A)
-	    (make-face-italic
-	     ediff-current-diff-face-B)
-	    (make-face-italic
-	     ediff-current-diff-face-C)))
+          (lambda ()
+            (flycheck-mode nil)
+            (setq ediff-highlight-all-diffs nil)
+            (set-face-background
+             ediff-current-diff-face-A "#1e2424")
+            (set-face-background
+             ediff-current-diff-face-B "#1e2424")
+            (set-face-background
+             ediff-current-diff-face-C "#1e2424")
+            (make-face-italic
+             ediff-current-diff-face-A)
+            (make-face-italic
+             ediff-current-diff-face-B)
+            (make-face-italic
+             ediff-current-diff-face-C)))
