@@ -39,10 +39,13 @@ powered by <p class=\"creator\">%c</p><p class=\"validation\">%v</p>"))))
  '(org-modules
    (quote
     (org-bbdb org-bibtex org-crypt org-gnus org-habit org-id org-info org-protocol)))
+ '(org-protocol-project-alist
+   (quote
+    (("http://orgmode.org/worg/" :base-url "http://orgmode.org/worg/" :working-directory "/Users/jallen/org/" :online-suffix ".html" :working-suffix ".org"))))
  '(package-selected-packages
    (quote
-    (whitespace-cleanup-mode company-arduino org-protocol-jekyll jsx-mode wanderlust company-rtags helm-rtags ag helm-flycheck rjsx-mode org-mac-link org-mac-iCal org-mime puppet-mode org-ac yaml-mode web-mode thrift tangotango-theme smex rainbow-mode rainbow-delimiters popwin org-pomodoro org-bullets nose markdown-mode magit json-mode js2-refactor js-comint helm-unicode helm-swoop helm-pydoc helm-projectile helm-orgcard helm-flx helm-describe-modes helm-descbinds helm-css-scss helm-company helm-commandlinefu helm-c-yasnippet google-c-style go-rename go-eldoc go-dlv go-autocomplete gitignore-mode gitconfig-mode flymake-yaml flymake-shell flymake-json flymake-google-cpplint flymake-go flymake-cursor flymake-css flymake flycheck exec-path-from-shell elpy diminish crontab-mode color-identifiers-mode coffee-mode anzu ac-js2 2048-game)))
- '(projectile-use-git-grep t)
+    (whitespace-cleanup-mode lsp-python lsp-mode yaml-mode web-mode wanderlust thrift tangotango-theme smex rjsx-mode rainbow-mode rainbow-delimiters popwin org-pomodoro org-ac nose markdown-mode magit jsx-mode json-mode js2-refactor js-comint htmlize helm-unicode helm-swoop helm-rtags helm-pydoc helm-projectile helm-orgcard helm-flymake helm-flycheck helm-flx helm-describe-modes helm-descbinds helm-css-scss helm-company helm-commandlinefu helm-c-yasnippet google-c-style go-rename go-guru go-eldoc go-dlv go-autocomplete gitignore-mode gitconfig-mode flymake-yaml flymake-shell flymake-json flymake-google-cpplint flymake-cursor flymake-css flycheck-rtags exec-path-from-shell elpy diminish crontab-mode company-rtags company-flow color-identifiers-mode coffee-mode bbdb anzu ag ac-js2 2048-game)))
+ '(quote (projectile-use-git-grep t))
  '(safe-local-variable-values
    (quote
     ((eval setq default-directory

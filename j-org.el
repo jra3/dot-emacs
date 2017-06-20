@@ -45,7 +45,8 @@
 	;; ("w" todo "WAITING" nil ("waiting.txt")) 
 	;; ("n" todo "NEXT" nil ("next.html"))
 
-	("D" "Daily Action List"
+        
+        ("D" "Daily Action List"
 	 (
 	  (agenda "" ((org-agenda-ndays 1)
 		      (org-agenda-sorting-strategy
@@ -56,20 +57,20 @@
 	("d" "Agenda + Next Actions"
 	 (
 	  (agenda "honker" ((org-agenda-ndays 1)
-		      (org-agenda-sorting-strategy
-		       (quote ((agenda time-up priority-down tag-up) )))
-		      (org-deadline-warning-days 0)
-		      ))
+                            (org-agenda-sorting-strategy
+                             (quote ((agenda time-up priority-down tag-up) )))
+                            (org-deadline-warning-days 0)
+                            ))
 	  (todo "NEXT")) nil ("next.html")
 	  )
 
 	("w" "Weekly Agenda + Next Actions"
 	 (
 	  (agenda "weekly" ((org-agenda-ndays 7)
-		      (org-agenda-sorting-strategy
-		       (quote ((agenda time-up priority-down tag-up) )))
-		      (org-deadline-warning-days 0)
-		      ))
+                            (org-agenda-sorting-strategy
+                             (quote ((agenda time-up priority-down tag-up) )))
+                            (org-deadline-warning-days 0)
+                            ))
 	  (todo "NEXT")) nil ("week.html")
 	  )
 
@@ -77,10 +78,10 @@
 	 ((agenda "" ((org-agenda-ndays 7))) ;; review upcoming deadlines and appointments
 	  ;; type "l" in the agenda to review logged items 
 	  (stuck "") ;; review stuck projects as designated by org-stuck-projects
-	  (tags-todo "project") ;; review all projects
+	  (tags "project") ;; review all projects
 	  (todo "MAYBE") ;; review someday/maybe items
 	  (todo "WAITING"))) ;; review waiting items 
-	       
+        
 	)
       )
 
@@ -151,8 +152,8 @@
  org-agenda-files (list "~/org/gtd.org"			
 			"~/org/work.org"
 			"~/org/personal.org"
-			"~/org/diary.org"
-			"~/org/habits.org")
+;;			"~/org/habits.org" ;
+                        )
 
  org-pomodoro-start-sound-p t
  org-publish-use-timestamps-flag nil
