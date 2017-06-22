@@ -1,14 +1,14 @@
 ;; default to better frame titles
 (setq frame-title-format (concat  "%b - emacs@" system-name))
 
-(setq default-frame-alist
-      (quote
-       ((left-fringe . 1)
-        (right-fringe . 1)
-        (menu-bar-lines . 0)
-        (tool-bar-lines . 0)
-        ;; (font . "Menlo-16")
-        )))
+;; (setq default-frame-alist
+;;       (quote
+;;        ((left-fringe . 1)
+;;         (right-fringe . 1)
+;;         (menu-bar-lines . 0)
+;;         (tool-bar-lines . 0)
+;;         (font . "Menlo-16")
+;;         )))
 
 ;; highlight matcing parens when cursor is on one
 (show-paren-mode t)
@@ -53,9 +53,9 @@
 ;; Screw that, I kill it on save anyway
 (setq-default show-trailing-whitespace nil)
 
-;; (defun jallen-font () (interactive) (set-frame-font "Menlo-14"))
-;; (defun jallen-font-no-contacts () (interactive) (set-frame-font "Menlo-18"))
-;; (defun jallen-blind () (interactive) (set-frame-font "Menlo-30"))
+(defun jallen-font () (interactive) (set-frame-font "Menlo-14"))
+(defun jallen-font-no-contacts () (interactive) (set-frame-font "Menlo-18"))
+(defun jallen-blind () (interactive) (set-frame-font "Menlo-30"))
 
 (defvar mode-line-cleaner-alist
   `((auto-complete-mode . " α")
@@ -84,15 +84,15 @@ want to use in the modeline *in lieu of* the original.")
   (interactive)
   (loop for cleaner in mode-line-cleaner-alist
         do (let* ((mode (car cleaner))
-                 (mode-str (cdr cleaner))
-                 (old-mode-str (cdr (assq mode minor-mode-alist))))
+                  (mode-str (cdr cleaner))
+                  (old-mode-str (cdr (assq mode minor-mode-alist))))
              (when old-mode-str
-                 (setcar old-mode-str mode-str))
-               ;; major mode
+               (setcar old-mode-str mode-str))
+             ;; major mode
              (when (eq mode major-mode)
                (setq mode-name mode-str)))))
 
 
 (add-hook 'after-change-major-mode-hook 'clean-mode-line)
- 
+
 (provide 'j-appearance)

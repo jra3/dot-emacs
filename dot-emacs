@@ -146,8 +146,8 @@
 (if (file-exists-p "~/.local-overrides.el")
     (load-file "~/.local-overrides.el"))
 
-(with-eval-after-load 'flycheck
-  (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+;; (with-eval-after-load 'flycheck
+;;   (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
 ;; Sweet, sweet diffs
 (add-hook 'ediff-load-hook

@@ -26,10 +26,12 @@
    (quote
     (".bzr" "CVS" ".git" ".hg" ".svn" ".tox" "build" "dist" ".cask" "third_party" "third_party_dev" "node_modules" "interana_tailer/interana_tailer")))
  '(elpy-rpc-python-command "python")
+ '(flycheck-disabled-checkers (quote (emacs-lisp-checkdoc python-flake8)))
  '(holiday-bahai-holidays nil)
  '(holiday-islamic-holidays nil)
  '(holiday-oriental-holidays nil)
  '(indent-tabs-mode nil)
+ '(lsp-response-timeout 3)
  '(markdown-command "multimarkdown")
  '(org-agenda-restore-windows-after-quit t)
  '(org-html-postamble-format
