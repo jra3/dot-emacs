@@ -59,34 +59,24 @@
   "Username to use for tasks completion. when nil, $USER is used")
 
 (defun company-tasks--make-candidate (candidate)
-  (let ((text (car candidate))
-        (meta (cadr candidate)))
-    (propertize text 'meta meta)))
+  (let ((task_number (cdr (assoc 'task_number candidate)))
+        (annotation (cdr (assoc 'title candidate)))
+        (meta (cdr (assoc 'description candidate)))
+        )
+    (propertize task_number
+                'annotation annotation
+                'meta meta)))
 
 (defun company-tasks--candidates (prefix)
-  (let (res)
-    (dolist (item (company-tasks--query))
-      (push (company-tasks--make-candidate item) res))
-    res))
-
-(defun company-tasks--query ()
-  (let (res)
-    (dolist (task (split-string (shell-command-to-string
-                                 (concat
-                                  "/usr/local/bin/tasks search --name "
-                                  (or company-tasks-username
-                                      (user-login-name))
-                                  " --json | jq '.[] | \"t\\(.task_number),\\(.title)\"' | sed 's#\"##g'")) "\n" t))
-      (push (split-string task "," t) res))
-    res))
-
-;; (defun company-tasks--meta (candidate)
-;;   (format "This will use %s of %s"
-;;           (get-text-property 0 'meta candidate)
-;;           (substring-no-properties candidate)))
+  (mapcar
+   'company-tasks--make-candidate
+   (json-read-from-string (shell-command-to-string "/usr/local/bin/tasks search --name jallen --json"))))
 
 (defun company-tasks--annotation (candidate)
-  (format " %s" (get-text-property 0 'meta candidate)))
+  (format " %s" (get-text-property 0 'annotation candidate)))
+
+(defun company-tasks--meta (candidate)
+  (get-text-property 0 'meta candidate))
 
 (defun company-tasks (command &optional arg &rest ignored)
   (interactive (list 'interactive))
@@ -98,7 +88,7 @@
                  (match-string-no-properties 1)))
     (candidates (company-tasks--candidates arg))
     (annotation (company-tasks--annotation arg))
-    ;; (meta (company-tasks--meta arg))
+    (meta (company-tasks--meta arg))
     ))
 
 (defun text-mode-hook-setup ()
