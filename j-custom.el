@@ -22,6 +22,7 @@
  '(c-report-syntactic-errors t)
  '(calendar-mark-holidays-flag t)
  '(calendar-view-holidays-initially-flag t)
+ '(company-bbdb-modes (quote (message-mode text-mode)))
  '(elpy-project-ignored-directories
    (quote
     (".bzr" "CVS" ".git" ".hg" ".svn" ".tox" "build" "dist" ".cask" "third_party" "third_party_dev" "node_modules" "interana_tailer/interana_tailer")))
@@ -32,6 +33,15 @@
  '(holiday-oriental-holidays nil)
  '(indent-tabs-mode nil)
  '(lsp-response-timeout 3)
+ '(lsp-enable-codeaction nil)
+ '(lsp-enable-completion-at-point t)
+ '(lsp-enable-eldoc t)
+ '(lsp-enable-flycheck t)
+ '(lsp-enable-indentation nil)
+ '(lsp-enable-xref t)
+ '(lsp-flow-binary
+   "/data/users/jallen/www-hg/node_modules/.bin/flow-language-server")
+ '(lsp-highlight-symbol-at-point t)
  '(markdown-command "multimarkdown")
  '(org-agenda-restore-windows-after-quit t)
  '(org-html-postamble-format
@@ -44,10 +54,6 @@ powered by <p class=\"creator\">%c</p><p class=\"validation\">%v</p>"))))
  '(org-protocol-project-alist
    (quote
     (("http://orgmode.org/worg/" :base-url "http://orgmode.org/worg/" :working-directory "/Users/jallen/org/" :online-suffix ".html" :working-suffix ".org"))))
- '(package-selected-packages
-   (quote
-    (whitespace-cleanup-mode lsp-python lsp-mode yaml-mode web-mode wanderlust thrift tangotango-theme smex rjsx-mode rainbow-mode rainbow-delimiters popwin org-pomodoro org-ac nose markdown-mode magit jsx-mode json-mode js2-refactor js-comint htmlize helm-unicode helm-swoop helm-rtags helm-pydoc helm-projectile helm-orgcard helm-flymake helm-flycheck helm-flx helm-describe-modes helm-descbinds helm-css-scss helm-company helm-commandlinefu helm-c-yasnippet google-c-style go-rename go-guru go-eldoc go-dlv go-autocomplete gitignore-mode gitconfig-mode flymake-yaml flymake-shell flymake-json flymake-google-cpplint flymake-cursor flymake-css flycheck-rtags exec-path-from-shell elpy diminish crontab-mode company-rtags company-flow color-identifiers-mode coffee-mode bbdb anzu ag ac-js2 2048-game)))
- '(quote (projectile-use-git-grep t))
  '(safe-local-variable-values
    (quote
     ((eval setq default-directory

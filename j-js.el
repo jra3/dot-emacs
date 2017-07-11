@@ -1,9 +1,13 @@
+(require 'flow-minor-mode)
+(require 'lsp-flow)
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.js$" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.jsx$" . web-mode))
 
 (setq web-mode-content-types-alist
   '(("jsx" . "\\.js[x]?\\'")))
+
+
 
 ;; Creative....
 (font-lock-add-keywords
@@ -16,7 +20,7 @@
 ;; disable jshint since we prefer eslint checking
 (setq-default flycheck-disabled-checkers
   (append flycheck-disabled-checkers
-	  '(javascript-jshint)))
+          '(javascript-jshint)))
 
 ;; use eslint with web-mode for jsx files
 (flycheck-add-mode 'javascript-eslint 'web-mode)
@@ -52,6 +56,8 @@
 (add-to-list 'web-mode-indentation-params '("lineup-calls" . nil))
 (add-to-list 'web-mode-indentation-params '("lineup-concats" . nil))
 (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil))
+
+(add-hook 'web-mode-hook 'flow-minor-enable-automatically)
 
 ;; =============================================================================
 

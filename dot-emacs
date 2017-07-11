@@ -1,5 +1,10 @@
+;;; package --- jallen's .emacs file
 ;; -*- Emacs-Lisp -*-
 
+;;; Commentary:
+;;  he's so dreamy
+
+;;; Code:
 (defvar dot-emacs-dir "~/.dot-emacs")
 (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
     (let* ((my-lisp-dir dot-emacs-dir)
@@ -49,17 +54,11 @@
     company-rtags
     company-flow
 
-    flycheck-rtags
-
-    ;; ido
-    ;; ido-ubiquitous
-    ;; flx-ido
-    ;; ido-vertical-mode
-
     auto-complete
     exec-path-from-shell
 
     flycheck
+    flycheck-rtags
 
     go-mode
     go-eldoc
@@ -102,7 +101,6 @@
 
     whitespace-cleanup-mode
     wanderlust
-
     ))
 
 (package-initialize)
@@ -146,23 +144,4 @@
 (if (file-exists-p "~/.local-overrides.el")
     (load-file "~/.local-overrides.el"))
 
-;; (with-eval-after-load 'flycheck
-;;   (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
-
-;; Sweet, sweet diffs
-(add-hook 'ediff-load-hook
-          (lambda ()
-            (flycheck-mode nil)
-            (setq ediff-highlight-all-diffs nil)
-            (set-face-background
-             ediff-current-diff-face-A "#1e2424")
-            (set-face-background
-             ediff-current-diff-face-B "#1e2424")
-            (set-face-background
-             ediff-current-diff-face-C "#1e2424")
-            (make-face-italic
-             ediff-current-diff-face-A)
-            (make-face-italic
-             ediff-current-diff-face-B)
-            (make-face-italic
-             ediff-current-diff-face-C)))
+;;; .emacs ends here

@@ -1,3 +1,4 @@
+(setq-default major-mode 'text-mode)
 (require 'highlight-80+)
 
 (require 'bbdb)

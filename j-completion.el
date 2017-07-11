@@ -1,84 +1,112 @@
 (require 'company)
-(setq company-backends
-      (quote
-       (
-        company-rtags
-        company-nxml
-        company-css
-        company-flow
+(setq company-idle-delay 0.1)
+(setq company-minimum-prefix-length 1)
+(add-hook 'after-init-hook 'global-company-mode)
+(setq company-backends '((company-capf
+                          company-files
+                          company-elisp
+                          ;; company-inf-ruby company-anaconda company-go company-irony company-clang
+                          company-cmake
+                          company-css
+                          company-yasnippet)
+                         (company-dabbrev company-dabbrev-code)))
 
-        company-files
-        company-dabbrev
-        )
-       )
-      )
+(defvar my-reviewers
+  '(
+    "NT"
 
-(require 'rtags)
-
-(defvar rtags-autostart-diagnostics)
-(defvar rtags-completions-enabled)
-(defvar company-backends)
-(defvar c-mode-base-map)
-(defvar rtags-use-helm)
-
-(require 'helm-rtags)
-(rtags-enable-standard-keybindings)
-
-(setq rtags-autostart-diagnostics t)
-(rtags-diagnostics)
-(setq rtags-completions-enabled t)
-
-;; company integration
-(push 'company-rtags company-backends)
-(global-company-mode)
-(delete 'company-backends 'company-clang)
-
-;; ;; nice keyboard shortcuts
-;; (define-key c-mode-base-map (kbd "<M-tab>")
-;;   (function company-complete))
-;; (define-key c-mode-base-map (kbd "M-.")
-;;   (function rtags-find-symbol-at-point))
-;; (define-key c-mode-base-map (kbd "M-,")
-;;   (function rtags-find-references-at-point))
-
-;; (define-key c-mode-base-map (kbd "<s-right>")
-;;   (function rtags-location-stack-forward))
-;; (define-key c-mode-base-map (kbd "<s-left>")
-;;   (function rtags-location-stack-back))
-
-(when (require 'helm nil :noerror)
-  (setq rtags-use-helm t)
+    "maxsegan"
+    "henryz"
+    "nahapetyan"
+    "uts"
+    "d14z"
+    "rohanmehta"
+    )
   )
 
-;; ;; flycheck integration
-;; (require 'flycheck)
+(defun company-reviewers--engineers ()
+  "returns a list of unixnames in the engineers unix group"
+  (interactive)
+  (split-string (shell-command-to-string "getent group engineers | cut -d: -f4") "," t))
 
-;; (require 'flycheck-rtags)
-;; (defun my-flycheck-rtags-setup ()
-;;   "Flycheck integration."
-;;   (interactive)
-;;   (flycheck-select-checker 'rtags)
-;;   ;; RTags creates more accurate overlays.
-;;   (setq-local flycheck-highlighting-mode nil)
+(defun company-reviewers--annotation (s)
+  (format
+   " [%s]"
+   (replace-regexp-in-string
+    "\n$" ""
+    (shell-command-to-string
+     (format "getent passwd %s | cut -d: -f5" s))))
+  )
 
-;;   (setq rtags-enable-unsaved-reparsing nil)
-;;   (setq-local flycheck-check-syntax-automatically t)
-;;   (setq-local rtags-periodic-reparse-timeout 1)
-;;   )
+(defun company-reviewers (command &optional arg &rest ignored)
+  "`company-mode' completion backend for my common diff reviewers."
+  (interactive (list 'interactive))
+  (cl-case command
+    (interactive (company-begin-backend 'company-reviewers))
+    (prefix (and (memq major-mode '(text-mode))
+                 (looking-back "^\\(Reviewers\\|Subsribers\\): *.*? *\\([^,]*\\)"
+                               (line-beginning-position))
+                 (match-string-no-properties 2)))
+    (candidates (all-completions arg (append
+                                      my-reviewers
+                                      (company-reviewers--engineers))))
+    (annotation (company-reviewers--annotation arg))
+    (sorted t)
+    (no-cache t)))
 
-;; c-mode-common-hook is also called by c++-mode
-;; (add-hook 'c-mode-common-hook #'my-flycheck-rtags-setup)
+;; TODO defcustom this into an fb variable
+(defvar company-tasks-username nil
+  "Username to use for tasks completion. when nil, $USER is used")
 
+(defun company-tasks--make-candidate (candidate)
+  (let ((text (car candidate))
+        (meta (cadr candidate)))
+    (propertize text 'meta meta)))
 
-(setq rtags-path (expand-file-name "~/local/rtags-install/bin"))
-(rtags-enable-standard-keybindings)
+(defun company-tasks--candidates (prefix)
+  (let (res)
+    (dolist (item (company-tasks--query))
+      (push (company-tasks--make-candidate item) res))
+    res))
 
-(setq rtags-rc-log-enabled t)
-(setq rtags-completions-enabled t)
-(setq rtags-use-helm t)
+(defun company-tasks--query ()
+  (let (res)
+    (dolist (task (split-string (shell-command-to-string
+                                 (concat
+                                  "/usr/local/bin/tasks search --name "
+                                  (or company-tasks-username
+                                      (user-login-name))
+                                  " --json | jq '.[] | \"t\\(.task_number),\\(.title)\"' | sed 's#\"##g'")) "\n" t))
+      (push (split-string task "," t) res))
+    res))
 
-(require 'yasnippet)
-;; (yas-installed-snippets-dir
-;; (setq yas-snippet-dirs (quote ("~/.dot-emacs/snippets")) nil (yasnippet))
+;; (defun company-tasks--meta (candidate)
+;;   (format "This will use %s of %s"
+;;           (get-text-property 0 'meta candidate)
+;;           (substring-no-properties candidate)))
+
+(defun company-tasks--annotation (candidate)
+  (format " %s" (get-text-property 0 'meta candidate)))
+
+(defun company-tasks (command &optional arg &rest ignored)
+  (interactive (list 'interactive))
+  (cl-case command
+    (interactive (company-begin-backend 'company-tasks))
+    (prefix (and (memq major-mode '(text-mode))
+                 (looking-back "^Tasks: *.*? *\\([^,]*\\)"
+                               (line-beginning-position))
+                 (match-string-no-properties 1)))
+    (candidates (company-tasks--candidates arg))
+    (annotation (company-tasks--annotation arg))
+    ;; (meta (company-tasks--meta arg))
+    ))
+
+(defun text-mode-hook-setup ()
+  (make-local-variable 'company-backends)
+  (add-to-list 'company-backends 'company-reviewers)
+  (add-to-list 'company-backends 'company-tasks)
+  )
+
+(add-hook 'text-mode-hook 'text-mode-hook-setup)
 
 (provide 'j-completion)

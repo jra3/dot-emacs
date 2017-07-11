@@ -95,4 +95,22 @@ want to use in the modeline *in lieu of* the original.")
 
 (add-hook 'after-change-major-mode-hook 'clean-mode-line)
 
+;; Sweet, sweet diffs
+(add-hook 'ediff-load-hook
+          (lambda ()
+            (flycheck-mode nil)
+            (setq ediff-highlight-all-diffs nil)
+            (set-face-background
+             ediff-current-diff-face-A "#1e2424")
+            (set-face-background
+             ediff-current-diff-face-B "#1e2424")
+            (set-face-background
+             ediff-current-diff-face-C "#1e2424")
+            (make-face-italic
+             ediff-current-diff-face-A)
+            (make-face-italic
+             ediff-current-diff-face-B)
+            (make-face-italic
+             ediff-current-diff-face-C)))
+
 (provide 'j-appearance)
