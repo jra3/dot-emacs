@@ -44,7 +44,7 @@
   (cl-case command
     (interactive (company-begin-backend 'company-reviewers))
     (prefix (and (memq major-mode '(text-mode))
-                 (looking-back "^\\(Reviewers\\|Subsribers\\): *.*? *\\([^,]*\\)"
+                 (looking-back "^\\(Reviewers\\|Subscribers\\): *.*? *\\([^,]*\\)"
                                (line-beginning-position))
                  (match-string-no-properties 2)))
     (candidates (all-completions arg (append
