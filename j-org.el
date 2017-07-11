@@ -11,8 +11,8 @@
 ;; (add-to-list 'org-protocol-protocol-alist
 ;;              '("Hello World" :protocol "hello-world"
 ;;                :function my-hello-world
-;; 	       :kill-client t
-;; 	       ))
+;;             :kill-client t
+;;             ))
 ;; ;; org-protocol:/hello-world:/
 
 ;; (defun my-hello-world (data)
@@ -28,7 +28,7 @@
       org-habit-graph-column 66
       org-habit-show-all-today nil)
 
-; I prefer return to activate a link
+;; I prefer return to activate a link
 (setq org-return-follows-link t)
 
 (global-set-key "\C-cl" 'org-store-link)
@@ -40,49 +40,67 @@
 (setq org-tags-exclude-from-inheritance '("project"))
 
 ; http://www.brool.com/post/using-org-mode-with-gtd/
-(setq org-agenda-custom-commands 
+(setq org-agenda-custom-commands
       '(
-	;; ("w" todo "WAITING" nil ("waiting.txt")) 
-	;; ("n" todo "NEXT" nil ("next.html"))
+        ;; ("w" todo "WAITING" nil ("waiting.txt"))
+        ;; ("n" todo "NEXT" nil ("next.html"))
 
-        
+        ;; ("T" "Daily Action List"
+        ;;  (
+        ;;   (agenda "" ((org-agenda-ndays 1)
+        ;;               (org-agenda-sorting-strategy
+        ;;                (quote ((agenda time-up priority-down tag-up) )))
+        ;;               (org-deadline-warning-days 0)
+        ;;               ))))
+
+        ("n" "Work... work"
+         (
+          (tags-todo "today")
+          (tags "project")
+          (todo "NEXT")
+          (tags-todo "inbox" ((org-agenda-files '("~/org/gtd.org"))))
+          )
+         ((org-agenda-files '("~/org/work.org")))
+         )
+
         ("D" "Daily Action List"
-	 (
-	  (agenda "" ((org-agenda-ndays 1)
-		      (org-agenda-sorting-strategy
-		       (quote ((agenda time-up priority-down tag-up) )))
-		      (org-deadline-warning-days 0)
-		      ))))
-	
-	("d" "Agenda + Next Actions"
-	 (
-	  (agenda "honker" ((org-agenda-ndays 1)
+         (
+          (agenda "habits" ((org-agenda-files '("~/org/habits.org"))))
+          (agenda "" ((org-agenda-ndays 1)
+                      (org-agenda-sorting-strategy
+                       (quote ((agenda time-up priority-down tag-up) )))
+                      (org-deadline-warning-days 0)
+                      ))))
+
+        ("d" "Agenda + Next Actions"
+         (
+          (agenda "honker" ((org-agenda-ndays 1)
                             (org-agenda-sorting-strategy
                              (quote ((agenda time-up priority-down tag-up) )))
                             (org-deadline-warning-days 0)
                             ))
-	  (todo "NEXT")) nil ("next.html")
-	  )
+          (todo "NEXT")) nil ("next.html")
+          )
 
-	("w" "Weekly Agenda + Next Actions"
-	 (
-	  (agenda "weekly" ((org-agenda-ndays 7)
+        ("w" "Weekly Agenda + Next Actions"
+         (
+          (agenda "weekly" ((org-agenda-ndays 7)
                             (org-agenda-sorting-strategy
                              (quote ((agenda time-up priority-down tag-up) )))
                             (org-deadline-warning-days 0)
                             ))
-	  (todo "NEXT")) nil ("week.html")
-	  )
+          (todo "NEXT"))
+         nil ("week.html"))
 
-	("W" "Weekly Review"
-	 ((agenda "" ((org-agenda-ndays 7))) ;; review upcoming deadlines and appointments
-	  ;; type "l" in the agenda to review logged items 
-	  (stuck "") ;; review stuck projects as designated by org-stuck-projects
-	  (tags "project") ;; review all projects
-	  (todo "MAYBE") ;; review someday/maybe items
-	  (todo "WAITING"))) ;; review waiting items 
-        
-	)
+        ("W" "Weekly Review"
+         ((agenda "" ((org-agenda-ndays 7))) ;; review upcoming deadlines and appointments
+          ;; type "l" in the agenda to review logged items
+          (stuck "") ;; review stuck projects as designated by org-stuck-projects
+          (tags "project") ;; review all projects
+          (todo "MAYBE") ;; review someday/maybe items
+          (todo "WAITING"))) ;; review waiting items
+
+        )
       )
 
 (defun org-id-finish (id)
@@ -97,69 +115,67 @@
 
 (setq
  org-directory "~/org"
- 
+
  org-capture-templates '(
 
-			 ("t" "Todo" entry ; New inbox item to be processed
-			  (file+headline "~/org/gtd.org" "Inbox")
-			  "* TODO %?\n  %i\n  %a")
+                         ("t" "Todo" entry ; New inbox item to be processed
+                          (file+headline "~/org/gtd.org" "Inbox")
+                          "* TODO %?\n  %i\n  %a")
 
-			 ("p" "Project" entry ; Create a new project entry
-			  (file+headline "~/org/gtd.org" "Projects")
-			  "* %? :project:\n  %i\n")
+                         ("p" "Project" entry ; Create a new project entry
+                          (file+headline "~/org/gtd.org" "Projects")
+                          "* %? :project:\n  %i\n")
 
-			 ("a" "Action" entry ; New inbox item to be processed
-			  (file+datetree "~/org/gtd.org" "Inbox")
-			  "* TODO %? :action:\n  %i\n")
+                         ("a" "Action" entry ; New inbox item to be processed
+                          (file+datetree "~/org/gtd.org" "Inbox")
+                          "* TODO %? :action:\n  %i\n")
 
-			 ("j" "Journal Entries")			 			 
-			 ("jm" "Precious Memory" entry ; Freeform journal entry
-			  (file+datetree "~/org/journal.org")
-			  "* %? :memory:\n  %i\n  %a")
-			 ("jl" "Today I Learned" entry ; Breif TIL journal entry
-			  (file+datetree "~/org/journal.org" "TIL")
-			  "* %?\nLearned on %U :til:\n  %i\n  %a")
-			 ("j." "Journal" entry ; Freeform journal entry
-			  (file+datetree "~/org/journal.org")
-			  "* %?\nEntered on %U\n  %i\n  %a")
+                         ("j" "Journal Entries")
+                         ("jm" "Precious Memory" entry ; Freeform journal entry
+                          (file+datetree "~/org/journal.org")
+                          "* %? :memory:\n  %i\n  %a")
+                         ("jl" "Today I Learned" entry ; Breif TIL journal entry
+                          (file+datetree "~/org/journal.org" "TIL")
+                          "* %?\nLearned on %U :til:\n  %i\n  %a")
+                         ("j." "Journal" entry ; Freeform journal entry
+                          (file+datetree "~/org/journal.org")
+                          "* %?\nEntered on %U\n  %i\n  %a")
 
-			 ("5" "5 Minute Journal")
-			 ("5m" "Morning Entry" entry (file+datetree "~/org/5-min-journal.org")
-			  "* Morning\n  I am grateful for...\n  - %?\n  - \n  - \n\n  What will I do to make today great?\n  - \n  - \n  - \n\n  I am ...")
-					; 5-minute journal. Evening entry
-			 ("5e" "Evening Entry" entry (file+datetree "~/org/5-min-journal.org")
-			  "* Evening\n  3 amazing things that happened today...\n  - %?\n  - \n  - \n\n  How could I have made today even better?\n  - \n")
+                         ("5" "5 Minute Journal")
+                         ("5m" "Morning Entry" entry (file+datetree "~/org/5-min-journal.org")
+                          "* Morning\n  I am grateful for...\n  - %?\n  - \n  - \n\n  What will I do to make today great?\n  - \n  - \n  - \n\n  I am ...")
+                                        ; 5-minute journal. Evening entry
+                         ("5e" "Evening Entry" entry (file+datetree "~/org/5-min-journal.org")
+                          "* Evening\n  3 amazing things that happened today...\n  - %?\n  - \n  - \n\n  How could I have made today even better?\n  - \n")
 
-			 ("n" "notes" entry ; Generic notebook entry
-			  (file+datetree "~/org/notes.org")
-			  "* %? %U\n")
+                         ("n" "notes" entry ; Generic notebook entry
+                          (file+datetree "~/org/notes.org")
+                          "* %? %U\n")
 
-			 )
+                         )
 
  ;; Fontify src blocks
  org-src-fontify-natively t
 
  org-export-html-style-include-scripts nil
  org-export-html-style-include-default nil
- 
+
  org-outline-path-complete-in-steps nil
 
  org-refile-use-outline-path t
  org-refile-targets '((nil :maxlevel . 1)
-		      (org-agenda-files :maxlevel . 2))
- 
+                      (org-agenda-files :maxlevel . 2))
+
  org-default-notes-file (concat org-directory "/notes.org")
- org-agenda-files (list "~/org/gtd.org"			
-			"~/org/work.org"
-			"~/org/personal.org"
-;;			"~/org/habits.org" ;
+ org-agenda-files (list "~/org/gtd.org"
+                        "~/org/work.org"
+                        "~/org/personal.org"
+                        "~/org/habits.org" ;
                         )
 
  org-pomodoro-start-sound-p t
  org-publish-use-timestamps-flag nil
  org-startup-folded (quote content))
-
-;(add-hook 'org-capture-after-finalize-hook (lambda () (org-id-finish "D51323BB-B5A3-4D22-B232-3182ED2A371A")))
 
 (setq
  org-hide-leading-stars t
@@ -169,7 +185,7 @@
  ;; only show times on items in the agenda, if we have an item at a specified time
  ;; if we set it to true, then we see all the times every 2 hours.  Takes up too much space.
  org-agenda-use-time-grid nil
- 
+
   ;; whenever I change state from TODO to DONE org will log that timestamp. Let's put that in a drawer
  org-log-into-drawer nil
 
@@ -206,6 +222,11 @@
 ;;a visual hint to let you know what line you are in in org-mode agenda
 (add-hook 'org-agenda-finalize-hook (lambda () (hl-line-mode)))
 
+(defun org-toggle-today ()
+  (interactive)
+  (org-toggle-tag "today"))
+
+(define-key org-mode-map (kbd "C-c T") 'org-toggle-today)
 (define-key org-agenda-mode-map (kbd "P") 'org-pomodoro)
 
  ;; Make windmove work in org-mode:
@@ -242,5 +263,20 @@
 ;; (add-hook 'org-clock-cancel-hook #'sanityinc/hide-org-clock-from-header-line)
 
  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(org-add-link-type "task" 'org-task-open)
+
+(defun org-task-open (path)
+  "Open the task in the browser."
+  (browse-url (concat "https://our.intern.facebook.com/intern/tasks/?q=" path)))
+
+(defun org-task-insert-link ()
+  "Store a link to a task."
+  (interactive)
+
+  (let* ((id (read-string "Task ID: " nil))
+         (link (concat "task:" id))
+         (description (format "(t%s) %s" id (shell-command-to-string (concat "tasks view --shell " id " 2>/dev/null | grep -A 1 Title | tail -n 1 | awk '{gsub(/^ +| +$/,\"\")} {print $0}'")))))
+    (insert (org-make-link-string link description))))
 
 (provide 'j-org)
