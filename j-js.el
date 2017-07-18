@@ -1,4 +1,3 @@
-(require 'flow-minor-mode)
 (require 'lsp-flow)
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.js$" . web-mode))
@@ -56,8 +55,6 @@
 (add-to-list 'web-mode-indentation-params '("lineup-calls" . nil))
 (add-to-list 'web-mode-indentation-params '("lineup-concats" . nil))
 (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil))
-
-(add-hook 'web-mode-hook 'flow-minor-enable-automatically)
 
 ;; =============================================================================
 
