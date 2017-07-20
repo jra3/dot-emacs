@@ -1,12 +1,8 @@
-(require 'lsp-flow)
-(require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.js$" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.jsx$" . web-mode))
 
 (setq web-mode-content-types-alist
   '(("jsx" . "\\.js[x]?\\'")))
-
-
 
 ;; Creative....
 (font-lock-add-keywords
@@ -56,6 +52,11 @@
 (add-to-list 'web-mode-indentation-params '("lineup-concats" . nil))
 (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil))
 
+<<<<<<< HEAD
+=======
+;; (add-hook 'web-mode-hook 'flow-minor-enable-automatically)
+
+>>>>>>> better agenda
 ;; =============================================================================
 
 (provide 'j-js)

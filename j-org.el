@@ -1,6 +1,3 @@
-;; (require 'org-ac)
-;; (org-ac/config-default)
-
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (add-to-list 'auto-mode-alist '("\\.org_archive\\'" . org-mode))
 
@@ -22,7 +19,7 @@
 ;;   nil)
 
 (require 'org-habit)
-(setq org-habit-preceding-days 14
+(setq org-habit-preceding-days 7
       org-habit-following-days 1
       org-habit-show-habits-only-for-today t
       org-habit-graph-column 66
@@ -56,8 +53,13 @@
         ("n" "Work... work"
          (
           (tags-todo "today")
-          (tags "project")
-          (todo "NEXT")
+
+          (tags "project" ((org-agenda-files '("~/org/work.org"))))
+          (todo "NEXT" ((org-agenda-files '("~/org/work.org"))))
+
+          (tags "project" ((org-agenda-files '("~/org/gtd.org"))))
+          (todo "NEXT" ((org-agenda-files '("~/org/gtd.org"))))
+
           (tags-todo "inbox" ((org-agenda-files '("~/org/gtd.org"))))
           )
          ((org-agenda-files '("~/org/work.org")))
