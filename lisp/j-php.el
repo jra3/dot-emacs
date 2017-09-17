@@ -40,6 +40,4 @@
 
   )
 
-(add-to-list 'auto-mode-alist '("\\.phpt?$" . hack-mode))
-(add-to-list 'auto-mode-alist '("\\.hhi$" . hack-mode))
 (provide 'j-php)
