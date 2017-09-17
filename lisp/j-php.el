@@ -1,5 +1,4 @@
 (require 'hack-mode)
-(require 'xhp-mode)
 (require 'highlight-80+)
 
 (require 'lsp-mode)
@@ -35,7 +34,6 @@
                   (whitespace-cleanup-mode)
                   )))
 
-  (add-hook 'xhp-mode-hook mode-hook)
   (add-hook 'hack-mode-hook mode-hook)
 
   )

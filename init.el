@@ -6,8 +6,8 @@
 
 ;;; Code:
 
-(if (file-exists-p "~/.local.el")
-    (load "~/.local.el"))
+(if (file-exists-p "~/.emacs.d/local.el")
+    (load "~/.emacs.d/local.el"))
 
 (add-to-list 'exec-path "/usr/local/bin")
 (add-to-list 'exec-path "~/.local/bin")
