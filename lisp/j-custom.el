@@ -61,4 +61,7 @@ powered by <p class=\"creator\">%c</p><p class=\"validation\">%v</p>"))))
    (quote
     ((eval setq default-directory
            (locate-dominating-file buffer-file-name ".dir-locals.el")))))
- '(send-mail-function (quote smtpmail-send-it)))
+ '(send-mail-function (quote smtpmail-send-it))
+ '(yas-snippet-dirs
+   (quote
+    ("/Users/jallen/.emacs.d/snippets" yas-installed-snippets-dir))))

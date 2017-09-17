@@ -28,7 +28,7 @@
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 (setq comint-prompt-read-only t)
 
-(setq custom-file (concat dot-emacs-dir "/j-custom.el"))
+(setq custom-file "~/.emacs.d/lisp/j-custom.el")
 (load custom-file)
 
 (defun jallen-sort-para ()

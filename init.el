@@ -6,17 +6,14 @@
 
 ;;; Code:
 
-;; Any customizations that are particular to the env
-;; e.g. shared work configs
 (if (file-exists-p "~/.local.el")
     (load "~/.local.el"))
 
 (add-to-list 'exec-path "/usr/local/bin")
 (add-to-list 'exec-path "~/.local/bin")
 
-(defvar dot-emacs-dir "~/.dot-emacs")
 (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
-    (let* ((my-lisp-dir dot-emacs-dir)
+    (let* ((my-lisp-dir "~/.emacs.d/lisp")
            (default-directory my-lisp-dir))
       (add-to-list 'load-path my-lisp-dir)
       (normal-top-level-add-subdirs-to-load-path)))
@@ -43,7 +40,7 @@
     thrift
     diminish
     elpy
-    crontab-mode
+    ;; crontab-mode
     gitconfig-mode
     gitignore-mode
     htmlize
@@ -134,8 +131,6 @@
 (require 'j-helm)
 (require 'j-completion)
 (require 'j-web)
-
-(require 'leg-mode)
 
 (require 'flow)
 
