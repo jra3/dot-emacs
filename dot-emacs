@@ -5,22 +5,21 @@
 ;;  he's so dreamy
 
 ;;; Code:
+
+;; Any customizations that are particular to the env
+;; e.g. shared work configs
+(if (file-exists-p "~/.local.el")
+    (load "~/.local.el"))
+
+(add-to-list 'exec-path "/usr/local/bin")
+(add-to-list 'exec-path "~/.local/bin")
+
 (defvar dot-emacs-dir "~/.dot-emacs")
 (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
     (let* ((my-lisp-dir dot-emacs-dir)
            (default-directory my-lisp-dir))
       (add-to-list 'load-path my-lisp-dir)
       (normal-top-level-add-subdirs-to-load-path)))
-
-(add-to-list 'exec-path "/usr/local/bin")
-(add-to-list 'exec-path "~/.local/bin")
-
-(add-to-list 'load-path "~/fbsource/fbcode/experimental/jallen/hack-mode")
-
-;; Any customizations that are particular to the env
-;; e.g. shared work configs
-(if (file-exists-p "~/.local.el")
-    (load "~/.local.el"))
 
 (require 'package)
 (setq package-archives '(
@@ -67,7 +66,6 @@
     go-guru
 
     helm-c-yasnippet
-    helm-commandlinefu
     helm-company
     helm-css-scss
     helm-descbinds
@@ -77,7 +75,6 @@
     helm-orgcard
     helm-projectile
     helm-pydoc
-    helm-swoop
     helm-unicode
 
     markdown-mode
@@ -113,6 +110,7 @@
   (unless (package-installed-p package)
     (package-install package)))
 
+(require 'j-ediff)
 (require 'j-terminal-compat)
 (require 'j-mc)
 (require 'j-util)
@@ -140,6 +138,8 @@
 (require 'leg-mode)
 
 (require 'flow)
+
+(require 'helm-myles)
 
 (if (file-exists-p "~/.local-overrides.el")
     (load-file "~/.local-overrides.el"))

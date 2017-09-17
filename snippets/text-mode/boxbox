@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: boxtemplate
+# key: boxbox
+# group: commits
+# --
+codemod nt:box->nt:box:compat for $0
+Summary: See T21332554
+codemod -d /home/jallen/www/$0 --extensions php '<(/?)nt:box([^:-])' '<\1nt:box:compat\2'
+codemod -d /home/jallen/www/$0 --extensions php ':nt:box([^:-])' ':nt:box:compat\1'
+Test Plan: hh for type checking
+Reviewers: henryz, nahapetyan
+Subscribers: nt-www
+Tasks: T21332554

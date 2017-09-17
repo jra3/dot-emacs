@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: ...={$this->:...}
+# key: xattr
+# --
+${1:attr}={$this->:$1}
