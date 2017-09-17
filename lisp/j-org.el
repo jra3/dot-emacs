@@ -52,15 +52,25 @@
 
         ("n" "Work... work"
          (
-          (tags-todo "today")
 
-          (tags "project" ((org-agenda-files '("~/org/work.org"))))
-          (todo "NEXT" ((org-agenda-files '("~/org/work.org"))))
+          (tags-todo "today" ((org-agenda-overriding-header "Today's items")
+                              (org-agenda-files jallen-default-org-agenda-files)
+                              ))
 
-          (tags "project" ((org-agenda-files '("~/org/gtd.org"))))
-          (todo "NEXT" ((org-agenda-files '("~/org/gtd.org"))))
+          (agenda "" ((org-agenda-ndays 1)))
 
-          (tags-todo "inbox" ((org-agenda-files '("~/org/gtd.org"))))
+          (tags "project" ((org-agenda-files '("~/org/work.org"))
+                           (org-agenda-overriding-header "Work Projects")))
+          (todo "NEXT" ((org-agenda-files '("~/org/work.org"))
+                        (org-agenda-overriding-header "Work Next Items")))
+
+          (tags "project" ((org-agenda-files '("~/org/gtd.org"))
+                        (org-agenda-overriding-header "Personal Projects")))
+          (todo "NEXT" ((org-agenda-files '("~/org/gtd.org"))
+                        (org-agenda-overriding-header "Personal Next Items")))
+
+          (tags-todo "inbox" ((org-agenda-files '("~/org/gtd.org"))
+                              (org-agenda-overriding-header "Inbox")))
           )
          ((org-agenda-files '("~/org/work.org")))
          )
@@ -122,7 +132,11 @@
 
                          ("t" "Todo" entry ; New inbox item to be processed
                           (file+headline "~/org/gtd.org" "Inbox")
-                          "* TODO %?\n  %i\n  %a")
+                          "* TODO %?\n  %i\n")
+
+                         ("T" "Today" entry ; New inbox item to be processed
+                          (file+headline "~/org/today.org" "todo list")
+                          "* TODO %?   :today:\n  %i\n")
 
                          ("p" "Project" entry ; Create a new project entry
                           (file+headline "~/org/gtd.org" "Projects")
@@ -154,6 +168,10 @@
                           (file+datetree "~/org/notes.org")
                           "* %? %U\n")
 
+                         ("q" "test" entry ; Generic notebook entry
+                          (file+headline "~/org/gtd.org" "Inbox")
+                          "* Morning\n  I am grateful for...\n  - %^{I am grateful for...}\n  - %^{I am grateful for...}\n  - %^{I am grateful for...}\n\n  What will I do to make today great?\n  - %^{What will I do to make today great?}\n  - %^{What will I do to make today great?}\n  - %^{What will I do to make today great?}\n\n  %^{I am ...}")
+
                          )
 
  ;; Fontify src blocks
@@ -165,15 +183,18 @@
  org-outline-path-complete-in-steps nil
 
  org-refile-use-outline-path t
- org-refile-targets '((nil :maxlevel . 1)
-                      (org-agenda-files :maxlevel . 2))
+ org-refile-targets '((org-agenda-files :tag . "project")
+                      ;; (nil . (:maxlevel . 1))
+                      )
 
  org-default-notes-file (concat org-directory "/notes.org")
- org-agenda-files (list "~/org/gtd.org"
-                        "~/org/work.org"
-                        "~/org/personal.org"
-                        "~/org/habits.org" ;
-                        )
+ jallen-default-org-agenda-files (list "~/org/gtd.org"
+                                       "~/org/work.org"
+                                       "~/org/personal.org"
+                                       "~/org/habits.org"
+                                       "~/org/today.org"
+                                       )
+ org-agenda-files jallen-default-org-agenda-files
 
  org-pomodoro-start-sound-p t
  org-publish-use-timestamps-flag nil

@@ -5,9 +5,9 @@
 ;;  he's so dreamy
 
 ;;; Code:
-(defvar dot-emacs-dir "~/.dot-emacs")
+
 (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
-    (let* ((my-lisp-dir dot-emacs-dir)
+    (let* ((my-lisp-dir "~/.emacs.d/lisp")
            (default-directory my-lisp-dir))
       (add-to-list 'load-path my-lisp-dir)
       (normal-top-level-add-subdirs-to-load-path)))
@@ -44,7 +44,7 @@
     thrift
     diminish
     elpy
-    crontab-mode
+    ;; crontab-mode
     gitconfig-mode
     gitignore-mode
     htmlize
@@ -136,8 +136,6 @@
 (require 'j-helm)
 (require 'j-completion)
 (require 'j-web)
-
-(require 'leg-mode)
 
 (require 'flow)
 

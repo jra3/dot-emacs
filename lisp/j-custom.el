@@ -56,9 +56,12 @@ powered by <p class=\"creator\">%c</p><p class=\"validation\">%v</p>"))))
     (("http://orgmode.org/worg/" :base-url "http://orgmode.org/worg/" :working-directory "/Users/jallen/org/" :online-suffix ".html" :working-suffix ".org"))))
  '(package-selected-packages
    (quote
-    (yaml-mode whitespace-cleanup-mode web-mode wanderlust thrift tangotango-theme smex rainbow-mode rainbow-delimiters popwin nose markdown-mode magit lsp-python json-mode js2-refactor js-comint htmlize helm-unicode helm-swoop helm-rtags helm-pydoc helm-projectile helm-orgcard helm-flycheck helm-flx helm-describe-modes helm-descbinds helm-css-scss helm-company helm-commandlinefu helm-c-yasnippet google-c-style go-rename go-guru go-eldoc go-autocomplete gitignore-mode gitconfig-mode flycheck-rtags exec-path-from-shell elpy diminish crontab-mode company-rtags company-flow color-identifiers-mode coffee-mode bbdb anzu ag)))
+    (arduino-mode yaml-mode whitespace-cleanup-mode web-mode wanderlust thrift tangotango-theme smex rainbow-mode rainbow-delimiters popwin nose markdown-mode magit lsp-python json-mode js2-refactor js-comint htmlize helm-unicode helm-swoop helm-rtags helm-pydoc helm-projectile helm-orgcard helm-flycheck helm-flx helm-describe-modes helm-descbinds helm-css-scss helm-company helm-commandlinefu helm-c-yasnippet google-c-style go-rename go-guru go-eldoc go-autocomplete gitignore-mode gitconfig-mode flycheck-rtags exec-path-from-shell elpy diminish crontab-mode company-rtags company-flow color-identifiers-mode coffee-mode bbdb anzu ag)))
  '(safe-local-variable-values
    (quote
     ((eval setq default-directory
            (locate-dominating-file buffer-file-name ".dir-locals.el")))))
- '(send-mail-function (quote smtpmail-send-it)))
+ '(send-mail-function (quote smtpmail-send-it))
+ '(yas-snippet-dirs
+   (quote
+    ("/Users/jallen/.emacs.d/snippets" yas-installed-snippets-dir))))
