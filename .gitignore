@@ -1,6 +1,11 @@
 local.el
 *.elc
 
-elpa/
 auto-save-list/
+elpa/
+games/
+recentf
+tutorial/
+
 tramp
+bookmarks
