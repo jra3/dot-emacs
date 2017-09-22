@@ -128,15 +128,12 @@
 (require 'j-yaml)
 (require 'j-markdown)
 
-(require 'j-helm)
 (require 'j-completion)
 (require 'j-web)
 
 (require 'flow)
 
+(require 'j-helm)
 (require 'helm-myles)
 
-(if (file-exists-p "~/.local-overrides.el")
-    (load-file "~/.local-overrides.el"))
-
-;;; .emacs ends here
+;;; init.el ends here
