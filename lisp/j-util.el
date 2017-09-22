@@ -1,10 +1,7 @@
-(fset 'eq-align
-      "\C-[xalign-regexp\C-m=\C-m")
-
-;; buffer size manipulation
-(fset 'grow-horiz   "\C-x}\C-x}\C-x}\C-x}\C-x}\C-x}\C-x}")
-(fset 'shrink-horiz "\C-x{\C-x{\C-x{\C-x{\C-x{\C-x{\C-x{")
-(fset 'grow-vert    "\C-x^\C-x^\C-x^\C-x^")
+(defun align-eq ()
+  "Aligns multiple lines so that = lines up, as with variable assignments."
+  (interactive)
+  (align-regexp " = "))
 
 (require 'compile)
 (add-to-list 'compilation-error-regexp-alist
@@ -43,18 +40,6 @@
       (sort-lines nil bpoint epoint)
       )
     ))
-
-;; refresh the list of unixnames as follows:
-;; > db -u cdb.org -e 'SELECT unixname from unixname' > ~/.unixnames
-;; > cat ~/.unixnames | xargs -n1 groups | grep engineers
-;;   | cut -f1 -d\ > ~/.engineers
-(defun jallen-insert-engineer-unixname (&rest ARGS)
-  "Autocompletes engineer unixnames for insertion at point"
-  (interactive)
-  (insert
-   (ido-completing-read "Reviewers: "
-                        (jallen-read-lines "~/.engineers"))
-   ))
 
 (defun jallen-read-lines (fpath)
   "Return a list of lines of a file at at FPATH."
