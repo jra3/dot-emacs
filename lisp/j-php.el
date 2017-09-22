@@ -1,4 +1,3 @@
-(require 'hack-mode)
 (require 'highlight-80+)
 
 (require 'lsp-mode)
@@ -7,6 +6,8 @@
 (with-eval-after-load 'lsp-mode
   (require 'lsp-flycheck))
 (lsp-flycheck-add-mode 'hack)
+
+;; (require 'hack-mode)
 
 (lsp-define-stdio-client 'hack-mode "hack" 'stdio
                          ;; find the project root by looking for the .hhconfig file
