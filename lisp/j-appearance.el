@@ -1,14 +1,23 @@
 ;; default to better frame titles
 (setq frame-title-format (concat  "%b - emacs@" system-name))
 
-;; (setq default-frame-alist
-;;       (quote
-;;        ((left-fringe . 1)
-;;         (right-fringe . 1)
-;;         (menu-bar-lines . 0)
-;;         (tool-bar-lines . 0)
-;;         (font . "Menlo-16")
-;;         )))
+(defun jallen-install-font ()
+  "copy my font files into the system-specific location"
+  (let ((fonts-source "~/.emacs.d/Input_Fonts/"))
+    (if (string-equal system-type "darwin")
+        (copy-directory fonts-source "~/Library/Fonts/") ; Mac
+      (copy-directory fonts-source "~/.fonts/") ; Linux
+      )
+    ))
+
+(setq default-frame-alist
+      (quote
+       ((left-fringe . 1)
+        (right-fringe . 1)
+        (menu-bar-lines . 0)
+        (tool-bar-lines . 0)
+        (font . "Input Mono Narrow-16")
+        )))
 
 ;; highlight matcing parens when cursor is on one
 (show-paren-mode t)
@@ -34,6 +43,11 @@
   (diminish 'flycheck-mode "Fly"))
 (add-hook 'after-init-hook 'load-diminish)
 
+(add-hook 'before-make-frame-hook
+          (lambda ()
+            (if (-any '(lambda (fonts) (string-prefix-p "-*-Input " (elt fonts 6))) (x-family-fonts))
+                (jallen-install-font))))
+
 ;; unique buffer names using path
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'reverse)
@@ -53,9 +67,12 @@
 ;; Screw that, I kill it on save anyway
 (setq-default show-trailing-whitespace nil)
 
-(defun jallen-font () (interactive) (set-frame-font "Menlo-14"))
-(defun jallen-font-no-contacts () (interactive) (set-frame-font "Menlo-18"))
-(defun jallen-blind () (interactive) (set-frame-font "Menlo-30"))
+(defun jallen-font () (interactive)
+       (set-frame-font "Input Mono Narrow-16"))
+(defun jallen-font-no-contacts () (interactive)
+       (set-frame-font "Input Mono Narrow-22"))
+(defun jallen-blind () (interactive)
+       (set-frame-font "Input Mono Narrow-30"))
 
 (defvar mode-line-cleaner-alist
   `((auto-complete-mode . " α")
@@ -79,7 +96,6 @@ When you add a new element to the alist, keep in mind that you
 must pass the correct minor/major mode symbol and a string you
 want to use in the modeline *in lieu of* the original.")
 
-
 (defun clean-mode-line ()
   (interactive)
   (loop for cleaner in mode-line-cleaner-alist
@@ -91,7 +107,6 @@ want to use in the modeline *in lieu of* the original.")
              ;; major mode
              (when (eq mode major-mode)
                (setq mode-name mode-str)))))
-
 
 (add-hook 'after-change-major-mode-hook 'clean-mode-line)
 

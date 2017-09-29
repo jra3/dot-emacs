@@ -22,7 +22,7 @@
 (setq org-habit-preceding-days 7
       org-habit-following-days 1
       org-habit-show-habits-only-for-today t
-      org-habit-graph-column 66
+      org-habit-graph-column 52
       org-habit-show-all-today nil)
 
 ;; I prefer return to activate a link
@@ -164,13 +164,16 @@
                          ("5e" "Evening Entry" entry (file+datetree "~/org/5-min-journal.org")
                           "* Evening\n  3 amazing things that happened today...\n  - %?\n  - \n  - \n\n  How could I have made today even better?\n  - \n")
 
+                         ("f" "CBT" entry (file "~/org/cbt-journal.org")
+                          "* %U\n** Activating Event\n** thoughts/Beliefs\n** emotional Consequences\n")
+
                          ("n" "notes" entry ; Generic notebook entry
                           (file+datetree "~/org/notes.org")
                           "* %? %U\n")
 
-                         ("q" "test" entry ; Generic notebook entry
-                          (file+headline "~/org/gtd.org" "Inbox")
-                          "* Morning\n  I am grateful for...\n  - %^{I am grateful for...}\n  - %^{I am grateful for...}\n  - %^{I am grateful for...}\n\n  What will I do to make today great?\n  - %^{What will I do to make today great?}\n  - %^{What will I do to make today great?}\n  - %^{What will I do to make today great?}\n\n  %^{I am ...}")
+                         ;; ("q" "test" entry ; Generic notebook entry
+                         ;;  (file+headline "~/org/gtd.org" "Inbox")
+                         ;;  "* Morning\n  I am grateful for...\n  - %^{I am grateful for...}\n  - %^{I am grateful for...}\n  - %^{I am grateful for...}\n\n  What will I do to make today great?\n  - %^{What will I do to make today great?}\n  - %^{What will I do to make today great?}\n  - %^{What will I do to make today great?}\n\n  %^{I am ...}")
 
                          )
 

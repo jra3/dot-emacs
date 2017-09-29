@@ -36,6 +36,7 @@
     bbdb
     company
     color-identifiers-mode
+    dired-details
     smex
     thrift
     diminish
@@ -95,6 +96,7 @@
 
     whitespace-cleanup-mode
     wanderlust
+    org-pomodoro
     ))
 
 (package-initialize)
@@ -108,6 +110,7 @@
     (package-install package)))
 
 (require 'j-ediff)
+(require 'j-dired)
 (require 'j-terminal-compat)
 (require 'j-mc)
 (require 'j-util)
@@ -135,5 +138,8 @@
 
 (require 'j-helm)
 (require 'helm-myles)
+
+
+
 
 ;;; init.el ends here

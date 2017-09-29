@@ -41,6 +41,8 @@
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
+(global-set-key (kbd "C-c C-n") 'newsticker-show-news)
+
 ; This is a little silly, but I'll leave it here as a fun example
 (defun increment-number-at-point ()
   (interactive)
