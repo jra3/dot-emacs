@@ -45,16 +45,16 @@
     gitignore-mode
     htmlize
 
-    rtags
-    helm-rtags
-    company-rtags
+    ;; helm-rtags
+    ;; company-rtags
+    ;; flycheck-rtags
+
     company-flow
 
     auto-complete
     exec-path-from-shell
 
     flycheck
-    flycheck-rtags
 
     go-mode
     go-eldoc
