@@ -43,6 +43,11 @@
  '(lsp-highlight-symbol-at-point t)
  '(lsp-response-timeout 3)
  '(markdown-command "multimarkdown")
+ '(newsticker-url-list
+   (quote
+    (("Schneier on Security" "https://www.schneier.com/blog/atom.xml" nil nil nil)
+     ("Xah Emacs Blog" "http://ergoemacs.org/emacs/blog.xml" nil nil nil)
+     ("Sacha Chua" "http://sachachua.com/blog/feed/" nil nil nil))))
  '(org-agenda-restore-windows-after-quit t)
  '(org-html-postamble-format
    (quote
@@ -56,7 +61,7 @@ powered by <p class=\"creator\">%c</p><p class=\"validation\">%v</p>"))))
     (("http://orgmode.org/worg/" :base-url "http://orgmode.org/worg/" :working-directory "/Users/jallen/org/" :online-suffix ".html" :working-suffix ".org"))))
  '(package-selected-packages
    (quote
-    (yaml-mode whitespace-cleanup-mode web-mode wanderlust thrift tangotango-theme smex rainbow-mode rainbow-delimiters popwin nose markdown-mode magit lsp-python json-mode js2-refactor js-comint htmlize helm-unicode helm-swoop helm-rtags helm-pydoc helm-projectile helm-orgcard helm-flycheck helm-flx helm-describe-modes helm-descbinds helm-css-scss helm-company helm-commandlinefu helm-c-yasnippet google-c-style go-rename go-guru go-eldoc go-autocomplete gitignore-mode gitconfig-mode flycheck-rtags exec-path-from-shell elpy diminish crontab-mode company-rtags company-flow color-identifiers-mode coffee-mode bbdb anzu ag)))
+    (org-super-agenda powerline org-pomodoro dired-details yaml-mode whitespace-cleanup-mode web-mode wanderlust thrift tangotango-theme smex rainbow-mode rainbow-delimiters popwin nose markdown-mode magit lsp-python json-mode js2-refactor js-comint htmlize helm-unicode helm-swoop helm-rtags helm-pydoc helm-projectile helm-orgcard helm-flycheck helm-flx helm-describe-modes helm-descbinds helm-css-scss helm-company helm-commandlinefu helm-c-yasnippet google-c-style go-rename go-guru go-eldoc go-autocomplete gitignore-mode gitconfig-mode flycheck-rtags exec-path-from-shell elpy diminish crontab-mode company-rtags company-flow color-identifiers-mode coffee-mode bbdb anzu ag)))
  '(safe-local-variable-values
    (quote
     ((eval setq default-directory
