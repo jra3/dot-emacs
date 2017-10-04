@@ -34,8 +34,6 @@
 (require 'j-terminal-compat)
 (require 'j-util)
 (require 'j-globalkeys)
-(require 'j-colors)
-(require 'j-appearance)
 (require 'j-behavior)
 (require 'j-org)
 
@@ -47,7 +45,6 @@
 (require 'j-html)
 (require 'j-css)
 (require 'j-thrift)
-(require 'j-yaml)
 (require 'j-markdown)
 
 (require 'j-completion)

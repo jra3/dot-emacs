@@ -1,3 +1,6 @@
+#+TITLE: Emacs Configuration
+#+AUTHOR: John Allen
+
 * Packages
 ** Add Package Repos
 
@@ -136,7 +139,92 @@
 (add-to-list 'exec-path "~/.local/bin")
 #+end_src
 
+* Appearance
+** Frame Titles
+#+begin_src emacs-lisp :tangle yes
+(setq frame-title-format (concat  "%b - emacs@" system-name))
+#+end_src
+** Fonts
+ Install fonts from my .emacs.d into system locations
+#+begin_src emacs-lisp :tangle yes
+(defun jallen-install-font ()
+  "copy my font files into the system-specific location"
+  (let ((fonts-source "~/.emacs.d/Input_Fonts/"))
+    (if (string-equal system-type "darwin")
+        (copy-directory fonts-source "~/Library/Fonts/") ; Mac
+      (copy-directory fonts-source "~/.fonts/") ; Linux
+      )
+    ))
 
+(add-hook 'before-make-frame-hook
+          (lambda ()
+            (if (-any '(lambda (fonts) (string-prefix-p "-*-Input " (elt fonts 6))) (x-family-fonts))
+                (jallen-install-font))))
+#+end_src
+
+Define some shortcuts for sizes that I use sometimes
+#+begin_src emacs-lisp :tangle yes
+(defun jallen-font () (interactive)
+       (set-frame-font "Input Mono Narrow-16"))
+(defun jallen-font-no-contacts () (interactive)
+       (set-frame-font "Input Mono Narrow-22"))
+(defun jallen-blind () (interactive)
+       (set-frame-font "Input Mono Narrow-30"))
+#+end_src
+** Frame Configuration
+#+begin_src emacs-lisp :tangle yes
+(setq default-frame-alist
+      (quote
+       ((left-fringe . 1)
+        (right-fringe . 1)
+        (menu-bar-lines . 0)
+        (tool-bar-lines . 0)
+        (font . "Input Mono Narrow-16")
+        )))
+#+end_src
+** Theme
+   I love tangotango
+#+begin_src emacs-lisp :tangle yes
+(use-package tangotango-theme
+  :config (load-theme 'tangotango t))
+#+end_src
+** Whitespace
+   I don't highlight trailing whitespace, because I auto-kill it anyway
+#+begin_src emacs-lisp :tangle yes
+(setq-default show-trailing-whitespace nil)
+#+end_src
+
+
+** Uniqify Buffer Names
+   TODO make this lazy load maybe?
+#+begin_src emacs-lisp :tangle yes
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'reverse
+      uniquify-separator "|"
+      uniquify-after-kill-buffer-p t
+      uniquify-ignore-buffers-re "^\\*")
+#+end_src
+** Jallen Face
+   My own name deserves to be seen
+#+begin_src emacs-lisp :tangle yes
+(make-face 'my-name-face)
+(set-face-foreground 'my-name-face "#000000")
+(set-face-background 'my-name-face "#ffff10")
+
+(add-hook 'font-lock-mode-hook 'highlight-my-name)
+(defun highlight-my-name () ""
+       (font-lock-add-keywords nil '(("jallen" (0 'my-name-face t)))))
+#+end_src
+** Turn off nux and noisy UI
+#+begin_src emacs-lisp :tangle yes
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+
+(setq inhibit-splash-screen t
+      inhibit-startup-message t
+      inhibit-startup-echo-area-message t)
+#+end_src
 * Awesome Key Bindings
 ** Multiple Cursors
 #+begin_src emacs-lisp :tangle yes
@@ -183,4 +271,13 @@ emacs -diff file1 file2
              ediff-current-diff-face-B)
             (make-face-italic
              ediff-current-diff-face-C)))
+#+end_src
+** YAML
+Enable =yaml-mode=
+#+begin_src emacs-lisp :tangle yes
+(use-package yaml-mode
+  :mode ("\\.yml$" "\\.yaml$" "\\.lock$")
+  :config
+  (add-hook 'yaml-mode-hook 'flycheck-mode)
+  (add-hook 'yaml-mode-hook 'flyspell-mode))
 #+end_src

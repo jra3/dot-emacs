@@ -1,3 +1,4 @@
+.#*
 local.el
 *.elc
 
@@ -7,9 +8,13 @@ games/
 recentf
 tutorial/
 
+.mc-lists.el
 tramp
 bookmarks
 
 newsticker/
 url/
 eshell/
+
+# Generated files
+config.el
