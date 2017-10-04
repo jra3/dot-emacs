@@ -6,6 +6,10 @@
 
 ;;; Code:
 
+(defvar my-start-time (current-time) "Time when Emacs was started")
+(defvar config-load-path (file-name-directory (or load-file-name buffer-file-name)))
+(defvar config-org-files '("config.org"))
+
 (if (file-exists-p "~/.emacs.d/local.el")
     (load "~/.emacs.d/local.el"))
 
@@ -104,6 +108,11 @@
 (or (file-exists-p package-user-dir)
     (package-refresh-contents))
 
+(require 'org)
+(dolist (file config-org-files)
+  (org-babel-load-file (concat config-load-path file)))
+
+
 ;; install the missing packages
 (dolist (package package-list)
   (unless (package-installed-p package)
@@ -140,6 +149,6 @@
 (require 'helm-myles)
 
 
-
+(message "Start up time %.2fs" (float-time (time-subtract (current-time) my-start-time)))
 
 ;;; init.el ends here
