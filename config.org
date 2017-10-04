@@ -1,5 +1,113 @@
-* Tesing out a dealie
+* Packages
+** Setting up /use-package/
+  use-package is a really great way of managing and configuring your
+  packages.
+  1) deferred loading, faster startup
+  2) dependency declaration is configuration
+     I never include packages that I never use
 
 #+begin_src emacs-lisp :tangle yes
-(message "I'm cuckoo for oooooorg")
+(require 'package)
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+;(package-initialize)
+#+end_src
+
+** Legacy Packages
+   These packages are declared upfront and configured elsewhere. These
+   will be converted to use-package
+
+#+begin_src emacs-lisp :tangle yes
+(or (file-exists-p package-user-dir)
+    (package-refresh-contents))
+
+;; install the missing packages
+(defvar package-list
+  '(
+    lsp-mode
+    lsp-python
+
+    js2-mode
+    ag  ; the silver searcher!
+    anzu
+    bbdb
+    company
+    color-identifiers-mode
+    dired-details
+    smex
+    thrift
+    diminish
+    elpy
+    ;; crontab-mode
+    gitconfig-mode
+    gitignore-mode
+    htmlize
+
+    ;; helm-rtags
+    ;; company-rtags
+    ;; flycheck-rtags
+
+    company-flow
+
+    auto-complete
+    exec-path-from-shell
+
+    flycheck
+
+    go-mode
+    go-eldoc
+    go-autocomplete
+    go-rename
+    go-guru
+
+    helm-c-yasnippet
+    helm-company
+    helm-css-scss
+    helm-descbinds
+    helm-describe-modes
+    helm-flx
+    helm-flycheck
+    helm-orgcard
+    helm-projectile
+    helm-pydoc
+    helm-unicode
+
+    markdown-mode
+
+    js-comint
+    js2-refactor
+    json-mode
+    coffee-mode
+
+    yaml-mode
+    google-c-style
+    multiple-cursors
+    magit
+    nose
+    popwin
+    projectile
+    rainbow-mode
+    rainbow-delimiters
+    tangotango-theme
+    web-mode
+
+    whitespace-cleanup-mode
+    wanderlust
+    org-pomodoro
+    ))
+
+(dolist (package package-list)
+  (unless (package-installed-p package)
+    (package-install package)))
+#+end_src
+
+* System Stuff
+
+** Adding some paths
+   Ensuring that some common paths are included. This may not be
+   necessary, but sometimes Macs can be tricky.
+#+begin_src emacs-lisp :tangle yes
+(add-to-list 'exec-path "/usr/local/bin")
+(add-to-list 'exec-path "~/.local/bin")
 #+end_src

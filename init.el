@@ -6,6 +6,13 @@
 
 ;;; Code:
 
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+
 (defvar my-start-time (current-time) "Time when Emacs was started")
 (defvar config-load-path (file-name-directory (or load-file-name buffer-file-name)))
 (defvar config-org-files '("config.org"))
@@ -13,110 +20,15 @@
 (if (file-exists-p "~/.emacs.d/local.el")
     (load "~/.emacs.d/local.el"))
 
-(add-to-list 'exec-path "/usr/local/bin")
-(add-to-list 'exec-path "~/.local/bin")
-
 (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
     (let* ((my-lisp-dir "~/.emacs.d/lisp")
            (default-directory my-lisp-dir))
       (add-to-list 'load-path my-lisp-dir)
       (normal-top-level-add-subdirs-to-load-path)))
 
-(require 'package)
-(setq package-archives '(
-                         ("gnu" . "https://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")
-                         ;;("marmalade" . "http://marmalade-repo.org/packages/")
-                         ))
-
-(defvar package-list
-  '(
-    lsp-mode
-    lsp-python
-
-    js2-mode
-    ag  ; the silver searcher!
-    anzu
-    bbdb
-    company
-    color-identifiers-mode
-    dired-details
-    smex
-    thrift
-    diminish
-    elpy
-    ;; crontab-mode
-    gitconfig-mode
-    gitignore-mode
-    htmlize
-
-    ;; helm-rtags
-    ;; company-rtags
-    ;; flycheck-rtags
-
-    company-flow
-
-    auto-complete
-    exec-path-from-shell
-
-    flycheck
-
-    go-mode
-    go-eldoc
-    go-autocomplete
-    go-rename
-    go-guru
-
-    helm-c-yasnippet
-    helm-company
-    helm-css-scss
-    helm-descbinds
-    helm-describe-modes
-    helm-flx
-    helm-flycheck
-    helm-orgcard
-    helm-projectile
-    helm-pydoc
-    helm-unicode
-
-    markdown-mode
-
-    js-comint
-    js2-refactor
-    json-mode
-    coffee-mode
-
-    yaml-mode
-    google-c-style
-    multiple-cursors
-    magit
-    nose
-    popwin
-    projectile
-    rainbow-mode
-    rainbow-delimiters
-    tangotango-theme
-    web-mode
-
-    whitespace-cleanup-mode
-    wanderlust
-    org-pomodoro
-    ))
-
-(package-initialize)
-
-(or (file-exists-p package-user-dir)
-    (package-refresh-contents))
-
 (require 'org)
 (dolist (file config-org-files)
   (org-babel-load-file (concat config-load-path file)))
-
-
-;; install the missing packages
-(dolist (package package-list)
-  (unless (package-installed-p package)
-    (package-install package)))
 
 (require 'j-ediff)
 (require 'j-dired)
