@@ -30,10 +30,8 @@
 (dolist (file config-org-files)
   (org-babel-load-file (concat config-load-path file)))
 
-(require 'j-ediff)
 (require 'j-dired)
 (require 'j-terminal-compat)
-(require 'j-mc)
 (require 'j-util)
 (require 'j-globalkeys)
 (require 'j-colors)

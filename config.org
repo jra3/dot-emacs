@@ -1,5 +1,15 @@
 * Packages
-** Setting up /use-package/
+** Add Package Repos
+
+#+begin_src emacs-lisp :tangle yes
+(require 'package)
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+(package-initialize)
+#+end_src
+
+** Install use-package
   use-package is a really great way of managing and configuring your
   packages.
   1) deferred loading, faster startup
@@ -7,11 +17,25 @@
      I never include packages that I never use
 
 #+begin_src emacs-lisp :tangle yes
-(require 'package)
-(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-;(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
-;(package-initialize)
+(mapc
+ (lambda (package)
+   (if (not (package-installed-p package))
+       (progn
+         (package-refresh-contents)
+         (package-install package))))
+ '(use-package diminish bind-key))
+#+end_src
+
+** Trigger use-package
+
+   And force the install of missing packages.
+
+#+begin_src emacs-lisp :tangle yes
+(eval-when-compile
+  (require 'use-package))
+(require 'diminish)
+(require 'bind-key)
+(setq use-package-always-ensure t)
 #+end_src
 
 ** Legacy Packages
@@ -110,4 +134,53 @@
 #+begin_src emacs-lisp :tangle yes
 (add-to-list 'exec-path "/usr/local/bin")
 (add-to-list 'exec-path "~/.local/bin")
+#+end_src
+
+
+* Awesome Key Bindings
+** Multiple Cursors
+#+begin_src emacs-lisp :tangle yes
+(use-package multiple-cursors
+  :bind
+  (("M-c" . mc/edit-lines)
+   ("C->" . mc/mark-next-like-this)
+   ("C-<" . mc/mark-previous-like-this)
+   ("C-c C-<" . mc/mark-all-like-this)))
+#+end_src
+
+* Modes
+** ediff
+
+Add a special command line switch to emacs so that we can easily use
+emacs as our diff tool.
+
+#+BEGIN_SRC bash
+emacs -diff file1 file2
+#+END_SRC
+
+#+begin_src emacs-lisp :tangle yes
+(defun command-line-diff (switch)
+  (let ((file1 (pop command-line-args-left))
+        (file2 (pop command-line-args-left)))
+    (ediff file1 file2)))
+
+(add-to-list 'command-switch-alist '("diff" . command-line-diff))
+
+(add-hook 'ediff-load-hook
+          (lambda ()
+            (message "getting my diff onnnnn")
+            (flycheck-mode nil)
+            (setq ediff-highlight-all-diffs nil)
+            (set-face-background
+             ediff-current-diff-face-A "#1e2424")
+            (set-face-background
+             ediff-current-diff-face-B "#1e2424")
+            (set-face-background
+             ediff-current-diff-face-C "#1e2424")
+            (make-face-italic
+             ediff-current-diff-face-A)
+            (make-face-italic
+             ediff-current-diff-face-B)
+            (make-face-italic
+             ediff-current-diff-face-C)))
 #+end_src
