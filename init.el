@@ -43,7 +43,6 @@
 (require 'j-python)
 (require 'j-js)
 (require 'j-html)
-(require 'j-css)
 (require 'j-thrift)
 (require 'j-markdown)
 

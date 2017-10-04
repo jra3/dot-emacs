@@ -26,18 +26,17 @@
        (progn
          (package-refresh-contents)
          (package-install package))))
- '(use-package diminish bind-key))
+ '(use-package diminish bind-key delight))
 #+end_src
 
 ** Trigger use-package
-
    And force the install of missing packages.
-
 #+begin_src emacs-lisp :tangle yes
 (eval-when-compile
   (require 'use-package))
 (require 'diminish)
 (require 'bind-key)
+(require 'delight)
 (setq use-package-always-ensure t)
 #+end_src
 
@@ -237,6 +236,19 @@ Define some shortcuts for sizes that I use sometimes
 #+end_src
 
 * Modes
+** CSS
+#+begin_src emacs-lisp :tangle yes
+(use-package rainbow-mode
+  :delight)
+
+(use-package css-mode
+  :mode "\\.css$"
+  :config
+  (setq css-indent-level 2
+        css-indent-offset 2)
+  (add-hook 'css-mode-hook 'rainbow-mode)
+)
+#+end_src
 ** ediff
 
 Add a special command line switch to emacs so that we can easily use
