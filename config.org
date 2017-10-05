@@ -172,7 +172,6 @@
   :diminish yas-minor-mode
   :config (yas-global-mode 1))
 #+end_src
-
 * Navigation
 ** Smooth Scrolling
 (use-package smooth-scrolling
@@ -240,7 +239,7 @@
 Super nice to switch between frames and buffers
 #+begin_src emacs-lisp :tangle yes
 (use-package win-switch
-  :bind ("C-x o" . win-switch-dispatch)
+  :bind (("C-x o" . win-switch-dispatch))
   :config
   (setq win-switch-provide-visual-feedback t)
   (setq win-switch-feedback-background-color "purple")
@@ -350,20 +349,71 @@ Define some shortcuts for sizes that I use sometimes
        (font-lock-add-keywords nil '(("jallen" (0 'my-name-face t)))))
 #+end_src
 ** Turn off nux and noisy UI
+   No scroll, tool, menu bars
 #+begin_src emacs-lisp :tangle yes
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+#+end_src
 
+   Scratch buffer can just be empty, thanks
+#+begin_src emacs-lisp :tangle yes
+(setq initial-scratch-message nil)
+#+end_src
+
+   No NUX
+#+begin_src emacs-lisp :tangle yes
 (setq inhibit-splash-screen t
       inhibit-startup-message t
       inhibit-startup-echo-area-message t)
 #+end_src
 
+
 ** Show lines and columns
 #+begin_src emacs-lisp :tangle yes
 (setq line-number-mode t
       column-number-mode t)
+#+end_src
+* Terminal Configuration
+** Terminals in emacs should use ansi colors
+#+begin_src emacs-lisp :tangle yes
+(use-package ansi-color)
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+(setq comint-prompt-read-only t)
+#+end_src
+
+** Deal with running emacs in terminal
+   Here is some scar tissue of me trying to make all keys work in the
+terminal as they do in X11. This isn't possible as far as I can tell,
+and I'm no longer sure if this does anything for me.
+
+we are expecting an xterm compatible terminal here. tmux requires you
+to set xterm-mode as a terminal option for this
+
+#+begin_src emacs-lisp :tangle yes
+(defadvice terminal-init-xterm (after map-S-up-escape-sequence activate)
+
+  (message "hot damn")
+  (define-key input-decode-map "\e[1;9A" [M-up])
+  (define-key input-decode-map "\e[1;9B" [M-down])
+  (define-key input-decode-map "\e[1;9C" [M-right])
+  (define-key input-decode-map "\e[1;9D" [M-left])
+
+  (define-key input-decode-map "\e[1;10A" [M-S-up])
+  (define-key input-decode-map "\e[1;10B" [M-S-down])
+  (define-key input-decode-map "\e[1;10C" [M-S-right])
+  (define-key input-decode-map "\e[1;10D" [M-S-left])
+
+  ;; weird
+  (global-set-key [select] [S-up])
+)
+
+#+end_src
+
+* RSS Reader
+  Feeds configured in my custom file
+#+begin_src emacs-lisp :tangle yes
+(global-set-key (kbd "C-c C-n") 'newsticker-show-news)
 #+end_src
 * Disable warnings about large files
   I'm not afraid of large files, yo
@@ -435,13 +485,13 @@ Define some shortcuts for sizes that I use sometimes
 
 ** Smooth Scrolling
    https://www.emacswiki.org/emacs/SmoothScrolling
-# #+begin_src emacs-lisp :tangle yes
-# (setq scroll-step 1
-#       scroll-conservatively 10000
-#       mouse-wheel-scroll-amount '(1 ((shift) . 1))
-#       mouse-wheel-progressive-speed nil ;; don't accelerate scrolling
-#       mouse-wheel-follow-mouse t) ;; scroll window under mouse
-#  #+end_src
+   #+begin_src emacs-lisp :tangle yes
+   (setq scroll-step 1
+         scroll-conservatively 10000
+         mouse-wheel-scroll-amount '(1 ((shift) . 1))
+         mouse-wheel-progressive-speed nil ;; don't accelerate scrolling
+         mouse-wheel-follow-mouse t) ;; scroll window under mouse
+   #+end_src
 ** Screen Splitting
 #+begin_src emacs-lisp :tangle yes
 (setq split-height-threshold 10000
@@ -480,6 +530,31 @@ Define some shortcuts for sizes that I use sometimes
 #+begin_src emacs-lisp :tangle yes
 (global-set-key (kbd "C-c r") 'revert-buffer)
 #+end_src
+* Magit
+  Magit is a great interface to git. Too bad we don't have one for
+  mercurial
+  #+begin_src emacs-lisp :tangle yes
+  (use-package magit
+    :config
+    (set-face-foreground 'magit-diff-add "green3")
+    (set-face-foreground 'magit-diff-del "red3")
+    (defadvice magit-status (around magit-fullscreen activate)
+      (window-configuration-to-register :magit-fullscreen)
+      ad-do-it
+      (delete-other-windows)))
+  #+end_src
+* Flycheck
+
+#+begin_src emacs-lisp :tangle yes
+(use-package flycheck
+  :diminish
+  :config
+  (setq-default flycheck-temp-prefix ".flycheck")
+  (setq-default flycheck-disabled-checkers
+    (append flycheck-disabled-checkers
+      '(json-jsonlist))))
+#+end_src
+
 * Awesome Key Bindings
 ** Multiple Cursors
 #+begin_src emacs-lisp :tangle yes
@@ -492,6 +567,14 @@ Define some shortcuts for sizes that I use sometimes
 #+end_src
 
 * Utility Functions
+** Read lines of file into a list
+#+begin_src emacs-lisp :tangle yes
+(defun jallen-read-lines (fpath)
+  "Return a list of lines of a file at at FPATH."
+  (with-temp-buffer
+    (insert-file-contents fpath)
+    (split-string (buffer-string) "\n" t)))
+#+end_src
 ** Edit Current Buffer As root
 #+begin_src emacs-lisp :tangle yes
 (defun sudo ()
@@ -601,6 +684,22 @@ Define some shortcuts for sizes that I use sometimes
           'executable-make-buffer-file-executable-if-script-p)
 #+end_src
 * Modes
+** elisp
+   Turn on eldoc-mode
+   #+begin_src emacs-lisp :tangle yes
+   (use-package eldoc
+     :diminish eldoc-mode
+     :config (add-hook 'emacs-lisp-mode-hook 'eldoc-mode))
+   #+end_src
+
+   Enable slime-nav
+   #+begin_src emacs-lisp :tangle yes
+   (use-package elisp-slime-nav-mode
+     :diminish elisp-slime-nav-mode
+     :config
+     (add-hook 'emacs-lisp-mode-hook (lambda () (elisp-slime-nav-mode t))))
+   #+end_src
+
 ** CSS
 #+begin_src emacs-lisp :tangle yes
 (use-package rainbow-mode
@@ -614,6 +713,61 @@ Define some shortcuts for sizes that I use sometimes
   (add-hook 'css-mode-hook 'rainbow-mode)
 )
 #+end_src
+** [#B] C++
+#+begin_src emacs-lisp :tangle yes
+(use-package google-c-style)
+#+end_src
+
+Tweaks to support enums better
+#+begin_src emacs-lisp :tangle yes
+(defun inside-class-enum-p (pos)
+  "Checks if POS is within the braces of a C++ \"enum class\"."
+  (ignore-errors
+    (save-excursion
+      (goto-char pos)
+      (up-list -1)
+      (backward-sexp 1)
+      (looking-back "enum[ \t]+class[ \t]+[^}]+"))))
+
+(defun align-enum-class (langelem)
+  (if (inside-class-enum-p (c-langelem-pos langelem))
+      0
+    (c-lineup-topmost-intro-cont langelem)))
+
+(defun align-enum-class-closing-brace (langelem)
+  (if (inside-class-enum-p (c-langelem-pos langelem))
+      '-
+    '+))
+
+(defun fix-enum-class ()
+  "Setup `c++-mode' to better handle \"class enum\"."
+  (add-to-list 'c-offsets-alist
+               '(topmost-intro-cont . align-enum-class))
+  (add-to-list 'c-offsets-alist
+               '(statement-cont . align-enum-class-closing-brace)))
+#+end_src
+
+
+#+begin_src emacs-lisp :tangle yes
+(use-package c++-mode
+  :diminish c++-mode
+  :mode "\\.h$"
+  :bind (:map c++-mode-map
+         ("C-c o" . ff-get-other-file))
+  :config
+  (add-hook 'c++-mode-hook 'fix-enum-class)
+  (add-hook 'c++-mode-hook
+            (lambda ()
+              (subword-mode 1)
+              (setq-local require-final-newline t)
+              (setq-local compilation-auto-jump-to-first-error t)
+              ))
+  (add-hook 'c-mode-common-hook 'google-set-c-style)
+  (add-hook 'c-mode-common-hook 'google-make-newline-indent))
+#+end_src
+
+
+
 ** ediff
 
 Add a special command line switch to emacs so that we can easily use
@@ -650,7 +804,7 @@ emacs -diff file1 file2
              ediff-current-diff-face-C)))
 #+end_src
 ** YAML
-Enable =yaml-mode=
+   Enable =yaml-mode=
 #+begin_src emacs-lisp :tangle yes
 (use-package yaml-mode
   :mode ("\\.yml$" "\\.yaml$" "\\.lock$")
@@ -658,3 +812,58 @@ Enable =yaml-mode=
   (add-hook 'yaml-mode-hook 'flycheck-mode)
   (add-hook 'yaml-mode-hook 'flyspell-mode))
 #+end_src
+** Thrift
+#+begin_src emacs-lisp :tangle yes
+(use-package thrift
+  :mode "\\.thrift$")
+
+#+end_src
+** Markdown
+#+begin_src emacs-lisp :tangle yes
+(use-package markdown-mode
+   :mode (("\\.text\\'" . markdown-mode)
+          ("\\.markdown\\'" . markdown-mode)
+          ("README\\.md\\'" . gfm-mode)))
+#+end_src
+** JS + Web
+   Web mode is a very, very, very fine mode
+   #+begin_src emacs-lisp :tangle yes
+   (use-package web-mode
+     :mode "\\.phtml\\'"
+     :mode "\\.[agj]sp\\'"
+     :mode "\\.as[cp]x\\'"
+     :mode "\\.erb\\'"
+     :mode "\\.mustache\\'"
+     :mode "\\.djhtml\\'"
+     :mode "\\.html?\\'"
+     :mode "\\.jsx?\\'"
+     :config
+     (setq web-mode-code-indent-offset 2
+           web-mode-css-indent-offset 2
+           web-mode-attr-indent-offset 2
+           web-mode-enable-auto-closing t
+           web-mode-enable-auto-indentation t
+           web-mode-enable-auto-opening t
+           web-mode-enable-auto-pairing t
+           web-mode-enable-auto-quoting t
+           web-mode-markup-indent-offset 2
+           web-mode-script-padding 2
+           web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'"))
+           web-mode-style-padding 2)
+     (font-lock-add-keywords
+      'web-mode `(("\\(function *\\)("
+                   (0 (progn (compose-region (match-beginning 1) (match-end 1) "ƒ")
+                             nil)))))
+     (setq-default flycheck-disabled-checkers
+       (append flycheck-disabled-checkers
+               '(javascript-jshint)))
+     (flycheck-add-mode 'javascript-eslint 'web-mode)
+     (defadvice web-mode-highlight-part (around tweak-jsx activate)
+       (if (equal web-mode-content-type "jsx")
+         (let ((web-mode-enable-part-face nil))
+           ad-do-it)
+         ad-do-it))
+     (add-to-list 'web-mode-indentation-params '("lineup-calls" . nil))
+     (add-to-list 'web-mode-indentation-params '("lineup-concats" . nil))
+     (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil)))
+   #+end_src

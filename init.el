@@ -31,22 +31,10 @@
   (org-babel-load-file (concat config-load-path file)))
 
 (require 'j-dired)
-(require 'j-terminal-compat)
-(require 'j-util)
-(require 'j-globalkeys)
 (require 'j-org)
-
 (require 'j-go)
-(require 'j-cpp)
-(require 'j-php)
+;; (require 'j-php) Make this way better
 (require 'j-python)
-(require 'j-js)
-(require 'j-html)
-(require 'j-thrift)
-(require 'j-markdown)
-
-(require 'j-completion)
-(require 'j-web)
 
 (require 'helm-myles)
 

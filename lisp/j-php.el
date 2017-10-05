@@ -1,5 +1,3 @@
-(require 'highlight-80+)
-
 (require 'lsp-mode)
 (require 'lsp-common)
 

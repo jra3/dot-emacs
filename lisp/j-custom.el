@@ -61,7 +61,7 @@ powered by <p class=\"creator\">%c</p><p class=\"validation\">%v</p>"))))
     (("http://orgmode.org/worg/" :base-url "http://orgmode.org/worg/" :working-directory "/Users/jallen/org/" :online-suffix ".html" :working-suffix ".org"))))
  '(package-selected-packages
    (quote
-    (avy minimap highlight-80+ uniquify use-package dired-details yaml-mode whitespace-cleanup-mode web-mode wanderlust thrift tangotango-theme smex rainbow-mode rainbow-delimiters powerline popwin org-pomodoro nose markdown-mode magit lsp-python json-mode js2-refactor js-comint htmlize helm-unicode helm-pydoc helm-projectile helm-orgcard helm-flycheck helm-flx helm-describe-modes helm-descbinds helm-css-scss helm-company helm-c-yasnippet google-c-style go-rename go-guru go-eldoc go-autocomplete gitignore-mode gitconfig-mode exec-path-from-shell elpy diminish crontab-mode company-flow color-identifiers-mode coffee-mode bbdb anzu ag)))
+    (c++-mode elisp-slime-nav-mode slime-nav-mode avy minimap highlight-80+ uniquify use-package dired-details yaml-mode whitespace-cleanup-mode web-mode wanderlust thrift tangotango-theme smex rainbow-mode rainbow-delimiters powerline popwin org-pomodoro nose markdown-mode magit lsp-python json-mode js2-refactor js-comint htmlize helm-unicode helm-pydoc helm-projectile helm-orgcard helm-flycheck helm-flx helm-describe-modes helm-descbinds helm-css-scss helm-company helm-c-yasnippet google-c-style go-rename go-guru go-eldoc go-autocomplete gitignore-mode gitconfig-mode exec-path-from-shell elpy diminish crontab-mode company-flow color-identifiers-mode coffee-mode bbdb anzu ag)))
  '(safe-local-variable-values
    (quote
     ((eval setq default-directory
