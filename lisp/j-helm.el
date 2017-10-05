@@ -6,13 +6,14 @@
 (helm-descbinds-mode)
 
 ;; Sweet version of M-x
-(global-set-key (kbd "M-x") 'helm-M-x)
-(setq helm-M-x-fuzzy-match t)
+;; (global-set-key (kbd "M-x") 'helm-M-x)
+;; (setq helm-M-x-fuzzy-match t)
 
-;; Visual kill-ring
-(global-set-key (kbd "M-y") 'helm-show-kill-ring)
-(setq helm-buffers-fuzzy-matching t
-      helm-recentf-fuzzy-match    t)
+;; ;; Visual kill-ring
+;; (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+
+;; (setq helm-buffers-fuzzy-matching t
+;;       helm-recentf-fuzzy-match    t)
 
 ;; Way better find-files. C-x 4 f is already bound somehow...
 (global-set-key (kbd "C-x C-f") 'helm-find-files)

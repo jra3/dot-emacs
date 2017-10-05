@@ -1,7 +1,7 @@
 #+TITLE: Emacs Configuration
 #+AUTHOR: John Allen
 
-* Packages
+* Package Installation
 ** Add Package Repos
 
 #+begin_src emacs-lisp :tangle yes
@@ -77,7 +77,6 @@
     company-flow
 
     auto-complete
-    exec-path-from-shell
 
     flycheck
 
@@ -128,16 +127,45 @@
     (package-install package)))
 #+end_src
 
-* System Stuff
-
-** Adding some paths
-   Ensuring that some common paths are included. This may not be
-   necessary, but sometimes Macs can be tricky.
+* Path Fix for Mac
 #+begin_src emacs-lisp :tangle yes
-(add-to-list 'exec-path "/usr/local/bin")
-(add-to-list 'exec-path "~/.local/bin")
+(use-package exec-path-from-shell
+  :if (memq window-system '(mac ns))
+  :ensure t
+  :config
+  (exec-path-from-shell-initialize))
 #+end_src
 
+* Configure Helm
+  Make everything fuzzy and also rebind functions.
+#+begin_src emacs-lisp :tangle yes
+(use-package flx)
+(use-package helm-flx)
+(use-package helm
+  :demand
+  :diminish helm-mode
+  :bind (("M-x" . helm-M-x)
+         ("M-y" . helm-show-kill-ring)
+         ("C-x b" . helm-mini)
+         ("C-x C-f" . helm-find-files)
+         ("C-x r l" . helm-bookmarks)
+         ("C-c C-i" . helm-semantic-or-imenu)
+         :map helm-find-files-map ;; I like these from Ido
+         ;; ("C-<tab>" . helm-execute-persistent-action)
+         ("<tab>" . helm-execute-persistent-action)
+         ("C-i" . helm-execute-persistent-action)
+         ("C-<backspace>" . helm-find-files-up-one-level))
+  :config
+  (helm-mode 1)
+  (helm-descbinds-mode)
+  (helm-flx-mode +1)
+  (setq helm-M-x-fuzzy-match t
+        helm-buffers-fuzzy-matching t
+        helm-recentf-fuzzy-match t
+        helm-locate-fuzzy-match t
+        helm-lisp-fuzzy-completion t
+        helm-bookmark-show-location t))
+#+end_src
 * Appearance
 ** Frame Titles
 #+begin_src emacs-lisp :tangle yes
@@ -192,7 +220,6 @@ Define some shortcuts for sizes that I use sometimes
 #+begin_src emacs-lisp :tangle yes
 (setq-default show-trailing-whitespace nil)
 #+end_src
-
 
 ** Uniqify Buffer Names
    TODO make this lazy load maybe?

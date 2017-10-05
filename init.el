@@ -51,7 +51,6 @@
 
 (require 'flow)
 
-(require 'j-helm)
 (require 'helm-myles)
 
 
