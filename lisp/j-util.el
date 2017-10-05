@@ -12,13 +12,13 @@
   (let ((bfn buffer-file-name))
     (find-file (concatenate 'string "/sudo:root@localhost:" bfn))))
 
-(defun windstick (&optional n)
-  (interactive "P")
-  (set-window-dedicated-p (selected-window) t))
+;; (defun windstick (&optional n)
+;;   (interactive "P")
+;;   (set-window-dedicated-p (selected-window) t))
 
-(defun windrelease (&optional n)
-  (interactive "P")
-  (set-window-dedicated-p (selected-window) nil))
+;; (defun windrelease (&optional n)
+;;   (interactive "P")
+;;   (set-window-dedicated-p (selected-window) nil))
 
 ;; add color to shells
 (require 'ansi-color)
@@ -28,18 +28,6 @@
 (setq custom-file "~/.emacs.d/lisp/j-custom.el")
 (load custom-file)
 
-(defun jallen-sort-para ()
-  "Sorts the paragraph in which the point is located"
-  (interactive)
-  (save-excursion
-    (let (bpoint epoint)
-      (backward-paragraph)
-      (setq bpoint (point))
-      (forward-paragraph)
-      (setq epoint (point))
-      (sort-lines nil bpoint epoint)
-      )
-    ))
 
 (defun jallen-read-lines (fpath)
   "Return a list of lines of a file at at FPATH."

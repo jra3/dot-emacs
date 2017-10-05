@@ -34,7 +34,6 @@
 (require 'j-terminal-compat)
 (require 'j-util)
 (require 'j-globalkeys)
-(require 'j-behavior)
 (require 'j-org)
 
 (require 'j-go)
@@ -49,10 +48,10 @@
 (require 'j-completion)
 (require 'j-web)
 
-(require 'flow)
-
 (require 'helm-myles)
 
+(setq custom-file "lisp/j-custom.el")
+(load (concat config-load-path custom-file))
 
 (message "Start up time %.2fs" (float-time (time-subtract (current-time) my-start-time)))
 

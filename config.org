@@ -135,7 +135,6 @@
   :config
   (exec-path-from-shell-initialize))
 #+end_src
-
 * Configure Helm
   Make everything fuzzy and also rebind functions.
 #+begin_src emacs-lisp :tangle yes
@@ -165,6 +164,121 @@
         helm-locate-fuzzy-match t
         helm-lisp-fuzzy-completion t
         helm-bookmark-show-location t))
+#+end_src
+* Snippets
+  Snippets are are awesome. They are found in ~/emacs.d/snippets
+#+begin_src emacs-lisp :tangle yes
+(use-package yasnippet
+  :diminish yas-minor-mode
+  :config (yas-global-mode 1))
+#+end_src
+
+* Navigation
+** Smooth Scrolling
+(use-package smooth-scrolling
+  :config
+  (smooth-scrolling-mode 1)
+  (setq smooth-scroll-margin 5))
+** Configure Windmove
+   I like to use the S-<arrow> keys for moving windows
+#+begin_src emacs-lisp :tangle yes
+(windmove-default-keybindings)
+
+;; Make windmove work in org-mode:
+(add-hook 'org-shiftup-final-hook 'windmove-up)
+(add-hook 'org-shiftleft-final-hook 'windmove-left)
+(add-hook 'org-shiftdown-final-hook 'windmove-down)
+(add-hook 'org-shiftright-final-hook 'windmove-right)
+#+end_src
+
+** Manipulate Window Sizes
+   C-x <arrow>
+#+begin_src emacs-lisp :tangle yes
+(global-set-key
+ (kbd "C-x <right>")
+ '(lambda () (interactive) (enlarge-window-horizontally 4)))
+(global-set-key
+ (kbd "C-x <left>")
+ '(lambda () (interactive) (shrink-window-horizontally 4)))
+(global-set-key
+ (kbd "C-x <up>")
+ '(lambda () (interactive) (enlarge-window 4)))
+(global-set-key
+ (kbd "C-x <down>")
+ '(lambda () (interactive) (shrink-window 4)))
+#+end_src
+** Popwin
+  Popwin give us special temporary behavior for certain buffers. This
+  lets them pop in and out in a way that I like better than the
+  default behavior of taking over the other-buffer
+
+#+begin_src emacs-lisp :tangle yes
+(use-package popwin
+  :config
+  (setq display-buffer-function 'popwin:display-buffer)
+  (setq popwin:special-display-config
+      (quote
+       (("*Ibuffer*" :position top :noselect t :height 30)
+        ("*Python Check*" :position top :noselect t :height 30)
+        ("*magit-log*")
+        ("*compilation*")
+        ("*Python Doc*")
+        ("*grep*")
+        ("*Help*")
+        ("*hh-client-definitions*" :noselect t)
+        ("*Completions*" :noselect t)
+        ("*Occur*" :noselect t)))))
+#+end_src
+
+** Go to a line by number
+   I'm not really sure why this isn't bound somewhere already... I use
+   this all the time. Am I the weird one?
+#+begin_src emacs-lisp :tangle yes
+(global-set-key (kbd "C-c t")  'goto-line)
+#+end_src
+** Enable win-switch
+Super nice to switch between frames and buffers
+#+begin_src emacs-lisp :tangle yes
+(use-package win-switch
+  :bind ("C-x o" . win-switch-dispatch)
+  :config
+  (setq win-switch-provide-visual-feedback t)
+  (setq win-switch-feedback-background-color "purple")
+  (setq win-switch-feedback-foreground-color "white")
+  (win-switch-setup-keys-default))
+#+end_src
+** Enable ibuffer
+#+begin_src emacs-lisp :tangle yes
+(use-package ibuffer-vc)
+(use-package ibuffer-git)
+(define-key global-map (kbd "C-x C-b") 'ibuffer)
+(setq ibuffer-default-sorting-mode 'major-mode)
+;; (define-key
+;;   ibuffer-mode-map
+;;   (kbd "RET")
+;;   'ibuffer-visit-buffer-other-window)
+
+#+end_src
+** Enable minimap
+#+begin_src emacs-lisp :tangle yes
+(use-package minimap
+  :config
+  (setq minimap-window-location "right")
+  (setq minimap-major-modes '(prog-mode org-mode)))
+#+end_src
+** Enable =anzu=
+#+begin_src emacs-lisp :tangle yes
+(use-package anzu
+  :config (global-anzu-mode +1)
+  (setq anzu-mode-lighter ""))
+#+end_src
+
+** Save Point Positions Between Sessions
+#+begin_src emacs-lisp :tangle yes
+(use-package saveplace
+  :config
+  (setq-default save-place t)
+  (setq save-place-file (expand-file-name ".places" "~/tmp/saves")))
 #+end_src
 * Appearance
 ** Frame Titles
@@ -215,12 +329,6 @@ Define some shortcuts for sizes that I use sometimes
 (use-package tangotango-theme
   :config (load-theme 'tangotango t))
 #+end_src
-** Whitespace
-   I don't highlight trailing whitespace, because I auto-kill it anyway
-#+begin_src emacs-lisp :tangle yes
-(setq-default show-trailing-whitespace nil)
-#+end_src
-
 ** Uniqify Buffer Names
    TODO make this lazy load maybe?
 #+begin_src emacs-lisp :tangle yes
@@ -251,6 +359,127 @@ Define some shortcuts for sizes that I use sometimes
       inhibit-startup-message t
       inhibit-startup-echo-area-message t)
 #+end_src
+
+** Show lines and columns
+#+begin_src emacs-lisp :tangle yes
+(setq line-number-mode t
+      column-number-mode t)
+#+end_src
+* Disable warnings about large files
+  I'm not afraid of large files, yo
+#+begin_src emacs-lisp :tangle yes
+(setq large-file-warning-threshold nil)
+#+end_src
+* Highlight the selected region
+#+begin_src emacs-lisp :tangle yes
+(setq transient-mark-mode t)
+#+end_src
+* Search/Match should be case insensitive
+  The documentation is actually a little misleading. The search will
+  be case sensitive if the search string has any capital characters in
+  it.
+#+begin_src emacs-lisp :tangle yes
+(setq case-fold-search t)
+#+end_src
+* Revert Files When They Change On Disk
+#+begin_src emacs-lisp :tangle yes
+(global-auto-revert-mode t)
+#+end_src
+* Simple Behavior Customizations
+** Set fill-column to sensible default for me
+#+begin_src emacs-lisp :tangle yes
+(setq fill-column 78)
+#+end_src
+** Backups
+#+begin_src emacs-lisp :tangle yes
+(defvar user-temporary-file-directory "~/tmp/saves/"
+  (concat temporary-file-directory user-login-name "/"))
+(make-directory user-temporary-file-directory t)
+
+(setq
+ make-backup-files t
+ backup-by-copying t      ; don't clobber symlinks
+ backup-directory-alist
+ '(("." . user-temporary-file-directory))    ; don't litter my fs tree
+ delete-old-versions t
+ kept-new-versions 6
+ kept-old-versions 2
+ version-control t)       ; use versioned backups
+
+; disable vc integration, the repos can just be too big
+(setq vc-handled-backends nil)
+(setq vc-make-backup-files t)
+
+(setq backup-directory-alist
+      `((".*" . ,user-temporary-file-directory)))
+(setq auto-save-file-name-transforms
+      `((".*" ,user-temporary-file-directory t)))
+(setq auto-save-list-file-prefix
+      (concat user-temporary-file-directory ".auto-saves-"))
+
+#+end_src
+
+** Text-mode is a better default than fundamental for me
+#+begin_src emacs-lisp :tangle yes
+(setq-default major-mode 'text-mode)
+#+end_src
+** Replace 'yes/no' by just 'y/n'
+#+begin_src emacs-lisp :tangle yes
+(fset 'yes-or-no-p 'y-or-n-p)
+#+end_src
+
+** Tags operations should be case sensitive
+#+begin_src emacs-lisp :tangle yes
+(setq tags-case-fold-search nil)
+#+end_src
+
+** Smooth Scrolling
+   https://www.emacswiki.org/emacs/SmoothScrolling
+# #+begin_src emacs-lisp :tangle yes
+# (setq scroll-step 1
+#       scroll-conservatively 10000
+#       mouse-wheel-scroll-amount '(1 ((shift) . 1))
+#       mouse-wheel-progressive-speed nil ;; don't accelerate scrolling
+#       mouse-wheel-follow-mouse t) ;; scroll window under mouse
+#  #+end_src
+** Screen Splitting
+#+begin_src emacs-lisp :tangle yes
+(setq split-height-threshold 10000
+      split-width-threshold 10000)
+#+end_src
+** Subword movement in prog-mode
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'prog-mode-hook 'subword-mode)
+#+end_src
+** No bell, thanks
+#+begin_src emacs-lisp :tangle yes
+(setq ring-bell-function 'ignore)
+#+end_src
+* Spellcheck in Comments & Strings
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+#+end_src
+* Editing
+** Multiple Cursors
+   Multi-cursor editing is so cool when you can do it. Useful when
+   editing many similar lines. More interactive than macros.
+#+begin_src emacs-lisp :tangle yes
+(use-package multiple-cursors
+  :bind (("M-c" . mc/edit-lines)
+         ("C->" . mc/mark-next-like-this)
+         ("C-<" . mc/mark-previous-like-this)
+         ("C-c C-<" . mc/mark-all-like-this)
+         ("C-S-<mouse-1>" . mc/add-cursor-on-click)))
+#+end_src
+
+** Align lines on ' = '
+#+begin_src emacs-lisp :tangle yes
+(global-set-key (kbd "C-c =") 'align-eq)
+#+end_src
+** Revert a buffer
+#+begin_src emacs-lisp :tangle yes
+(global-set-key (kbd "C-c r") 'revert-buffer)
+#+end_src
 * Awesome Key Bindings
 ** Multiple Cursors
 #+begin_src emacs-lisp :tangle yes
@@ -262,6 +491,115 @@ Define some shortcuts for sizes that I use sometimes
    ("C-c C-<" . mc/mark-all-like-this)))
 #+end_src
 
+* Utility Functions
+** Edit Current Buffer As root
+#+begin_src emacs-lisp :tangle yes
+(defun sudo ()
+  "Use TRAMP to `sudo' the current buffer"
+  (interactive)
+  (when buffer-file-name
+    (find-alternate-file
+     (concat "/sudo:root@localhost:"
+             buffer-file-name))))
+#+end_src
+** Sticky Window
+  Sometimes I like having a dedicated buffer for compilation output or
+  other things
+
+#+begin_src emacs-lisp :tangle yes
+(defun windstick (&optional n)
+  (interactive "P")
+  (set-window-dedicated-p (selected-window) t))
+
+(defun windrelease (&optional n)
+  (interactive "P")
+  (set-window-dedicated-p (selected-window) nil))
+#+end_src
+
+** Sort Lines In Paragraph
+#+begin_src emacs-lisp :tangle yes
+(defun jallen-sort-para ()
+  "Sorts the paragraph in which the point is located"
+  (interactive)
+  (save-excursion
+    (let (bpoint epoint)
+      (backward-paragraph)
+      (setq bpoint (point))
+      (forward-paragraph)
+      (setq epoint (point))
+      (sort-lines nil bpoint epoint)
+      )
+    ))
+#+end_src
+** Increment/Decrement number at point
+   Because why not?
+#+begin_src emacs-lisp :tangle yes
+(defun increment-number-at-point ()
+  (interactive)
+  (skip-chars-backward "0-9")
+  (or (looking-at "[0-9]+")
+      (error "No number at point"))
+  (replace-match (number-to-string (1+ (string-to-number (match-string 0))))))
+
+(defun decrement-number-at-point ()
+  (interactive)
+  (skip-chars-backward "0-9")
+  (or (looking-at "[0-9]+")
+      (error "No number at point"))
+  (replace-match (number-to-string (- (string-to-number (match-string 0)) 1))))
+#+end_src
+* Compilation
+  If I'm compiling, just save all the buffers automatically for me
+#+begin_src emacs-lisp :tangle yes
+(setq compilation-ask-about-save nil)
+#+end_src
+
+* Code Format
+** Default Indentation
+   c-basic-offset is used by most major modes I use as the basis for
+   how deeply to indent any code.
+#+begin_src emacs-lisp :tangle yes
+(setq c-basic-offset 2)
+#+end_src
+** Whitespace
+  I don't highlight trailing whitespace, because I auto-kill it anyway
+#+begin_src emacs-lisp :tangle yes
+(setq-default show-trailing-whitespace nil)
+#+end_src
+  And here we do the killing
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'before-save-hook 'whitespace-cleanup)
+#+end_src
+** Tabs
+#+begin_src emacs-lisp :tangle yes
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 2)
+(setq tab-width 2)
+#+end_src
+** Add newline to the end of files
+#+begin_src emacs-lisp :tangle yes
+(setq require-final-newline t)
+#+end_src
+** Set Unix file coding system
+#+begin_src emacs-lisp :tangle yes
+(setq-default buffer-file-coding-system 'utf-8-unix)
+(setq-default default-buffer-file-coding-system 'utf-8-unix)
+(set-default-coding-systems 'utf-8-unix)
+(prefer-coding-system 'utf-8-unix)
+#+end_src
+* Better regex-builder
+  'string' does not require the crazy double escape thing from emacs
+  regexes
+#+begin_src emacs-lisp :tangle yes
+(use-package re-builder
+  :config
+  (setq reb-re-syntax 'string))
+#+end_src
+* Make scripts executable on save
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'after-save-hook
+          'executable-make-buffer-file-executable-if-script-p)
+#+end_src
 * Modes
 ** CSS
 #+begin_src emacs-lisp :tangle yes
