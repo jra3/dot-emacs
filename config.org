@@ -3,114 +3,79 @@
 
 * Package Installation
 ** Install use-package
-  use-package is a really great way of managing and configuring your
-  packages.
-  1) deferred loading, faster startup
-  2) dependency declaration is configuration
-     I never include packages that I never use
+   use-package is a really great way of managing and configuring your
+   packages.
 
-#+begin_src emacs-lisp :tangle yes
-(mapc
- (lambda (package)
-   (if (not (package-installed-p package))
-       (progn
-         (package-refresh-contents)
-         (package-install package))))
- '(use-package diminish bind-key delight))
-#+end_src
+  1) deferred loading, faster startup
+  2) dependency declaration is configuration I never include packages
+     that I never use
+
+  #+begin_src emacs-lisp :tangle yes
+    (mapc
+     (lambda (package)
+       (if (not (package-installed-p package))
+           (progn
+             (package-refresh-contents)
+             (package-install package))))
+     '(use-package diminish bind-key delight))
+  #+end_src
 
 ** Trigger use-package
    And force the install of missing packages.
-#+begin_src emacs-lisp :tangle yes
-(eval-when-compile
-  (require 'use-package))
-(require 'diminish)
-(require 'bind-key)
-(require 'delight)
-(setq use-package-always-ensure t)
-#+end_src
 
-** Legacy Packages
-   These packages are declared upfront and configured elsewhere. These
-   will be converted to use-package
-#+begin_src emacs-lisp :tangle yes
-(or (file-exists-p package-user-dir)
-    (package-refresh-contents))
-
-;; install the missing packages
-(defvar package-list
-  '(
-
-    ;; crontab-mode
-    ;; gitconfig-mode
-    ;; gitignore-mode
-
-    helm-c-yasnippet
-    helm-company
-    helm-css-scss
-    helm-descbinds
-    helm-describe-modes
-    helm-flx
-    helm-flycheck
-    helm-orgcard
-    helm-pydoc
-    helm-unicode
-
-    js-comint
-    ; js2-refactor
-    json-mode
-
-    org-pomodoro
-    ))
-
-(dolist (package package-list)
-  (unless (package-installed-p package)
-    (package-install package)))
-#+end_src
+  #+begin_src emacs-lisp :tangle yes
+    (eval-when-compile
+      (require 'use-package))
+    (require 'diminish)
+    (require 'bind-key)
+    (require 'delight)
+    (setq use-package-always-ensure t)
+  #+end_src
 
 * Path Fix for Mac
-#+begin_src emacs-lisp :tangle yes
-(use-package exec-path-from-shell
-  :if (memq window-system '(mac ns))
-  :ensure t
-  :config
-  (exec-path-from-shell-initialize))
-#+end_src
+  #+begin_src emacs-lisp :tangle yes
+    (use-package exec-path-from-shell
+      :if (memq window-system '(mac ns))
+      :ensure t
+      :config
+      (exec-path-from-shell-initialize))
+  #+end_src
 * Customization File
-#+begin_src emacs-lisp :tangle yes
-  (setq custom-file "custom.el")
-  (load (concat config-load-path custom-file))
-#+end_src
+  #+begin_src emacs-lisp :tangle yes
+    (setq custom-file "custom.el")
+    (load (concat config-load-path custom-file))
+  #+end_src
 * TODO Configure Helm
   Make everything fuzzy and also rebind functions.
-#+begin_src emacs-lisp :tangle yes
-(use-package flx)
-(use-package helm-flx)
-(use-package helm
-  :demand
-  :diminish helm-mode
-  :bind (("M-x" . helm-M-x)
-         ("M-y" . helm-show-kill-ring)
-         ("C-x b" . helm-mini)
-         ("C-x C-f" . helm-find-files)
-         ("C-x r l" . helm-bookmarks)
-         ("C-c C-i" . helm-semantic-or-imenu)
-         :map helm-find-files-map ;; I like these from Ido
-         ;; ("C-<tab>" . helm-execute-persistent-action)
-         ("<tab>" . helm-execute-persistent-action)
-         ("C-i" . helm-execute-persistent-action)
-         ("C-<backspace>" . helm-find-files-up-one-level))
-  :config
-  (helm-mode 1)
-  (helm-descbinds-mode)
-  (helm-flx-mode +1)
-  (setq helm-M-x-fuzzy-match t
-        helm-buffers-fuzzy-matching t
-        helm-recentf-fuzzy-match t
-        helm-locate-fuzzy-match t
-        helm-lisp-fuzzy-completion t
-        helm-bookmark-show-location t))
-#+end_src
+  #+begin_src emacs-lisp :tangle yes
+    (use-package flx)
+    (use-package helm-flx)
+    (use-package helm-descbinds)
+    (use-package helm
+      :demand
+      :diminish helm-mode
+      :bind (("M-x" . helm-M-x)
+             ("M-y" . helm-show-kill-ring)
+             ("C-x b" . helm-mini)
+             ("C-x C-f" . helm-find-files)
+             ("C-x r l" . helm-bookmarks)
+             ("C-c C-i" . helm-semantic-or-imenu)
+             :map helm-find-files-map ;; I like these from Ido
+             ;; ("C-<tab>" . helm-execute-persistent-action)
+             ("<tab>" . helm-execute-persistent-action)
+             ("C-i" . helm-execute-persistent-action)
+             ("C-<backspace>" . helm-find-files-up-one-level))
+      :config
+      (helm-mode 1)
+      (helm-descbinds-mode)
+      (helm-flx-mode +1)
+      (setq helm-M-x-fuzzy-match t
+            helm-buffers-fuzzy-matching t
+            helm-recentf-fuzzy-match t
+            helm-locate-fuzzy-match t
+            helm-lisp-fuzzy-completion t
+            helm-bookmark-show-location t))
+  #+end_src
 * Configuring =org-mode=
 ** Set environment
 #+begin_src emacs-lisp :tangle yes
@@ -147,11 +112,21 @@
 #+end_src
 
 ** Pretty headlines
+*** Make headlines more compact
 #+begin_src emacs-lisp :tangle yes
   (setq org-hide-leading-stars t
         org-ellipsis "⤵"
-        org-tags-column 80
-        org-startup-folded 'content)
+        org-tags-column 80)
+#+end_src
+*** Start folded by default
+#+begin_src emacs-lisp :tangle yes
+    (setq org-startup-folded 'content)
+#+end_src
+
+*** Make all headline levels the same size
+#+begin_src emacs-lisp :tangle yes
+  (set-face-attribute 'org-level-1 nil :foreground "dodger blue" :weight 'bold :height 1.0)
+  (set-face-attribute 'org-level-2 nil :foreground "#edd400" :weight 'bold :height 1.0)
 #+end_src
 ** Enter follows links at point
    Because how the hell else should it work?
@@ -181,11 +156,11 @@
   (setq org-use-speed-commands t)
 #+end_src
 ** Enable =org-pomodoro=
-#+begin_src emacs-lisp :tangle yes
-(use-package org-pomodoro
-  :bind (:map org-agenda-mode-map ("P" . org-pomodoro))
-  :config (setq org-pomodoro-start-sound-p t))
-#+end_src
+  #+begin_src emacs-lisp :tangle yes
+    (use-package org-pomodoro
+      :bind (:map org-agenda-mode-map ("P" . org-pomodoro))
+      :config (setq org-pomodoro-start-sound-p t))
+  #+end_src
 ** Notes file
 #+begin_src emacs-lisp :tangle yes
 (setq  org-default-notes-file (concat org-directory "/notes.org"))
@@ -1050,7 +1025,6 @@ Tweaks to support enums better
   (add-hook 'c-mode-common-hook 'google-make-newline-indent))
 #+end_src
 
-
 ** ediff
 
 Add a special command line switch to emacs so that we can easily use
@@ -1110,11 +1084,15 @@ emacs -diff file1 file2
      :config (add-to-list 'company-backends 'company-jedi))
    #+end_src
 ** Thrift
-#+begin_src emacs-lisp :tangle yes
-(use-package thrift
-  :mode "\\.thrift$")
+  #+begin_src emacs-lisp :tangle yes
+    (use-package thrift
+      :mode "\\.thrift$")
+  #+end_src
+** JSON
+  #+begin_src emacs-lisp :tangle yes
+    (use-package json)
+  #+end_src
 
-#+end_src
 ** Markdown
 #+begin_src emacs-lisp :tangle yes
 (use-package markdown-mode
@@ -1125,42 +1103,51 @@ emacs -diff file1 file2
 ** JS + Web
    Web mode is a very, very, very fine mode
    #+begin_src emacs-lisp :tangle yes
-   (use-package web-mode
-     :mode "\\.phtml\\'"
-     :mode "\\.[agj]sp\\'"
-     :mode "\\.as[cp]x\\'"
-     :mode "\\.erb\\'"
-     :mode "\\.mustache\\'"
-     :mode "\\.djhtml\\'"
-     :mode "\\.html?\\'"
-     :mode "\\.jsx?\\'"
-     :config
-     (setq web-mode-code-indent-offset 2
-           web-mode-css-indent-offset 2
-           web-mode-attr-indent-offset 2
-           web-mode-enable-auto-closing t
-           web-mode-enable-auto-indentation t
-           web-mode-enable-auto-opening t
-           web-mode-enable-auto-pairing t
-           web-mode-enable-auto-quoting t
-           web-mode-markup-indent-offset 2
-           web-mode-script-padding 2
-           web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'"))
-           web-mode-style-padding 2)
-     (font-lock-add-keywords
-      'web-mode `(("\\(function *\\)("
-                   (0 (progn (compose-region (match-beginning 1) (match-end 1) "ƒ")
-                             nil)))))
-     (setq-default flycheck-disabled-checkers
-       (append flycheck-disabled-checkers
-               '(javascript-jshint)))
-     (flycheck-add-mode 'javascript-eslint 'web-mode)
-     (defadvice web-mode-highlight-part (around tweak-jsx activate)
-       (if (equal web-mode-content-type "jsx")
-         (let ((web-mode-enable-part-face nil))
-           ad-do-it)
-         ad-do-it))
-     (add-to-list 'web-mode-indentation-params '("lineup-calls" . nil))
-     (add-to-list 'web-mode-indentation-params '("lineup-concats" . nil))
-     (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil)))
+     (use-package js-comint)
+     (use-package web-mode
+       :mode "\\.phtml\\'"
+       :mode "\\.[agj]sp\\'"
+       :mode "\\.as[cp]x\\'"
+       :mode "\\.erb\\'"
+       :mode "\\.mustache\\'"
+       :mode "\\.djhtml\\'"
+       :mode "\\.html?\\'"
+       :mode "\\.jsx?\\'"
+       :bind
+       (:map web-mode-map
+             ("C-x C-e" . js-send-last-sexp)
+             ("C-M-x" . js-send-last-sexp-and-go)
+             ("C-c b" . js-send-buffer)
+             ("C-c C-b" . js-send-buffer-and-go)
+             ("C-c l" . js-load-file-and-go)
+             )
+       :config
+       (setq web-mode-code-indent-offset 2
+             web-mode-css-indent-offset 2
+             web-mode-attr-indent-offset 2
+             web-mode-enable-auto-closing t
+             web-mode-enable-auto-indentation t
+             web-mode-enable-auto-opening t
+             web-mode-enable-auto-pairing t
+             web-mode-enable-auto-quoting t
+             web-mode-markup-indent-offset 2
+             web-mode-script-padding 2
+             web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'"))
+             web-mode-style-padding 2)
+       (font-lock-add-keywords
+        'web-mode `(("\\(function *\\)("
+                     (0 (progn (compose-region (match-beginning 1) (match-end 1) "ƒ")
+                               nil)))))
+       (setq-default flycheck-disabled-checkers
+                     (append flycheck-disabled-checkers
+                             '(javascript-jshint)))
+       (flycheck-add-mode 'javascript-eslint 'web-mode)
+       (defadvice web-mode-highlight-part (around tweak-jsx activate)
+         (if (equal web-mode-content-type "jsx")
+             (let ((web-mode-enable-part-face nil))
+               ad-do-it)
+           ad-do-it))
+       (add-to-list 'web-mode-indentation-params '("lineup-calls" . nil))
+       (add-to-list 'web-mode-indentation-params '("lineup-concats" . nil))
+       (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil)))
    #+end_src

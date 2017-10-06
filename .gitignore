@@ -8,6 +8,7 @@ games/
 recentf
 tutorial/
 
+org-clock-save.el
 .mc-lists.el
 tramp
 bookmarks
