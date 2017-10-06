@@ -13,29 +13,28 @@
 (require 'package)
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-;(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
 (package-initialize)
 
-;; Load local customizations
+;; Local customizations are loaded super-early to allow us to set
+;; proxies so that we can fetch packages
 (let ((local (concat config-load-path "local.el")))
   (if (file-exists-p local)
       (load local)))
 
+;; The bulk of my config lives in these org files
 (require 'org)
 (dolist (file config-org-files)
   (org-babel-load-file (concat config-load-path file)))
 
+;; TODO move dired to config.org
+;; TODO move helm-myles to the extra dir
 (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
     (let* ((my-lisp-dir "~/.emacs.d/lisp")
            (default-directory my-lisp-dir))
       (add-to-list 'load-path my-lisp-dir)
       (normal-top-level-add-subdirs-to-load-path)))
-
 (require 'j-dired)
 (require 'helm-myles)
-
-(setq custom-file "lisp/j-custom.el")
-(load (concat config-load-path custom-file))
 
 (use-package load-dir
   :config (setq load-dirs (concat config-load-path "extra/")))

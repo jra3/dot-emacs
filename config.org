@@ -78,7 +78,7 @@
 #+end_src
 * Customization File
 #+begin_src emacs-lisp :tangle yes
-  (setq custom-file "lisp/j-custom.el")
+  (setq custom-file "custom.el")
   (load (concat config-load-path custom-file))
 #+end_src
 * TODO Configure Helm
@@ -599,7 +599,14 @@ Define some shortcuts for sizes that I use sometimes
       uniquify-after-kill-buffer-p t
       uniquify-ignore-buffers-re "^\\*")
 #+end_src
-** Jallen Face
+** isearch faces
+#+begin_src emacs-lisp :tangle yes
+  (set-face-foreground 'lazy-highlight "black")
+  (set-face-background 'lazy-highlight "yellow")
+  (set-face-foreground 'isearch "white")
+  (set-face-background 'isearch "blue")
+#+end_src
+** Jallen face
    My own name deserves to be seen
 #+begin_src emacs-lisp :tangle yes
 (make-face 'my-name-face)
@@ -629,7 +636,6 @@ Define some shortcuts for sizes that I use sometimes
         inhibit-startup-message t
         inhibit-startup-echo-area-message t)
 #+end_src
-
 
 ** Show lines and columns
 #+begin_src emacs-lisp :tangle yes
