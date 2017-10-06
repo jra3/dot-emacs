@@ -1,8 +1,5 @@
 (require 'diminish)
 
-(require 'lsp-mode)
-(require 'lsp-python)
-
 ;; (eval-after-load 'elpy
 ;;   '(progn
 ;;      (define-key elpy-mode-map (kbd "C-c C-f") 'helm-projectile)  ;; unshadow projectile-find-file

@@ -2,16 +2,6 @@
 #+AUTHOR: John Allen
 
 * Package Installation
-** Add Package Repos
-
-#+begin_src emacs-lisp :tangle yes
-(require 'package)
-(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-;(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
-(package-initialize)
-#+end_src
-
 ** Install use-package
   use-package is a really great way of managing and configuring your
   packages.
@@ -43,7 +33,6 @@
 ** Legacy Packages
    These packages are declared upfront and configured elsewhere. These
    will be converted to use-package
-
 #+begin_src emacs-lisp :tangle yes
 (or (file-exists-p package-user-dir)
     (package-refresh-contents))
@@ -51,40 +40,10 @@
 ;; install the missing packages
 (defvar package-list
   '(
-    lsp-mode
-    lsp-python
 
-    js2-mode
-    ag  ; the silver searcher!
-    anzu
-    bbdb
-    company
-    color-identifiers-mode
-    dired-details
-    smex
-    thrift
-    diminish
-    elpy
     ;; crontab-mode
-    gitconfig-mode
-    gitignore-mode
-    htmlize
-
-    ;; helm-rtags
-    ;; company-rtags
-    ;; flycheck-rtags
-
-    company-flow
-
-    auto-complete
-
-    flycheck
-
-    go-mode
-    go-eldoc
-    go-autocomplete
-    go-rename
-    go-guru
+    ;; gitconfig-mode
+    ;; gitignore-mode
 
     helm-c-yasnippet
     helm-company
@@ -94,31 +53,13 @@
     helm-flx
     helm-flycheck
     helm-orgcard
-    helm-projectile
     helm-pydoc
     helm-unicode
 
-    markdown-mode
-
     js-comint
-    js2-refactor
+    ; js2-refactor
     json-mode
-    coffee-mode
 
-    yaml-mode
-    google-c-style
-    multiple-cursors
-    magit
-    nose
-    popwin
-    projectile
-    rainbow-mode
-    rainbow-delimiters
-    tangotango-theme
-    web-mode
-
-    whitespace-cleanup-mode
-    wanderlust
     org-pomodoro
     ))
 
@@ -135,7 +76,12 @@
   :config
   (exec-path-from-shell-initialize))
 #+end_src
-* Configure Helm
+* Customization File
+#+begin_src emacs-lisp :tangle yes
+  (setq custom-file "lisp/j-custom.el")
+  (load (concat config-load-path custom-file))
+#+end_src
+* TODO Configure Helm
   Make everything fuzzy and also rebind functions.
 #+begin_src emacs-lisp :tangle yes
 (use-package flx)
@@ -164,6 +110,316 @@
         helm-locate-fuzzy-match t
         helm-lisp-fuzzy-completion t
         helm-bookmark-show-location t))
+#+end_src
+* Configuring =org-mode=
+** Set environment
+#+begin_src emacs-lisp :tangle yes
+(setq org-directory "~/org")
+
+(defun org-file-path (filename)
+  "Return the absolute address of an org file, given its relative name."
+  (concat (file-name-as-directory org-directory) filename))
+
+(defun org-find-file ()
+  "Leverage Helm to quickly open any org files."
+  (interactive)
+  (find-file (concat org-directory
+                     (helm-comp-read "Select your org file: "
+                                     (directory-files org-directory nil "\.org$")))))
+#+end_src
+
+** Modules
+#+begin_src emacs-lisp :tangle yes
+  (setq-default
+   org-modules
+   '(org-bibtex
+     org-crypt
+     org-habit
+     org-id
+     org-info
+     org-protocol))
+#+end_src
+** Enable =org-mode= for org files
+#+begin_src emacs-lisp :tangle yes
+(use-package org
+  :mode ("\\.org\\'" . org-mode)
+  :mode ("\\.org_archive\\'" . org-mode))
+#+end_src
+
+** Pretty headlines
+#+begin_src emacs-lisp :tangle yes
+  (setq org-hide-leading-stars t
+        org-ellipsis "⤵"
+        org-tags-column 80
+        org-startup-folded 'content)
+#+end_src
+** Enter follows links at point
+   Because how the hell else should it work?
+#+begin_src emacs-lisp :tangle yes
+  (setq org-return-follows-link t)
+#+end_src
+** Src blocks
+*** Intentation and fontification
+#+begin_src emacs-lisp :tangle yes
+  (setq org-src-fontify-natively t)
+  (setq org-src-tab-acts-natively t)
+#+end_src
+
+*** Just evaluate it, don't backtalk me
+#+begin_src emacs-lisp :tangle yes
+  (setq org-confirm-babel-evaluate nil)
+#+end_src
+** Set up global keys
+#+begin_src emacs-lisp :tangle yes
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cc" 'org-capture)
+(global-set-key "\C-cb" 'org-iswitchb)
+#+end_src
+** Speed commands
+#+begin_src emacs-lisp :tangle yes
+  (setq org-use-speed-commands t)
+#+end_src
+** Enable =org-pomodoro=
+#+begin_src emacs-lisp :tangle yes
+(use-package org-pomodoro
+  :bind (:map org-agenda-mode-map ("P" . org-pomodoro))
+  :config (setq org-pomodoro-start-sound-p t))
+#+end_src
+** Notes file
+#+begin_src emacs-lisp :tangle yes
+(setq  org-default-notes-file (concat org-directory "/notes.org"))
+#+end_src
+** TODO Agenda files
+   make this respect org-directory
+#+begin_src emacs-lisp :tangle yes
+(setq jallen-default-org-agenda-files
+      (list "~/org/gtd.org"
+            "~/org/work.org"
+            "~/org/personal.org"
+            "~/org/habits.org"
+            "~/org/today.org")
+      org-agenda-files jallen-default-org-agenda-files)
+#+end_src
+** Refiling
+#+begin_src emacs-lisp :tangle yes
+(setq org-outline-path-complete-in-steps nil
+      org-refile-use-outline-path t
+      org-refile-targets '((org-agenda-files :tag . "project")
+                            ;; (nil . (:maxlevel . 1))
+                           ))
+#+end_src
+** Configure projects
+#+begin_src emacs-lisp :tangle yes
+(setq org-stuck-projects '("+project" ("TODO" "NEXT") () "\\<IGNORE\\>" ))
+(setq org-tags-exclude-from-inheritance '("project"))
+#+end_src
+** TODO Agenda configurations
+#+begin_src emacs-lisp :tangle yes
+  (setq
+   org-agenda-custom-commands
+   '(
+     ;; ("w" todo "WAITING" nil ("waiting.txt"))
+     ;; ("n" todo "NEXT" nil ("next.html"))
+     ;; ("T" "Daily Action List"
+     ;;  (
+     ;;   (agenda "" ((org-agenda-ndays 1)
+     ;;               (org-agenda-sorting-strategy
+     ;;                (quote ((agenda time-up priority-down tag-up) )))
+     ;;               (org-deadline-warning-days 0)
+     ;;               ))))
+
+     ("n" "Work... work"
+      ((tags-todo "today" ((org-agenda-overriding-header "Today's items")
+                           (org-agenda-files jallen-default-org-agenda-files)))
+       (agenda "" ((org-agenda-ndays 1)))
+       (tags "project" ((org-agenda-files '("~/org/work.org"))
+                        (org-agenda-overriding-header "Work Projects")))
+       (todo "NEXT" ((org-agenda-files '("~/org/work.org"))
+                     (org-agenda-overriding-header "Work Next Items")))
+       (tags "project" ((org-agenda-files '("~/org/gtd.org"))
+                        (org-agenda-overriding-header "Personal Projects")))
+       (todo "NEXT" ((org-agenda-files '("~/org/gtd.org"))
+                     (org-agenda-overriding-header "Personal Next Items")))
+       (tags-todo "inbox" ((org-agenda-files '("~/org/gtd.org"))
+                           (org-agenda-overriding-header "Inbox")))
+       )
+      ((org-agenda-files '("~/org/work.org"))))
+
+     ("D" "Daily Action List"
+      ((agenda "habits" ((org-agenda-files '("~/org/habits.org"))))
+       (agenda "" ((org-agenda-ndays 1)
+                   (org-agenda-sorting-strategy
+                    (quote ((agenda time-up priority-down tag-up) )))
+                   (org-deadline-warning-days 0)
+                   ))))
+
+     ("d" "Agenda + Next Actions"
+      ((agenda "honker" ((org-agenda-ndays 1)
+                         (org-agenda-sorting-strategy
+                          (quote ((agenda time-up priority-down tag-up) )))
+                         (org-deadline-warning-days 0)
+                         ))
+       (todo "NEXT")) nil ("next.html"))
+
+     ("w" "Weekly Agenda + Next Actions"
+      ((agenda "weekly" ((org-agenda-ndays 7)
+                         (org-agenda-sorting-strategy
+                          (quote ((agenda time-up priority-down tag-up) )))
+                         (org-deadline-warning-days 0)
+                         ))
+       (todo "NEXT"))
+      nil ("week.html"))
+
+     ("W" "Weekly Review"
+      ((agenda "" ((org-agenda-ndays 7))) ;; review upcoming deadlines and appointments
+       ;; type "l" in the agenda to review logged items
+       (stuck "") ;; review stuck projects as designated by org-stuck-projects
+       (tags "project") ;; review all projects
+       (todo "MAYBE") ;; review someday/maybe items
+       (todo "WAITING"))) ;; review waiting items
+     ))
+#+end_src
+** Clocks
+*** Logging time of task completion
+#+begin_src emacs-lisp :tangle yes
+  (setq org-log-done 'time ; log the time a task is marked done
+        org-log-into-drawer t) ; timestamps go in a drawer, not the body
+#+end_src
+*** Logging time spent on tasks
+#+begin_src emacs-lisp :tangle yes
+  (setq org-clock-into-drawer t
+        org-clock-out-remove-zero-time-clocks t)
+#+end_src
+*** Editing timestamps
+#+begin_src emacs-lisp :tangle yes
+  (setq org-edit-timestamp-down-means-later t)
+#+end_src
+*** Save the running clock and all clock history when exiting Emacs, load it on startp
+#+begin_src emacs-lisp :tangle yes
+  (org-clock-persistence-insinuate)
+  (setq org-clock-persist 'history)
+  (setq org-clock-in-resume t)
+#+end_src
+*** Update the state of tasks when they get clocked
+#+begin_src emacs-lisp :tangle yes
+(setq org-clock-in-switch-to-state "STARTED")
+#+end_src
+*** Show clocked in task in header-line
+#+begin_src emacs-lisp :tangle yes
+(defun jallen-show-org-clock-in-header-line ()
+  (setq-default header-line-format '((" " org-mode-line-string " "))))
+
+(defun jallen-hide-org-clock-from-header-line ()
+  (setq-default header-line-format nil))
+
+(add-hook 'org-clock-in-hook
+          #'jallen-show-org-clock-in-header-line)
+(add-hook 'org-clock-out-hook
+          #'jallen-hide-org-clock-from-header-line)
+(add-hook 'org-clock-cancel-hook
+          #'jallen-hide-org-clock-from-header-line)
+#+end_src
+** =org-capture= templates
+#+begin_src emacs-lisp :tangle yes
+  (setq
+   org-capture-templates
+   '(
+     ("t" "Todo" entry ; New inbox item to be processed
+      (file+headline "~/org/gtd.org" "Inbox")
+      "* TODO %?\n  %i\n")
+
+     ("T" "Today" entry ; New inbox item to be processed
+      (file+headline "~/org/today.org" "todo list")
+      "* TODO %?   :today:\n  %i\n")
+
+     ("p" "Project" entry ; Create a new project entry
+      (file+headline "~/org/gtd.org" "Projects")
+      "* %? :project:\n  %i\n")
+
+     ("a" "Action" entry ; New inbox item to be processed
+      (file+datetree "~/org/gtd.org" "Inbox")
+      "* TODO %? :action:\n  %i\n")
+
+     ("j" "Journal Entries")
+     ("jm" "Precious Memory" entry ; Freeform journal entry
+      (file+datetree "~/org/journal.org")
+      "* %? :memory:\n  %i\n  %a")
+     ("jl" "Today I Learned" entry ; Breif TIL journal entry
+      (file+datetree "~/org/journal.org" "TIL")
+      "* %?\nLearned on %U :til:\n  %i\n  %a")
+     ("j." "Journal" entry ; Freeform journal entry
+      (file+datetree "~/org/journal.org")
+      "* %?\nEntered on %U\n  %i\n  %a")
+
+     ("5" "5 Minute Journal")
+     ("5m" "Morning Entry" entry (file+datetree "~/org/5-min-journal.org")
+      "* Morning\n  I am grateful for...\n  - %?\n  - \n  - \n\n  What will I do to make today great?\n  - \n  - \n  - \n\n  I am ...")
+                                          ; 5-minute journal. Evening entry
+     ("5e" "Evening Entry" entry (file+datetree "~/org/5-min-journal.org")
+      "* Evening\n  3 amazing things that happened today...\n  - %?\n  - \n  - \n\n  How could I have made today even better?\n  - \n")
+
+     ("f" "CBT" entry (file "~/org/cbt-journal.org")
+      "* %U\n** Activating Event\n** thoughts/Beliefs\n** emotional Consequences\n")
+
+     ("n" "notes" entry ; Generic notebook entry
+      (file+datetree "~/org/notes.org")
+      "* %? %U\n")
+     ))
+ #+end_src
+** Habits
+#+begin_src emacs-lisp :tangle yes
+  (require 'org-habit)
+  (setq org-habit-preceding-days 7
+          org-habit-following-days 1
+          org-habit-show-habits-only-for-today t
+          org-habit-graph-column 52
+          org-habit-show-all-today nil)
+#+end_src
+** Working with agendas
+*** Highlight the line that the point is on
+#+begin_src emacs-lisp :tangle yes
+  (add-hook 'org-agenda-finalize-hook (lambda () (hl-line-mode)))
+#+end_src
+*** Buffer setup
+#+begin_src emacs-lisp :tangle yes
+  (setq org-agenda-use-time-grid nil
+        org-agenda-restore-windows-after-quit t
+        org-agenda-start-on-weekday nil
+        org-agenda-span 1
+        org-agenda-window-setup 'current-window)
+#+end_src
+*** My =:today:= tag
+#+begin_src emacs-lisp :tangle yes
+  (defun org-toggle-today ()
+    (interactive)
+    (org-toggle-tag "today"))
+  (define-key org-mode-map (kbd "C-c T") 'org-toggle-today)
+#+end_src
+** Exporting
+*** Exporter Setup
+#+begin_src emacs-lisp :tangle yes
+  (setq
+   org-export-html-style-include-scripts nil
+   org-export-html-style-include-default nil
+   org-export-backends '(ascii beamer html icalendar texinfo latex)
+   org-publish-use-timestamps-flag nil)
+#+end_src
+*** HTML postamble
+#+begin_src emacs-lisp :tangle yes
+  (setq org-html-postamble-format
+        (quote
+         (("en" "<p class=\"author\">Author: %a (%e)</p>
+  powered by <p class=\"creator\">%c</p><p class=\"validation\">%v</p>"))))
+#+end_src
+
+** FB Tasks links
+#+begin_src emacs-lisp :tangle yes
+  (org-add-link-type "task" 'org-task-open)
+
+  (defun org-task-open (path)
+    "Open the task in the browser."
+    (browse-url (concat "https://our.intern.facebook.com/intern/tasks/?q=" path)))
 #+end_src
 * Snippets
   Snippets are are awesome. They are found in ~/emacs.d/snippets
@@ -279,6 +535,12 @@ Super nice to switch between frames and buffers
   (setq-default save-place t)
   (setq save-place-file (expand-file-name ".places" "~/tmp/saves")))
 #+end_src
+** TODO The Silver Searcher
+   Maybe install/enable this only if ag is in the path
+#+begin_src emacs-lisp :tangle yes
+
+(use-package ag)
+#+end_src
 * Appearance
 ** Frame Titles
 #+begin_src emacs-lisp :tangle yes
@@ -351,21 +613,21 @@ Define some shortcuts for sizes that I use sometimes
 ** Turn off nux and noisy UI
    No scroll, tool, menu bars
 #+begin_src emacs-lisp :tangle yes
-(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+  (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+  (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+  (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
 #+end_src
 
    Scratch buffer can just be empty, thanks
 #+begin_src emacs-lisp :tangle yes
-(setq initial-scratch-message nil)
+  (setq initial-scratch-message nil)
 #+end_src
 
    No NUX
 #+begin_src emacs-lisp :tangle yes
-(setq inhibit-splash-screen t
-      inhibit-startup-message t
-      inhibit-startup-echo-area-message t)
+  (setq inhibit-splash-screen t
+        inhibit-startup-message t
+        inhibit-startup-echo-area-message t)
 #+end_src
 
 
@@ -392,8 +654,6 @@ to set xterm-mode as a terminal option for this
 
 #+begin_src emacs-lisp :tangle yes
 (defadvice terminal-init-xterm (after map-S-up-escape-sequence activate)
-
-  (message "hot damn")
   (define-key input-decode-map "\e[1;9A" [M-up])
   (define-key input-decode-map "\e[1;9B" [M-down])
   (define-key input-decode-map "\e[1;9C" [M-right])
@@ -410,10 +670,28 @@ to set xterm-mode as a terminal option for this
 
 #+end_src
 
-* RSS Reader
-  Feeds configured in my custom file
+* Dired
+** Enable =dired-x=
 #+begin_src emacs-lisp :tangle yes
-(global-set-key (kbd "C-c C-n") 'newsticker-show-news)
+(require 'dired-x)
+#+end_src
+
+** Simple =dired= display
+#+begin_src emacs-lisp :tangle yes
+(use-package dired-details
+  :config
+  (setq-default dired-details-hidden-string "--- ")
+  (dired-details-install))
+#+end_src
+
+* RSS Reader
+#+begin_src emacs-lisp :tangle yes
+  (global-set-key (kbd "C-c C-n") 'newsticker-show-news)
+  (setq-default
+   newsticker-url-list
+   '(("Schneier on Security" "https://www.schneier.com/blog/atom.xml" nil nil nil)
+     ("Xah Emacs Blog" "http://ergoemacs.org/emacs/blog.xml" nil nil nil)
+     ("Sacha Chua" "http://sachachua.com/blog/feed/" nil nil nil)))
 #+end_src
 * Disable warnings about large files
   I'm not afraid of large files, yo
@@ -535,24 +813,19 @@ to set xterm-mode as a terminal option for this
   mercurial
   #+begin_src emacs-lisp :tangle yes
   (use-package magit
-    :config
-    (set-face-foreground 'magit-diff-add "green3")
-    (set-face-foreground 'magit-diff-del "red3")
-    (defadvice magit-status (around magit-fullscreen activate)
-      (window-configuration-to-register :magit-fullscreen)
-      ad-do-it
-      (delete-other-windows)))
+    :bind ("C-x g" . magit-status))
   #+end_src
 * Flycheck
 
 #+begin_src emacs-lisp :tangle yes
-(use-package flycheck
-  :diminish
-  :config
-  (setq-default flycheck-temp-prefix ".flycheck")
-  (setq-default flycheck-disabled-checkers
-    (append flycheck-disabled-checkers
-      '(json-jsonlist))))
+  (use-package flycheck
+    :diminish
+    :config
+    (setq-default flycheck-temp-prefix ".flycheck")
+    (setq-default flycheck-disabled-checkers
+                  '(emacs-lisp-checkdoc
+                    python-flake8
+                    json-jsonlist)))
 #+end_src
 
 * Awesome Key Bindings
@@ -685,26 +958,31 @@ to set xterm-mode as a terminal option for this
 #+end_src
 * Modes
 ** elisp
-   Turn on eldoc-mode
+*** Turn on eldoc-mode
    #+begin_src emacs-lisp :tangle yes
    (use-package eldoc
      :diminish eldoc-mode
      :config (add-hook 'emacs-lisp-mode-hook 'eldoc-mode))
    #+end_src
 
-   Enable slime-nav
+*** Enable slime-nav
    #+begin_src emacs-lisp :tangle yes
-   (use-package elisp-slime-nav-mode
-     :diminish elisp-slime-nav-mode
-     :config
-     (add-hook 'emacs-lisp-mode-hook (lambda () (elisp-slime-nav-mode t))))
+     (use-package elisp-slime-nav
+       :diminish elisp-slime-nav-mode
+       :config
+       (add-hook 'emacs-lisp-mode-hook (lambda () (elisp-slime-nav-mode t))))
    #+end_src
+*** Enable =rainbow-delimiters=
+    But only for emacs-lisp
+    #+begin_src emacs-lisp :tangle yes
+    (use-package rainbow-delimiters
+      :config
+      (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode))
+    #+end_src
 
 ** CSS
 #+begin_src emacs-lisp :tangle yes
-(use-package rainbow-mode
-  :delight)
-
+(use-package rainbow-mode :delight)
 (use-package css-mode
   :mode "\\.css$"
   :config
@@ -713,7 +991,7 @@ to set xterm-mode as a terminal option for this
   (add-hook 'css-mode-hook 'rainbow-mode)
 )
 #+end_src
-** [#B] C++
+** C++
 #+begin_src emacs-lisp :tangle yes
 (use-package google-c-style)
 #+end_src
@@ -749,7 +1027,7 @@ Tweaks to support enums better
 
 
 #+begin_src emacs-lisp :tangle yes
-(use-package c++-mode
+(use-package cpp
   :diminish c++-mode
   :mode "\\.h$"
   :bind (:map c++-mode-map
@@ -765,7 +1043,6 @@ Tweaks to support enums better
   (add-hook 'c-mode-common-hook 'google-set-c-style)
   (add-hook 'c-mode-common-hook 'google-make-newline-indent))
 #+end_src
-
 
 
 ** ediff
@@ -812,6 +1089,20 @@ emacs -diff file1 file2
   (add-hook 'yaml-mode-hook 'flycheck-mode)
   (add-hook 'yaml-mode-hook 'flyspell-mode))
 #+end_src
+** Python
+   In the past I've used elpy to great effect, but I haven't messed
+   with that in a while
+*** Setup =python-mode=
+   #+begin_src emacs-lisp :tangle yes
+   (add-hook 'python-mode-hook 'electric-operator-mode)
+   (setq python-shell-interpreter "/usr/bin/ipython")
+   (setq py-basic-offset 4)
+   #+end_src
+*** Enable company-jedi
+   #+begin_src emacs-lisp :tangle yes
+   (use-package company-jedi
+     :config (add-to-list 'company-backends 'company-jedi))
+   #+end_src
 ** Thrift
 #+begin_src emacs-lisp :tangle yes
 (use-package thrift
