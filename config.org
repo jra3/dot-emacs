@@ -1153,12 +1153,12 @@ emacs -diff file1 file2
   #+end_src
 
 ** Markdown
-#+begin_src emacs-lisp :tangle yes
-(use-package markdown-mode
-   :mode (("\\.text\\'" . markdown-mode)
-          ("\\.markdown\\'" . markdown-mode)
-          ("README\\.md\\'" . gfm-mode)))
-#+end_src
+  #+begin_src emacs-lisp :tangle yes
+    (use-package markdown-mode
+       :mode (("\\.text\\'" . markdown-mode)
+              ("\\.markdown\\'" . markdown-mode)
+              ("README\\.md\\'" . gfm-mode)))
+  #+end_src
 ** JS + Web
    Web mode is a very, very, very fine mode
    #+begin_src emacs-lisp :tangle yes
@@ -1210,3 +1210,10 @@ emacs -diff file1 file2
        (add-to-list 'web-mode-indentation-params '("lineup-concats" . nil))
        (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil)))
    #+end_src
+** Config File Formats
+  #+begin_src emacs-lisp :tangle yes
+    (use-package gitignore-mode)
+    (use-package gitconfig-mode)
+    (use-package hgignore-mode)
+    (use-package hgrc-mode)
+  #+end_src
