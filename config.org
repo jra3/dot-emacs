@@ -1,5 +1,6 @@
 #+TITLE: Emacs Configuration
 #+AUTHOR: John Allen
+#+STARTUP: overview
 
 * Package Installation
 ** Install use-package
@@ -32,6 +33,11 @@
     (setq use-package-always-ensure t)
   #+end_src
 
+* Use dash
+  Because dash is awesome
+  #+begin_src emacs-lisp :tangle yes
+    (use-package dash)
+  #+end_src
 * Path Fix for Mac
   #+begin_src emacs-lisp :tangle yes
     (use-package exec-path-from-shell
@@ -78,32 +84,32 @@
   #+end_src
 * Configuring =org-mode=
 ** Set environment
-#+begin_src emacs-lisp :tangle yes
-(setq org-directory "~/org")
+  #+begin_src emacs-lisp :tangle yes
+    (setq org-directory "~/org/")
 
-(defun org-file-path (filename)
-  "Return the absolute address of an org file, given its relative name."
-  (concat (file-name-as-directory org-directory) filename))
+    (defun org-file-path (filename)
+      "Return the absolute address of an org file, given its relative name."
+      (concat (file-name-as-directory org-directory) filename))
 
-(defun org-find-file ()
-  "Leverage Helm to quickly open any org files."
-  (interactive)
-  (find-file (concat org-directory
-                     (helm-comp-read "Select your org file: "
-                                     (directory-files org-directory nil "\.org$")))))
-#+end_src
+    (defun org-find-file ()
+      "Leverage Helm to quickly open any org files."
+      (interactive)
+      (find-file (concat org-directory
+                         (helm-comp-read "Select your org file: "
+                                         (directory-files org-directory nil "\.org$")))))
+  #+end_src
 
 ** Modules
-#+begin_src emacs-lisp :tangle yes
-  (setq-default
-   org-modules
-   '(org-bibtex
-     org-crypt
-     org-habit
-     org-id
-     org-info
-     org-protocol))
-#+end_src
+  #+begin_src emacs-lisp :tangle yes
+    (setq-default
+     org-modules
+     '(org-bibtex
+       org-crypt
+       org-habit
+       org-id
+       org-info
+       org-protocol))
+  #+end_src
 ** Enable =org-mode= for org files
 #+begin_src emacs-lisp :tangle yes
 (use-package org
@@ -111,6 +117,12 @@
   :mode ("\\.org_archive\\'" . org-mode))
 #+end_src
 
+** My typical TODO sequence
+  #+begin_src emacs-lisp :tangle yes
+    (setq
+     org-todo-keywords
+     '((sequence "TODO(t)" "MAYBE(m!)" "WAITING(w!)" "NEXT(n)" "STARTED(s)" "|" "DONE(d!)" "CANCELED(c@)")))
+  #+end_src
 ** Pretty headlines
 *** Make headlines more compact
 #+begin_src emacs-lisp :tangle yes
@@ -158,24 +170,28 @@
 ** Enable =org-pomodoro=
   #+begin_src emacs-lisp :tangle yes
     (use-package org-pomodoro
-      :bind (:map org-agenda-mode-map ("P" . org-pomodoro))
-      :config (setq org-pomodoro-start-sound-p t))
+      :config
+      (setq org-pomodoro-start-sound-p t
+            org-pomodoro-keep-killed-pomodoro-time t
+            ; org-pomodoro-sound (expand-file-name "~/Dropbox/Audio/wav/13699__harri__a.mp3")
+            ; org-pomodoro-short-break-sound (expand-file-name "~/Dropbox/Audio/wav/13699__harri__a.mp3")
+            ; org-pomodoro-long-break-sound (expand-file-name "~/Dropbox/Audio/wav/13699__harri__a.mp3")
+            ; org-pomodoro-start-sound (expand-file-name "~/Dropbox/Audio/wav/big-singing-bowl.wav")
+            ; org-pomodoro-killed-sound (expand-file-name "~/Dropbox/Audio/wav/jf-glass-breaking.wav")
+            org-pomodoro-time-format "%.2m"))
   #+end_src
 ** Notes file
 #+begin_src emacs-lisp :tangle yes
 (setq  org-default-notes-file (concat org-directory "/notes.org"))
 #+end_src
-** TODO Agenda files
-   make this respect org-directory
-#+begin_src emacs-lisp :tangle yes
-(setq jallen-default-org-agenda-files
-      (list "~/org/gtd.org"
-            "~/org/work.org"
-            "~/org/personal.org"
-            "~/org/habits.org"
-            "~/org/today.org")
-      org-agenda-files jallen-default-org-agenda-files)
-#+end_src
+** Agenda files
+  #+begin_src emacs-lisp :tangle yes
+    (setq jallen-org-habit-file (concat org-directory "habits.org")
+          jallen-default-org-agenda-files
+          (--map (concat org-directory it)
+                 '("gtd.org" "work.org" "today.org"))
+          org-agenda-files jallen-default-org-agenda-files)
+  #+end_src
 ** Refiling
 #+begin_src emacs-lisp :tangle yes
 (setq org-outline-path-complete-in-steps nil
@@ -191,69 +207,73 @@
 #+end_src
 ** TODO Agenda configurations
 #+begin_src emacs-lisp :tangle yes
-  (setq
-   org-agenda-custom-commands
-   '(
-     ;; ("w" todo "WAITING" nil ("waiting.txt"))
-     ;; ("n" todo "NEXT" nil ("next.html"))
-     ;; ("T" "Daily Action List"
-     ;;  (
-     ;;   (agenda "" ((org-agenda-ndays 1)
-     ;;               (org-agenda-sorting-strategy
-     ;;                (quote ((agenda time-up priority-down tag-up) )))
-     ;;               (org-deadline-warning-days 0)
-     ;;               ))))
+    (setq
+     org-agenda-custom-commands
+     '(
+       ;; ("w" todo "WAITING" nil ("waiting.txt"))
+       ;; ("n" todo "NEXT" nil ("next.html"))
+       ;; ("T" "Daily Action List"
+       ;;  (
+       ;;   (agenda "" ((org-agenda-ndays 1)
+       ;;               (org-agenda-sorting-strategy
+       ;;                (quote ((agenda time-up priority-down tag-up) )))
+       ;;               (org-deadline-warning-days 0)
+       ;;               ))))
 
-     ("n" "Work... work"
-      ((tags-todo "today" ((org-agenda-overriding-header "Today's items")
-                           (org-agenda-files jallen-default-org-agenda-files)))
-       (agenda "" ((org-agenda-ndays 1)))
-       (tags "project" ((org-agenda-files '("~/org/work.org"))
-                        (org-agenda-overriding-header "Work Projects")))
-       (todo "NEXT" ((org-agenda-files '("~/org/work.org"))
-                     (org-agenda-overriding-header "Work Next Items")))
-       (tags "project" ((org-agenda-files '("~/org/gtd.org"))
-                        (org-agenda-overriding-header "Personal Projects")))
-       (todo "NEXT" ((org-agenda-files '("~/org/gtd.org"))
-                     (org-agenda-overriding-header "Personal Next Items")))
-       (tags-todo "inbox" ((org-agenda-files '("~/org/gtd.org"))
-                           (org-agenda-overriding-header "Inbox")))
-       )
-      ((org-agenda-files '("~/org/work.org"))))
+       ("h" "Habits and Chores"
+        ((agenda "" ((org-agenda-span 1)
+                     (org-deadline-warning-days 30))))
+        ((org-agenda-files (list jallen-org-habit-file))))
+       ("n" "Work... work"
+        ((tags-todo "today" ((org-agenda-overriding-header "Today's items")
+                             (org-agenda-files jallen-default-org-agenda-files)))
+         (agenda "" ((org-agenda-span 1)))
+         (tags "project" ((org-agenda-files '("~/org/work.org"))
+                          (org-agenda-overriding-header "Work Projects")))
+         (todo "NEXT" ((org-agenda-files '("~/org/work.org"))
+                       (org-agenda-overriding-header "Work Next Items")))
+         (tags "project" ((org-agenda-files '("~/org/gtd.org"))
+                          (org-agenda-overriding-header "Personal Projects")))
+         (todo "NEXT" ((org-agenda-files '("~/org/gtd.org"))
+                       (org-agenda-overriding-header "Personal Next Items")))
+         (tags-todo "inbox" ((org-agenda-files '("~/org/gtd.org"))
+                             (org-agenda-overriding-header "Inbox")))
+         )
+        ((org-agenda-files '("~/org/work.org"))))
 
-     ("D" "Daily Action List"
-      ((agenda "habits" ((org-agenda-files '("~/org/habits.org"))))
-       (agenda "" ((org-agenda-ndays 1)
-                   (org-agenda-sorting-strategy
-                    (quote ((agenda time-up priority-down tag-up) )))
-                   (org-deadline-warning-days 0)
-                   ))))
+       ("D" "Daily Action List"
+        ((agenda "habits" ((org-agenda-files '("~/org/habits.org"))))
+         (agenda "" ((org-agenda-span 1)
+                     (org-agenda-sorting-strategy
+                      (quote ((agenda time-up priority-down tag-up) )))
+                     (org-deadline-warning-days 0)
+                     ))))
 
-     ("d" "Agenda + Next Actions"
-      ((agenda "honker" ((org-agenda-ndays 1)
-                         (org-agenda-sorting-strategy
-                          (quote ((agenda time-up priority-down tag-up) )))
-                         (org-deadline-warning-days 0)
-                         ))
-       (todo "NEXT")) nil ("next.html"))
+       ("d" "Agenda + Next Actions"
+        ((agenda "honker" ((org-agenda-span 1)
+                           (org-agenda-sorting-strategy
+                            (quote ((agenda time-up priority-down tag-up) )))
+                           (org-deadline-warning-days 0)
+                           ))
+         (todo "NEXT")) nil ("next.html"))
 
-     ("w" "Weekly Agenda + Next Actions"
-      ((agenda "weekly" ((org-agenda-ndays 7)
-                         (org-agenda-sorting-strategy
-                          (quote ((agenda time-up priority-down tag-up) )))
-                         (org-deadline-warning-days 0)
-                         ))
-       (todo "NEXT"))
-      nil ("week.html"))
+       ("w" "Weekly Agenda + Next Actions"
+        ((agenda "weekly" ((org-agenda-span 7)
+                           (org-agenda-sorting-strategy
+                            (quote ((agenda time-up priority-down tag-up) )))
+                           (org-deadline-warning-days 0)
+                           ))
+         (todo "NEXT"))
+        nil ("week.html"))
 
-     ("W" "Weekly Review"
-      ((agenda "" ((org-agenda-ndays 7))) ;; review upcoming deadlines and appointments
-       ;; type "l" in the agenda to review logged items
-       (stuck "") ;; review stuck projects as designated by org-stuck-projects
-       (tags "project") ;; review all projects
-       (todo "MAYBE") ;; review someday/maybe items
-       (todo "WAITING"))) ;; review waiting items
-     ))
+       ("W" "Weekly Review"
+        ((agenda "" ((org-agenda-span 7))) ;; review upcoming deadlines and appointments
+         ;; type "l" in the agenda to review logged items
+         (stuck "") ;; review stuck projects as designated by org-stuck-projects
+         (tags "project") ;; review all projects
+         (todo "MAYBE") ;; review someday/maybe items
+         (todo "WAITING"))) ;; review waiting items
+       ))
 #+end_src
 ** Clocks
 *** Logging time of task completion
@@ -351,18 +371,49 @@
           org-habit-graph-column 52
           org-habit-show-all-today nil)
 #+end_src
+** Auto habit tracking for 5-min-journal
+   The ids in here are hardcoded the the random ids in my habits.org
+  #+begin_src emacs-lisp :tangle yes
+    (defun 5-min-journal-complete-on-capture ()
+      "To be run in org-capture-before-finalize-hook"
+      (pcase (plist-get org-capture-current-plist :description)
+        ("Morning Entry"
+         (progn
+           (org-id-goto "FEE1A918-0FFE-446F-A954-5B7A6DE29D3F")
+           (org-todo "DONE")
+           (bury-buffer)))
+        ("Evening Entry"
+         (progn
+           (org-id-goto "81125689-466F-4C87-9898-FB344CDD175F")
+           (org-todo "DONE")
+           (bury-buffer)))
+        (_ (message "Capture complete!")))
+      )
+    (add-hook
+     'org-capture-before-finalize-hook
+     '5-min-journal-complete-on-capture)
+  #+end_src
 ** Working with agendas
 *** Highlight the line that the point is on
 #+begin_src emacs-lisp :tangle yes
   (add-hook 'org-agenda-finalize-hook (lambda () (hl-line-mode)))
 #+end_src
 *** Buffer setup
+  #+begin_src emacs-lisp :tangle yes
+    (setq org-agenda-use-time-grid nil
+          org-agenda-restore-windows-after-quit t
+          org-agenda-start-on-weekday nil
+          org-agenda-span 1
+          org-agenda-window-setup 'current-window)
+  #+end_src
+*** Hotkeys
 #+begin_src emacs-lisp :tangle yes
-  (setq org-agenda-use-time-grid nil
-        org-agenda-restore-windows-after-quit t
-        org-agenda-start-on-weekday nil
-        org-agenda-span 1
-        org-agenda-window-setup 'current-window)
+  (add-hook
+   'org-agenda-mode-hook
+   (lambda ()
+     (define-key org-agenda-mode-map "q" 'bury-buffer)
+     (define-key org-agenda-mode-map "P" 'org-pomodoro))
+   'append)
 #+end_src
 *** My =:today:= tag
 #+begin_src emacs-lisp :tangle yes
@@ -618,6 +669,9 @@ Define some shortcuts for sizes that I use sometimes
       column-number-mode t)
 #+end_src
 * Terminal Configuration
+** Fix my shell prompt regex
+   I use fancy unicode characters in my shell prompt
+
 ** Terminals in emacs should use ansi colors
 #+begin_src emacs-lisp :tangle yes
 (use-package ansi-color)
@@ -666,14 +720,19 @@ to set xterm-mode as a terminal option for this
 #+end_src
 
 * RSS Reader
-#+begin_src emacs-lisp :tangle yes
-  (global-set-key (kbd "C-c C-n") 'newsticker-show-news)
-  (setq-default
-   newsticker-url-list
-   '(("Schneier on Security" "https://www.schneier.com/blog/atom.xml" nil nil nil)
-     ("Xah Emacs Blog" "http://ergoemacs.org/emacs/blog.xml" nil nil nil)
-     ("Sacha Chua" "http://sachachua.com/blog/feed/" nil nil nil)))
-#+end_src
+** Set up HTML rendering
+  #+begin_src emacs-lisp :tangle yes
+    (use-package w3m)
+  #+end_src
+** List of blogs
+  #+begin_src emacs-lisp :tangle yes
+    (global-set-key (kbd "C-c C-n") 'newsticker-show-news)
+    (setq-default
+     newsticker-url-list
+     '(("Schneier on Security" "https://www.schneier.com/blog/atom.xml" nil nil nil)
+       ("Xah Emacs Blog" "http://ergoemacs.org/emacs/blog.xml" nil nil nil)
+       ("Sacha Chua" "http://sachachua.com/blog/feed/" nil nil nil)))
+  #+end_src
 * Disable warnings about large files
   I'm not afraid of large files, yo
 #+begin_src emacs-lisp :tangle yes
