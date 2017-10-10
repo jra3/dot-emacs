@@ -275,6 +275,34 @@
          (todo "WAITING"))) ;; review waiting items
        ))
 #+end_src
+** Agenda faces
+
+   #+begin_src emacs-lisp :tangle yes
+     (defface my-org-deadline-yesterday
+       '((t (:foreground "#F45B69" :weight bold)))
+       "Agenda deadlines overdue")
+     (defface my-org-deadline-today
+       '((t (:foreground "#FAFFFD" :weight bold)))
+       "Agenda deadlines iminent")
+     (defface my-org-deadline-tomorrow
+       '((t (:foreground "#9FD356")))
+       "Agenda deadlines soon")
+     (defface my-org-deadline-later
+       '((t (:foreground "#3C91E6")))
+       "Agenda deadlines far in the future")
+     (defface my-org-deadline-someday
+       '((t (:foreground "#0A2463")))
+       "Agenda deadlines far in the future")
+
+     ;; faces for showing deadlines in the agenda
+     (setq org-agenda-deadline-faces
+           '((1.01 . my-org-deadline-yesterday)
+             (0.99 . my-org-deadline-today)
+             (0.69 . my-org-deadline-tomorrow)
+             (0.49 . my-org-deadline-later)
+             (0.00 . my-org-deadline-someday)))
+
+   #+end_src
 ** Clocks
 *** Logging time of task completion
 #+begin_src emacs-lisp :tangle yes
@@ -631,17 +659,6 @@ Define some shortcuts for sizes that I use sometimes
   (set-face-background 'lazy-highlight "yellow")
   (set-face-foreground 'isearch "white")
   (set-face-background 'isearch "blue")
-#+end_src
-** Jallen face
-   My own name deserves to be seen
-#+begin_src emacs-lisp :tangle yes
-(make-face 'my-name-face)
-(set-face-foreground 'my-name-face "#000000")
-(set-face-background 'my-name-face "#ffff10")
-
-(add-hook 'font-lock-mode-hook 'highlight-my-name)
-(defun highlight-my-name () ""
-       (font-lock-add-keywords nil '(("jallen" (0 'my-name-face t)))))
 #+end_src
 ** Turn off nux and noisy UI
    No scroll, tool, menu bars
