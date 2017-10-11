@@ -737,19 +737,30 @@ to set xterm-mode as a terminal option for this
 #+end_src
 
 * RSS Reader
+** Basic setup
+   #+begin_src emacs-lisp :tangle yes
+     (setq newsticker-date-format "(%A %D %H:%M)"
+           newsticker-html-renderer 'shr-render-region
+           newsticker-use-full-width nil)
+
+   #+end_src
 ** Set up HTML rendering
-  #+begin_src emacs-lisp :tangle yes
-    (use-package w3m)
-  #+end_src
+   #+begin_src emacs-lisp :tangle yes
+     (use-package w3m
+       :if (executable-find "w3m")
+       :init
+       (setq newsticker-html-renderer 'w3m-region)
+       )
+   #+end_src
 ** List of blogs
-  #+begin_src emacs-lisp :tangle yes
-    (global-set-key (kbd "C-c C-n") 'newsticker-show-news)
-    (setq-default
-     newsticker-url-list
-     '(("Schneier on Security" "https://www.schneier.com/blog/atom.xml" nil nil nil)
-       ("Xah Emacs Blog" "http://ergoemacs.org/emacs/blog.xml" nil nil nil)
-       ("Sacha Chua" "http://sachachua.com/blog/feed/" nil nil nil)))
-  #+end_src
+   #+begin_src emacs-lisp :tangle yes
+     (global-set-key (kbd "C-c C-n") 'newsticker-show-news)
+     (setq-default
+      newsticker-url-list
+      '(("Schneier on Security" "https://www.schneier.com/blog/atom.xml" nil nil nil)
+        ("Xah Emacs Blog" "http://ergoemacs.org/emacs/blog.xml" nil nil nil)
+        ("Sacha Chua" "http://sachachua.com/blog/feed/" nil nil nil)))
+   #+end_src
 * Disable warnings about large files
   I'm not afraid of large files, yo
 #+begin_src emacs-lisp :tangle yes
