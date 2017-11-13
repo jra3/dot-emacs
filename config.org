@@ -1085,12 +1085,12 @@ to set xterm-mode as a terminal option for this
           (other-window 1))))
   #+end_src
 * LSP
-
 ** Basic
 #+BEGIN_SRC emacs-lisp tangle: yes
   (add-to-list 'load-path "/home/jallen/oss/lsp-mode")
   (add-to-list 'load-path "/home/jallen/oss/lsp-hack")
   (require 'lsp-mode)
+  (require 'lsp-common)
   (require 'lsp-hack)
   (add-hook 'hack-mode-hook #'lsp-hack-enable)
 #+END_SRC
