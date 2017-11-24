@@ -1092,7 +1092,8 @@ to set xterm-mode as a terminal option for this
   (require 'lsp-mode)
   (require 'lsp-common)
   (require 'lsp-hack)
-  (add-hook 'hack-mode-hook #'lsp-hack-enable)
+  ; such alpha
+  ; (add-hook 'hack-mode-hook #'lsp-hack-enable)
 #+END_SRC
 
 * Modes
