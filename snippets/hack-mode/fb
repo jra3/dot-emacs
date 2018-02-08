@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: :nt:flexbox
+# key: fb
+# --
+<nt:flexbox flex-direction="column">

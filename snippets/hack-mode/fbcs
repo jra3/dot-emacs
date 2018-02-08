@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: :nt:flexbox:children
+# key: fbcs
+# --
+<nt:flexbox:children>
