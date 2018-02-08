@@ -50,7 +50,7 @@
   #+end_src
 * Customization File
   #+begin_src emacs-lisp :tangle yes
-    (setq custom-file "custom.el")
+    (setq custom-file "~/.emacs.d/custom.el")
     (load (concat config-load-path custom-file))
   #+end_src
 * TODO Configure Helm
@@ -614,30 +614,32 @@ Super nice to switch between frames and buffers
 ** Fonts
  Install fonts from my .emacs.d into system locations
 #+begin_src emacs-lisp :tangle yes
-(defun jallen-install-font ()
-  "copy my font files into the system-specific location"
-  (let ((fonts-source "~/.emacs.d/Input_Fonts/"))
-    (if (string-equal system-type "darwin")
-        (copy-directory fonts-source "~/Library/Fonts/") ; Mac
-      (copy-directory fonts-source "~/.fonts/") ; Linux
-      )
-    ))
+  (defun jallen-install-font ()
+    "copy my font files into the system-specific location"
+    (let ((fonts-source "~/.emacs.d/Input_Fonts/"))
+      (if (string-equal system-type "darwin")
+          (copy-directory fonts-source "~/Library/Fonts/") ; Mac
+        (copy-directory fonts-source "~/.fonts/") ; Linux
+        )
+      ))
 
-(add-hook 'before-make-frame-hook
-          (lambda ()
-            (if (-any '(lambda (fonts) (string-prefix-p "-*-Input " (elt fonts 6))) (x-family-fonts))
-                (jallen-install-font))))
+  (add-hook 'before-make-frame-hook
+            (lambda ()
+              (if (-any '(lambda (fonts) (string-prefix-p "-*-Input " (elt fonts 6))) (x-family-fonts))
+                  (jallen-install-font))))
 #+end_src
 
 Define some shortcuts for sizes that I use sometimes
 #+begin_src emacs-lisp :tangle yes
-(defun jallen-font () (interactive)
-       (set-frame-font "Input Mono Narrow-16"))
-(defun jallen-font-no-contacts () (interactive)
-       (set-frame-font "Input Mono Narrow-22"))
-(defun jallen-blind () (interactive)
-       (set-frame-font "Input Mono Narrow-30"))
+  (defun jallen-font () (interactive)
+         (set-frame-font "Input Mono Narrow-16"))
+  (defun jallen-font-no-contacts () (interactive)
+         (set-frame-font "Input Mono Narrow-22"))
+  (defun jallen-blind () (interactive)
+         (set-frame-font "Input Mono Narrow-30"))
 #+end_src
+
+
 ** Frame Configuration
 #+begin_src emacs-lisp :tangle yes
 (setq default-frame-alist
@@ -1091,10 +1093,13 @@ to set xterm-mode as a terminal option for this
   (add-to-list 'load-path "/home/jallen/oss/lsp-hack")
   (require 'lsp-mode)
   (require 'lsp-common)
+
+  (setq find-file-visit-truename t) ; hack hates symlinks
   (require 'lsp-hack)
-  ; such alpha
-  ; (add-hook 'hack-mode-hook #'lsp-hack-enable)
+
+  ;; (add-hook 'hack-mode-hook #'lsp-hack-enable) ; such alpha
 #+END_SRC
+
 
 * Modes
 ** elisp
@@ -1244,8 +1249,8 @@ emacs -diff file1 file2
    #+end_src
 ** Thrift
   #+begin_src emacs-lisp :tangle yes
-    (use-package thrift
-      :mode "\\.thrift$")
+;;    (use-package thrift
+;;      :mode "\\.thrift\\'")
   #+end_src
 ** JSON
   #+begin_src emacs-lisp :tangle yes
@@ -1259,6 +1264,11 @@ emacs -diff file1 file2
               ("\\.markdown\\'" . markdown-mode)
               ("README\\.md\\'" . gfm-mode)))
   #+end_src
+** Hack
+#+BEGIN_SRC emacs-lisp tangle: yes
+  (add-hook 'hack-mode-hook (lambda () (company-mode t) (message "%s" major-mode)) 'append)
+#+END_SRC
+
 ** JS + Web
    Web mode is a very, very, very fine mode
    #+begin_src emacs-lisp :tangle yes
@@ -1319,8 +1329,13 @@ emacs -diff file1 file2
   #+end_src
 * Which Key was that again?
 
+#+begin_src emacs-lisp :tangle yes
+  (use-package which-key
+    :pin gnu
+    :diminish which-key-mode
+    :config (which-key-mode 1))
+#+end_src
+* Log major-mode
   #+begin_src emacs-lisp :tangle yes
-    (use-package which-key
-      :diminish which-key-mode
-      :config (which-key-mode 1))
+    (add-hook 'prog-mode-hook (lambda () (message "%s" major-mode)) 'append)
   #+end_src
