@@ -33,8 +33,6 @@
            (default-directory my-lisp-dir))
       (add-to-list 'load-path my-lisp-dir)
       (normal-top-level-add-subdirs-to-load-path)))
-(require 'j-dired)
-(require 'helm-myles)
 
 (use-package load-dir
   :config (setq load-dirs (concat config-load-path "extra/")))
