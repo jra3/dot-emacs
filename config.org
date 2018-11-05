@@ -57,6 +57,7 @@
   Make everything fuzzy and also rebind functions.
   #+begin_src emacs-lisp :tangle yes
     (use-package flx)
+
     (use-package helm-flx)
     (use-package helm-descbinds)
     (use-package helm
@@ -83,6 +84,10 @@
             helm-locate-fuzzy-match t
             helm-lisp-fuzzy-completion t
             helm-bookmark-show-location t))
+    (use-package helm-xref
+      :config
+      (setq xref-show-xrefs-function 'helm-xref-show-xrefs))
+
   #+end_src
 * Configuring =org-mode=
 ** Set environment
@@ -543,9 +548,9 @@
         ("*magit-log*")
         ("*compilation*")
         ("*Python Doc*")
+        ("*xref*")
         ("*grep*")
         ("*Help*")
-        ("*hh-client-definitions*" :noselect t)
         ("*Completions*" :noselect t)
         ("*Occur*" :noselect t)))))
 #+end_src
@@ -743,10 +748,10 @@ to set xterm-mode as a terminal option for this
 
 ** Simple =dired= display
 #+begin_src emacs-lisp :tangle yes
-(use-package dired-details
-  :config
-  (setq-default dired-details-hidden-string "--- ")
-  (dired-details-install))
+; (use-package dired-details
+;   :config
+;   (setq-default dired-details-hidden-string "--- ")
+;   (dired-details-install))
 #+end_src
 
 * RSS Reader
@@ -890,13 +895,63 @@ to set xterm-mode as a terminal option for this
 #+begin_src emacs-lisp :tangle yes
 (global-set-key (kbd "C-c r") 'revert-buffer)
 #+end_src
-* Magit
+* VC
+
+** Magit
   Magit is a great interface to git. Too bad we don't have one for
   mercurial
   #+begin_src emacs-lisp :tangle yes
   (use-package magit
     :bind ("C-x g" . magit-status))
   #+end_src
+
+** git-gutter-mode
+#+BEGIN_SRC emacs-lisp tangle: yes
+(use-package git-gutter
+   :diminish git-gutter-mode
+   :commands (git-gutter-mode)
+   :bind (:map vc-prefix-map
+               ("[" . git-gutter:previous-hunk)
+               ("]" . git-gutter:next-hunk)
+               ("n" . git-gutter:revert-hunk)
+               ("SPC" . git-gutter:mark-hunk))
+   :init
+   (global-git-gutter-mode)
+   :config
+   (setq git-gutter:handled-backends '(git hg)))
+
+;; vc-hg comes with emacs, but we can still use use-package to group related
+ ;; config
+
+ (use-package vc-hg
+   :ensure nil
+   :bind
+   (:map vc-prefix-map
+     ("a" . vc-annotate)
+     ;; 'g' is the original binding for vc-annotate
+     ("g" . nil))
+   :config
+   (setq
+    vc-hg-annotate-re
+    (concat
+     "^\\(?: *[^ ]+ +\\)?\\(D?[0-9]+\\) +" ;; user and revision
+     "\\([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\\)" ;; date
+     "\\(?: +\\([^:]+\\)\\)?:") ;; filename
+    vc-annotate-hg-switches "-u"
+    )
+   ;; redefine vc-hg-annotate-command to use -p (phabricator diff) instead of -n
+   ;; (revision number)
+   ;; TODO select -p or -n base on whether or not the hg repo is a phabricator
+   ;; project. Is there a better way to do this other than replacing the
+   ;; function, e.g. with advice?
+   (defun vc-hg-annotate-command (file buffer &optional revision)
+     "Execute \"hg annotate\" on FILE, inserting the contents in BUFFER.
+ Optional arg REVISION is a revision to annotate from."
+     (apply #'vc-hg-command buffer 0 file "annotate" "-dq" "-p"
+            (append (vc-switches 'hg 'annotate)
+                    (if revision (list (concat "-r" revision)))))))
+#+END_SRC
+
 * Flycheck
 
 #+begin_src emacs-lisp :tangle yes
@@ -1089,18 +1144,75 @@ to set xterm-mode as a terminal option for this
 * LSP
 ** Basic
 #+BEGIN_SRC emacs-lisp tangle: yes
-  (add-to-list 'load-path "/home/jallen/oss/lsp-mode")
-  (add-to-list 'load-path "/home/jallen/oss/lsp-hack")
-  (require 'lsp-mode)
-  (require 'lsp-common)
 
-  (setq find-file-visit-truename t) ; hack hates symlinks
-  (require 'lsp-hack)
+  (use-package lsp-mode
+    :config
+    (setq
+      lsp-ui-sideline-show-code-actions nil
+      lsp-ui-sideline-show-hover nil
+      lsp-highlight-symbol-at-point nil
+      ))
 
-  ;; (add-hook 'hack-mode-hook #'lsp-hack-enable) ; such alpha
+  (use-package company-lsp
+    :after (lsp-mode company-mode)
+    :config
+    (push 'company-lsp company-backends)
+    (setq company-lsp-enable-snippet t
+          company-lsp-cache-candidates t))
+
+  (use-package lsp-ui
+    :init (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+    :config
+    (setq
+      company-transformers nil
+      company-lsp-async t
+      company-lsp-cache-candidates nil
+      xref-prompt-for-identifier '(not
+                                    xref-find-definitions
+                                    xref-find-definitions-other-window
+                                    xref-find-definitions-other-frame
+                                    xref-find-references))
+
+  (use-package lsp-hack)
 #+END_SRC
 
-
+** cquery
+#+BEGIN_SRC emacs-lisp tangle: yes
+(use-package cquery
+  :if
+  (file-exists-p "/bin/cquery")
+  :bind
+  (:map c-mode-base-map
+    ("M-." . xref-find-definitions)
+    ("C-t h c" . cquery-call-hierarchy)
+    ("C-t h i" . cquery-inheritance-hierarchy)
+    ("C-t i" . lsp-ui-sideline-toggle-symbols-info)
+    ("C-t I". helm-imenu)
+    ("C-t h m" . cquery-member-hierarchy)
+    ("C-t ." . lsp-ui-peek-find-definitions)
+    ("C-t ?" . lsp-ui-peek-find-references))
+  :preface
+  (defun cquery//enable ()
+    (condition-case nil
+      (lsp-cquery-enable)
+      (user-error nil)))
+  :init
+  (add-hook 'c-mode-common-hook #'cquery//enable)
+  :config
+  (setq
+    cquery-executable "/bin/cquery"
+    cquery-extra-args '("--log-file=/tmp/cq.log")
+    cquery-extra-init-params '(:completion (:detailedLabel t))
+    cquery-sem-highlight-method 'font-lock
+    company-transformers nil
+    company-lsp-async t
+    company-lsp-cache-candidates nil
+    xref-prompt-for-identifier '(not
+                                  xref-find-definitions
+                                  xref-find-definitions-other-window
+                                  xref-find-definitions-other-frame
+                                  xref-find-references)))
+#+END_SRC
 * Modes
 ** elisp
 *** Turn on eldoc-mode
@@ -1124,6 +1236,11 @@ to set xterm-mode as a terminal option for this
       :config
       (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode))
     #+end_src
+
+*** package-lint for authoring packages
+#+BEGIN_SRC emacs-lisp tangle: yes
+(use-package package-lint)
+#+END_SRC
 
 ** CSS
 #+begin_src emacs-lisp :tangle yes
@@ -1169,7 +1286,6 @@ Tweaks to support enums better
   (add-to-list 'c-offsets-alist
                '(statement-cont . align-enum-class-closing-brace)))
 #+end_src
-
 
 #+begin_src emacs-lisp :tangle yes
 (use-package cpp
@@ -1244,8 +1360,8 @@ emacs -diff file1 file2
    #+end_src
 *** Enable company-jedi
    #+begin_src emacs-lisp :tangle yes
-   (use-package company-jedi
-     :config (add-to-list 'company-backends 'company-jedi))
+                                             ; (use-package company-jedi
+                                             ;   :config (add-to-list 'company-backends 'company-jedi))
    #+end_src
 ** Thrift
   #+begin_src emacs-lisp :tangle yes
@@ -1265,8 +1381,29 @@ emacs -diff file1 file2
               ("README\\.md\\'" . gfm-mode)))
   #+end_src
 ** Hack
+
+
 #+BEGIN_SRC emacs-lisp tangle: yes
-  (add-hook 'hack-mode-hook (lambda () (company-mode t) (message "%s" major-mode)) 'append)
+  (use-package hack-mode
+    :init
+    (add-hook 'hack-mode-hook
+              (lambda ()
+                (bind-key "C-c j" (lambda ()
+                                    (interactive)
+                                    (message "1")
+                                    (lsp-mode nil)
+                                    (message "2")
+                                    (lsp-hack-enable)))
+                (lsp-hack-enable)
+                (flycheck-mode t)
+                (subword-mode t)
+                (company-mode t)))
+    :mode "\\.phpt?\\'"
+    :mode "\\.hhi\\'")
+
+  ;; Set PHP mode based on the #! line
+  (add-to-list 'interpreter-mode-alist '("php" . hack-mode))
+
 #+END_SRC
 
 ** JS + Web
