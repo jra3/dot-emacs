@@ -487,9 +487,14 @@
 #+begin_src emacs-lisp :tangle yes
   (org-add-link-type "task" 'org-task-open)
 
-  (defun org-task-open (path)
+  (defun org-task-open (id)
     "Open the task in the browser."
-    (browse-url (concat "https://our.intern.facebook.com/intern/tasks/?q=" path)))
+    (browse-url (concat "https://our.intern.facebook.com/intern/tasks?t="
+                        (string-remove-prefix "T" id))))
+
+  ;x (defun org-insert-task-link (id)
+  ;   (let ((desc ))
+  ;   (org-insert-link nil (concat "task:" (string-remove-prefix "T" id)) "dazzle"))
 #+end_src
 * Snippets
   Snippets are are awesome. They are found in ~/emacs.d/snippets
@@ -608,9 +613,15 @@ Super nice to switch between frames and buffers
 ** TODO The Silver Searcher
    Maybe install/enable this only if ag is in the path
 #+begin_src emacs-lisp :tangle yes
-
 (use-package ag)
 #+end_src
+** expand-region
+   it's awsome
+   #+begin_src emacs-lisp :tangle yes
+     (use-package expand-region
+       :commands er/expand-region
+       :bind ("C-=" . er/expand-region))
+   #+end_src
 * Appearance
 ** Frame Titles
 #+begin_src emacs-lisp :tangle yes
@@ -1288,21 +1299,21 @@ Tweaks to support enums better
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
-(use-package cpp
-  :diminish c++-mode
-  :mode "\\.h$"
-  :bind (:map c++-mode-map
-         ("C-c o" . ff-get-other-file))
-  :config
-  (add-hook 'c++-mode-hook 'fix-enum-class)
-  (add-hook 'c++-mode-hook
-            (lambda ()
-              (subword-mode 1)
-              (setq-local require-final-newline t)
-              (setq-local compilation-auto-jump-to-first-error t)
-              ))
-  (add-hook 'c-mode-common-hook 'google-set-c-style)
-  (add-hook 'c-mode-common-hook 'google-make-newline-indent))
+  (use-package cpp
+    :diminish c++-mode
+    :mode "\\.h$"
+    :bind (:map c++-mode-map
+           ("C-c o" . ff-get-other-file))
+    :config
+    (add-hook 'c++-mode-hook 'fix-enum-class)
+    (add-hook 'c++-mode-hook
+              (lambda ()
+                (subword-mode 1)
+                (setq-local require-final-newline t)
+                (setq-local compilation-auto-jump-to-first-error t)
+                ))
+    (add-hook 'c-mode-common-hook 'google-set-c-style)
+    (add-hook 'c-mode-common-hook 'google-make-newline-indent))
 #+end_src
 
 ** ediff
@@ -1352,6 +1363,11 @@ emacs -diff file1 file2
 ** Python
    In the past I've used elpy to great effect, but I haven't messed
    with that in a while
+*** BUCK/TARGETS
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("\\/TARGETS\\'" . python-mode))
+(add-to-list 'auto-mode-alist '("\\/BUCK\\'" . python-mode))
+#+END_SRC
 *** Setup =python-mode=
    #+begin_src emacs-lisp :tangle yes
    (add-hook 'python-mode-hook 'electric-operator-mode)
