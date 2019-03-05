@@ -918,49 +918,49 @@ to set xterm-mode as a terminal option for this
 
 ** git-gutter-mode
 #+BEGIN_SRC emacs-lisp tangle: yes
-(use-package git-gutter
-   :diminish git-gutter-mode
-   :commands (git-gutter-mode)
-   :bind (:map vc-prefix-map
-               ("[" . git-gutter:previous-hunk)
-               ("]" . git-gutter:next-hunk)
-               ("n" . git-gutter:revert-hunk)
-               ("SPC" . git-gutter:mark-hunk))
-   :init
-   (global-git-gutter-mode)
-   :config
-   (setq git-gutter:handled-backends '(git hg)))
+  (use-package git-gutter
+     :diminish git-gutter-mode
+     :commands (git-gutter-mode)
+     :bind (:map vc-prefix-map
+                 ("[" . git-gutter:previous-hunk)
+                 ("]" . git-gutter:next-hunk)
+                 ("n" . git-gutter:revert-hunk)
+                 ("SPC" . git-gutter:mark-hunk))
+     :init
+     (global-git-gutter-mode)
+     :config
+     (setq git-gutter:handled-backends '(git hg)))
 
-;; vc-hg comes with emacs, but we can still use use-package to group related
- ;; config
+  ;; vc-hg comes with emacs, but we can still use use-package to group related
+  ;; config
 
- (use-package vc-hg
-   :ensure nil
-   :bind
-   (:map vc-prefix-map
-     ("a" . vc-annotate)
-     ;; 'g' is the original binding for vc-annotate
-     ("g" . nil))
-   :config
-   (setq
-    vc-hg-annotate-re
-    (concat
-     "^\\(?: *[^ ]+ +\\)?\\(D?[0-9]+\\) +" ;; user and revision
-     "\\([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\\)" ;; date
-     "\\(?: +\\([^:]+\\)\\)?:") ;; filename
-    vc-annotate-hg-switches "-u"
-    )
-   ;; redefine vc-hg-annotate-command to use -p (phabricator diff) instead of -n
-   ;; (revision number)
-   ;; TODO select -p or -n base on whether or not the hg repo is a phabricator
-   ;; project. Is there a better way to do this other than replacing the
-   ;; function, e.g. with advice?
-   (defun vc-hg-annotate-command (file buffer &optional revision)
-     "Execute \"hg annotate\" on FILE, inserting the contents in BUFFER.
- Optional arg REVISION is a revision to annotate from."
-     (apply #'vc-hg-command buffer 0 file "annotate" "-dq" "-p"
-            (append (vc-switches 'hg 'annotate)
-                    (if revision (list (concat "-r" revision)))))))
+  (use-package vc-hg
+    :ensure nil
+    :bind
+    (:map vc-prefix-map
+          ("a" . vc-annotate)
+          ;; 'g' is the original binding for vc-annotate
+          ("g" . nil))
+    :config
+    (setq
+     vc-hg-annotate-re
+     (concat
+      "^\\(?: *[^ ]+ +\\)?\\(D?[0-9]+\\) +" ;; user and revision
+      "\\([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\\)" ;; date
+      "\\(?: +\\([^:]+\\)\\)?:") ;; filename
+     vc-annotate-hg-switches "-u"
+     )
+    ;; redefine vc-hg-annotate-command to use -p (phabricator diff) instead of -n
+    ;; (revision number)
+    ;; TODO select -p or -n base on whether or not the hg repo is a phabricator
+    ;; project. Is there a better way to do this other than replacing the
+    ;; function, e.g. with advice?
+    (defun vc-hg-annotate-command (file buffer &optional revision)
+      "Execute \"hg annotate\" on FILE, inserting the contents in BUFFER.
+   Optional arg REVISION is a revision to annotate from."
+      (apply #'vc-hg-command buffer 0 file "annotate" "-dq" "-p"
+             (append (vc-switches 'hg 'annotate)
+                     (if revision (list (concat "-r" revision)))))))
 #+END_SRC
 
 * Flycheck
@@ -1184,7 +1184,7 @@ to set xterm-mode as a terminal option for this
                                     xref-find-definitions-other-frame
                                     xref-find-references))
 
-  (use-package lsp-hack)
+  ;; (use-package lsp-hack)
 #+END_SRC
 
 ** cquery
