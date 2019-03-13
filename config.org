@@ -2,38 +2,29 @@
 #+AUTHOR: John Allen
 #+STARTUP: overview
 
-* Package Installation
-** Install use-package
-   use-package is a really great way of managing and configuring your
-   packages.
+* packages and use-package bootstrapping
 
-  1) deferred loading, faster startup
-  2) dependency declaration is configuration I never include packages
-     that I never use
+#+BEGIN_SRC emacs-lisp tangle: yes
 
-  #+begin_src emacs-lisp :tangle yes
-    (mapc
-     (lambda (package)
-       (if (not (package-installed-p package))
-           (progn
-             (package-refresh-contents)
-             (package-install package))))
-     '(use-package diminish bind-key delight))
-  #+end_src
+  ;; Set up the packageing system
+  (require 'package)
+  (setq package-archives nil)
+  (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+  (package-initialize)
 
-** Trigger use-package
-   And force the install of missing packages.
-
-  #+begin_src emacs-lisp :tangle yes
+  ;; Bootstrap `use-package' as my preferred frontend to `use-package`
+  (unless (package-installed-p 'use-package)
+      (package-refresh-contents)
+      (package-install 'use-package))
+    (require 'use-package)
     (eval-when-compile
-      (require 'use-package))
-    (require 'diminish)
-    (require 'bind-key)
-    (require 'delight)
-    (setq use-package-minimum-reported-time 0.01)
-    (setq use-package-verbose t)
-    (setq use-package-always-ensure t)
-  #+end_src
+      (require 'use-package)
+      ; install packages from package archive automatically
+      (require 'use-package-ensure)
+      (setq use-package-always-ensure t))
+
+#+END_SRC
 
 * Use dash
   Because dash is awesome
@@ -44,7 +35,6 @@
   #+begin_src emacs-lisp :tangle yes
     (use-package exec-path-from-shell
       :if (memq window-system '(mac ns))
-      :ensure t
       :config
       (exec-path-from-shell-initialize))
   #+end_src
@@ -53,7 +43,7 @@
     (setq custom-file "~/.emacs.d/custom.el")
     (load (concat config-load-path custom-file))
   #+end_src
-* TODO Configure Helm
+* Configure Helm
   Make everything fuzzy and also rebind functions.
   #+begin_src emacs-lisp :tangle yes
     (use-package flx)
@@ -91,35 +81,36 @@
   #+end_src
 * Configuring =org-mode=
 ** Set environment
-  #+begin_src emacs-lisp :tangle yes
-    (setq org-directory "~/org/")
+#+begin_src emacs-lisp :tangle yes
+  (setq org-directory "~/org/")
 
-    (defun org-file-path (filename)
-      "Return the absolute address of an org file, given its relative name."
-      (concat (file-name-as-directory org-directory) filename))
+  (defun org-file-path (filename)
+    "Return the absolute address of an org file, given its relative name."
+    (concat (file-name-as-directory org-directory) filename))
 
-    (defun org-find-file ()
-      "Leverage Helm to quickly open any org files."
-      (interactive)
-      (find-file (concat org-directory
-                         (helm-comp-read "Select your org file: "
-                                         (directory-files org-directory nil "\.org$")))))
-  #+end_src
+  (defun org-find-file ()
+    "Leverage Helm to quickly open any org files."
+    (interactive)
+    (find-file (concat org-directory
+                       (helm-comp-read "Select your org file: "
+                                       (directory-files org-directory nil "\.org$")))))
+#+end_src
 
 ** Modules
-  #+begin_src emacs-lisp :tangle yes
-    (setq-default
-     org-modules
-     '(org-bibtex
-       org-crypt
-       org-habit
-       org-id
-       org-info
-       org-protocol))
-    (require 'org-inlinetask)
-  #+end_src
+
+We ensure that we load org-habit and org-protocol
+
+#+begin_src emacs-lisp :tangle yes
+  (setq-default org-modules
+                '(org-bibtex
+                  org-habit
+                  org-id
+                  org-info
+                  org-protocol))
+#+end_src
 
 ** Enable =org-mode= for org files
+
 #+begin_src emacs-lisp :tangle yes
 (use-package org
   :mode ("\\.org\\'" . org-mode)
@@ -130,7 +121,7 @@
   #+begin_src emacs-lisp :tangle yes
     (setq
      org-todo-keywords
-     '((sequence "TODO(t)" "MAYBE(m!)" "WAITING(w!)" "NEXT(n)" "STARTED(s)" "|" "DONE(d!)" "CANCELED(c@)")))
+     '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
   #+end_src
 ** Pretty headlines
 *** Make headlines more compact
@@ -143,17 +134,18 @@
 #+begin_src emacs-lisp :tangle yes
     (setq org-startup-folded 'content)
 #+end_src
-
 *** Make all headline levels the same size
 #+begin_src emacs-lisp :tangle yes
   (set-face-attribute 'org-level-1 nil :foreground "dodger blue" :weight 'bold :height 1.0)
   (set-face-attribute 'org-level-2 nil :foreground "#edd400" :weight 'bold :height 1.0)
 #+end_src
 ** Enter follows links at point
+
    Because how the hell else should it work?
 #+begin_src emacs-lisp :tangle yes
   (setq org-return-follows-link t)
 #+end_src
+
 ** Src blocks
 *** Intentation and fontification
 #+begin_src emacs-lisp :tangle yes
@@ -165,6 +157,7 @@
 #+begin_src emacs-lisp :tangle yes
   (setq org-confirm-babel-evaluate nil)
 #+end_src
+
 ** Set up global keys
 #+begin_src emacs-lisp :tangle yes
 (global-set-key "\C-cl" 'org-store-link)
@@ -173,116 +166,131 @@
 (global-set-key "\C-cb" 'org-iswitchb)
 #+end_src
 ** Speed commands
+These are speed commands. They make the ORG go faster.
 #+begin_src emacs-lisp :tangle yes
   (setq org-use-speed-commands t)
 #+end_src
-** Enable =org-pomodoro=
-  #+begin_src emacs-lisp :tangle yes
-    (use-package org-pomodoro
-      :config
-      (setq org-pomodoro-start-sound-p t
-            org-pomodoro-keep-killed-pomodoro-time t
-            ; org-pomodoro-sound (expand-file-name "~/Dropbox/Audio/wav/13699__harri__a.mp3")
-            ; org-pomodoro-short-break-sound (expand-file-name "~/Dropbox/Audio/wav/13699__harri__a.mp3")
-            ; org-pomodoro-long-break-sound (expand-file-name "~/Dropbox/Audio/wav/13699__harri__a.mp3")
-            ; org-pomodoro-start-sound (expand-file-name "~/Dropbox/Audio/wav/big-singing-bowl.wav")
-            ; org-pomodoro-killed-sound (expand-file-name "~/Dropbox/Audio/wav/jf-glass-breaking.wav")
-            org-pomodoro-time-format "%.2m"))
-  #+end_src
+
 ** Notes file
 #+begin_src emacs-lisp :tangle yes
-(setq  org-default-notes-file (concat org-directory "/notes.org"))
+  (setq  org-default-notes-file (concat org-directory "/notes.org"))
 #+end_src
 ** Agenda files
+
   #+begin_src emacs-lisp :tangle yes
     (setq jallen-org-habit-file (concat org-directory "habits.org")
           jallen-default-org-agenda-files
           (--map (concat org-directory it)
-                 '("gtd.org" "work.org" "today.org" "5-min-journal.org"))
+                 '("inbox.org" "gtd.org" "tickler.org"))
           org-agenda-files jallen-default-org-agenda-files)
   #+end_src
 ** Refiling
 #+begin_src emacs-lisp :tangle yes
-(setq org-outline-path-complete-in-steps nil
-      org-refile-use-outline-path t
-      org-refile-targets '((org-agenda-files :tag . "project")
-                            ;; (nil . (:maxlevel . 1))
-                           ))
+  (setq org-outline-path-complete-in-steps nil
+        org-refile-use-outline-path t
+        org-refile-targets '(((concat org-directory "gtd.org") :maxlevel . 3)
+                             ((concat org-directory "someday.org") :level . 1)
+                             ((concat org-directory "tickler.org") :maxlevel . 2)))
 #+end_src
 ** Configure projects
 #+begin_src emacs-lisp :tangle yes
-(setq org-stuck-projects '("+project" ("TODO" "NEXT") () "\\<IGNORE\\>" ))
-(setq org-tags-exclude-from-inheritance '("project"))
+;(setq org-stuck-projects '("+project" ("TODO" "NEXT") () "\\<IGNORE\\>" ))
+;(setq org-tags-exclude-from-inheritance '("project"))
 #+end_src
 ** TODO Agenda configurations
+
 #+begin_src emacs-lisp :tangle yes
-    (setq
-     org-agenda-custom-commands
-     '(
-       ;; ("w" todo "WAITING" nil ("waiting.txt"))
-       ;; ("n" todo "NEXT" nil ("next.html"))
-       ;; ("T" "Daily Action List"
-       ;;  (
-       ;;   (agenda "" ((org-agenda-ndays 1)
-       ;;               (org-agenda-sorting-strategy
-       ;;                (quote ((agenda time-up priority-down tag-up) )))
-       ;;               (org-deadline-warning-days 0)
-       ;;               ))))
+  (setq org-agenda-custom-commands
 
-       ("h" "Habits and Chores"
-        ((agenda "" ((org-agenda-span 1)
-                     (org-deadline-warning-days 30))))
-        ((org-agenda-files (list jallen-org-habit-file))))
-       ("n" "Work... work"
-        ((tags-todo "today" ((org-agenda-overriding-header "Today's items")
-                             (org-agenda-files jallen-default-org-agenda-files)))
-         (agenda "" ((org-agenda-span 1)))
-         (tags "project" ((org-agenda-files '("~/org/work.org"))
-                          (org-agenda-overriding-header "Work Projects")))
-         (todo "NEXT" ((org-agenda-files '("~/org/work.org"))
-                       (org-agenda-overriding-header "Work Next Items")))
-         (tags "project" ((org-agenda-files '("~/org/gtd.org"))
-                          (org-agenda-overriding-header "Personal Projects")))
-         (todo "NEXT" ((org-agenda-files '("~/org/gtd.org"))
-                       (org-agenda-overriding-header "Personal Next Items")))
-         (tags-todo "inbox" ((org-agenda-files '("~/org/gtd.org"))
-                             (org-agenda-overriding-header "Inbox")))
-         )
-        ((org-agenda-files '("~/org/work.org"))))
+        '(("o" "At the office" tags-todo "@office"
+           ((org-agenda-overriding-header "Office")
+            (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
 
-       ("D" "Daily Action List"
-        ((agenda "habits" ((org-agenda-files '("~/org/habits.org"))))
-         (agenda "" ((org-agenda-span 1)
-                     (org-agenda-sorting-strategy
-                      (quote ((agenda time-up priority-down tag-up) )))
-                     (org-deadline-warning-days 0)
-                     ))))
+          ("n" todo "TODO" nil ("next.html"))))
 
-       ("d" "Agenda + Next Actions"
-        ((agenda "honker" ((org-agenda-span 1)
-                           (org-agenda-sorting-strategy
-                            (quote ((agenda time-up priority-down tag-up) )))
-                           (org-deadline-warning-days 0)
-                           ))
-         (todo "NEXT")) nil ("next.html"))
+  (defun my-org-agenda-skip-all-siblings-but-first ()
+    "Skip all but the first non-done entry."
+    (let (should-skip-entry)
+      (unless (org-current-is-todo)
+        (setq should-skip-entry t))
+      (save-excursion
+        (while (and (not should-skip-entry) (org-goto-sibling t))
+          (when (org-current-is-todo)
+            (setq should-skip-entry t))))
+      (when should-skip-entry
+        (or (outline-next-heading)
+            (goto-char (point-max))))))
 
-       ("w" "Weekly Agenda + Next Actions"
-        ((agenda "weekly" ((org-agenda-span 7)
-                           (org-agenda-sorting-strategy
-                            (quote ((agenda time-up priority-down tag-up) )))
-                           (org-deadline-warning-days 0)
-                           ))
-         (todo "NEXT"))
-        nil ("week.html"))
+  (defun org-current-is-todo ()
+    (string= "TODO" (org-get-todo-state)))
 
-       ("W" "Weekly Review"
-        ((agenda "" ((org-agenda-span 7))) ;; review upcoming deadlines and appointments
-         ;; type "l" in the agenda to review logged items
-         (stuck "") ;; review stuck projects as designated by org-stuck-projects
-         (tags "project") ;; review all projects
-         (todo "MAYBE") ;; review someday/maybe items
-         (todo "WAITING"))) ;; review waiting items
-       ))
+  ;; (setq
+  ;;  org-agenda-custom-commands
+  ;;  '(
+  ;;    ;; ("w" todo "WAITING" nil ("waiting.txt"))
+  ;;    ;; ("n" todo "NEXT" nil ("next.html"))
+  ;;    ;; ("T" "Daily Action List"
+  ;;    ;;  (
+  ;;    ;;   (agenda "" ((org-agenda-ndays 1)
+  ;;    ;;               (org-agenda-sorting-strategy
+  ;;    ;;                (quote ((agenda time-up priority-down tag-up) )))
+  ;;    ;;               (org-deadline-warning-days 0)
+  ;;    ;;               ))))
+
+  ;;    ("h" "Habits and Chores"
+  ;;     ((agenda "" ((org-agenda-span 1)
+  ;;                  (org-deadline-warning-days 30))))
+  ;;     ((org-agenda-files (list jallen-org-habit-file))))
+  ;;    ("n" "Work... work"
+  ;;     ((tags-todo "today" ((org-agenda-overriding-header "Today's items")
+  ;;                          (org-agenda-files jallen-default-org-agenda-files)))
+  ;;      (agenda "" ((org-agenda-span 1)))
+  ;;      (tags "project" ((org-agenda-files '("~/org/work.org"))
+  ;;                       (org-agenda-overriding-header "Work Projects")))
+  ;;      (todo "NEXT" ((org-agenda-files '("~/org/work.org"))
+  ;;                    (org-agenda-overriding-header "Work Next Items")))
+  ;;      (tags "project" ((org-agenda-files '("~/org/gtd.org"))
+  ;;                       (org-agenda-overriding-header "Personal Projects")))
+  ;;      (todo "NEXT" ((org-agenda-files '("~/org/gtd.org"))
+  ;;                    (org-agenda-overriding-header "Personal Next Items")))
+  ;;      (tags-todo "inbox" ((org-agenda-files '("~/org/gtd.org"))
+  ;;                          (org-agenda-overriding-header "Inbox")))
+  ;;      )
+  ;;     ((org-agenda-files '("~/org/work.org"))))
+
+  ;;    ("D" "Daily Action List"
+  ;;     ((agenda "habits" ((org-agenda-files '("~/org/habits.org"))))
+  ;;      (agenda "" ((org-agenda-span 1)
+  ;;                  (org-agenda-sorting-strategy
+  ;;                   (quote ((agenda time-up priority-down tag-up) )))
+  ;;                  (org-deadline-warning-days 0)
+  ;;                  ))))
+
+  ;;    ("d" "Agenda + Next Actions"
+  ;;     ((agenda "honker" ((org-agenda-span 1)
+  ;;                        (org-agenda-sorting-strategy
+  ;;                         (quote ((agenda time-up priority-down tag-up) )))
+  ;;                        (org-deadline-warning-days 0)
+  ;;                        ))
+  ;;      (todo "NEXT")) nil ("next.html"))
+
+  ;;    ("w" "Weekly Agenda + Next Actions"
+  ;;     ((agenda "weekly" ((org-agenda-span 7)
+  ;;                        (org-agenda-sorting-strategy
+  ;;                         (quote ((agenda time-up priority-down tag-up) )))
+  ;;                        (org-deadline-warning-days 0)
+  ;;                        ))
+  ;;      (todo "NEXT"))
+  ;;     nil ("week.html"))
+
+  ;;    ("W" "Weekly Review"
+  ;;     ((agenda "" ((org-agenda-span 7))) ;; review upcoming deadlines and appointments
+  ;;      ;; type "l" in the agenda to review logged items
+  ;;      (stuck "") ;; review stuck projects as designated by org-stuck-projects
+  ;;      (tags "project") ;; review all projects
+  ;;      (todo "MAYBE") ;; review someday/maybe items
+  ;;      (todo "WAITING"))) ;; review waiting items
+  ;;    ))
 #+end_src
 ** Agenda faces
 
@@ -310,7 +318,6 @@
              (0.69 . my-org-deadline-tomorrow)
              (0.49 . my-org-deadline-later)
              (0.00 . my-org-deadline-someday)))
-
    #+end_src
 ** Clocks
 *** Logging time of task completion
@@ -357,37 +364,27 @@
   (setq
    org-capture-templates
    '(
-     ("t" "Todo" entry ; New inbox item to be processed
-      (file+headline "~/org/gtd.org" "Inbox")
+     ("t" "Todo [inbox]" entry ; New inbox item to be processed
+      (file+headline (concat org-directory "inbox.org") "Tasks")
       "* TODO %?\n  %i\n")
-
-     ("T" "Today" entry ; New inbox item to be processed
-      (file+headline "~/org/today.org" "todo list")
-      "* TODO %?   :today:\n  %i\n")
-
-     ("p" "Project" entry ; Create a new project entry
-      (file+headline "~/org/gtd.org" "Projects")
-      "* %? :project:\n  %i\n")
-
-     ("a" "Action" entry ; New inbox item to be processed
-      (file+datetree "~/org/gtd.org" "Inbox")
-      "* TODO %? :action:\n  %i\n")
+     ("T" "Tickler" entry
+      (file+headline (concat org-directory "tickler.org") "Tickler")
+      "* %i%? \n %U")
 
      ("j" "Journal Entries")
      ("jm" "Precious Memory" entry ; Freeform journal entry
-      (file+datetree "~/org/journal.org")
+      (file+datetree (concat org-directory "journal.org"))
       "* %? :memory:\n  %i\n  %a")
      ("jl" "Today I Learned" entry ; Breif TIL journal entry
-      (file+datetree "~/org/journal.org" "TIL")
+      (file+datetree (concat org-directory "journal.org") "TIL")
       "* %?\nLearned on %U :til:\n  %i\n  %a")
      ("j." "Journal" entry ; Freeform journal entry
-      (file+datetree "~/org/journal.org")
+      (file+datetree (concat org-directory "journal.org"))
       "* %?\nEntered on %U\n  %i\n  %a")
 
      ("5" "5 Minute Journal")
      ("5m" "Morning Entry" entry (file+datetree "~/org/5-min-journal.org")
       "* Morning\n  I am grateful for...\n  - %?\n  - \n  - \n\n  What will I do to make today great?\n  - \n  - \n  - \n\n  I am ...")
-                                          ; 5-minute journal. Evening entry
      ("5e" "Evening Entry" entry (file+datetree "~/org/5-min-journal.org")
       "* Evening\n  3 amazing things that happened today...\n  - %?\n  - \n  - \n\n  How could I have made today even better?\n  - \n")
 
@@ -483,19 +480,6 @@
   powered by <p class=\"creator\">%c</p><p class=\"validation\">%v</p>"))))
 #+end_src
 
-** FB Tasks links
-#+begin_src emacs-lisp :tangle yes
-  (org-add-link-type "task" 'org-task-open)
-
-  (defun org-task-open (id)
-    "Open the task in the browser."
-    (browse-url (concat "https://our.intern.facebook.com/intern/tasks?t="
-                        (string-remove-prefix "T" id))))
-
-  ;x (defun org-insert-task-link (id)
-  ;   (let ((desc ))
-  ;   (org-insert-link nil (concat "task:" (string-remove-prefix "T" id)) "dazzle"))
-#+end_src
 * Snippets
   Snippets are are awesome. They are found in ~/emacs.d/snippets
 #+begin_src emacs-lisp :tangle yes
@@ -504,11 +488,6 @@
   :config (yas-global-mode 1))
 #+end_src
 * Navigation
-** Smooth Scrolling
-(use-package smooth-scrolling
-  :config
-  (smooth-scrolling-mode 1)
-  (setq smooth-scroll-margin 5))
 ** Configure Windmove
    I like to use the S-<arrow> keys for moving windows
 #+begin_src emacs-lisp :tangle yes
@@ -543,39 +522,69 @@
   default behavior of taking over the other-buffer
 
 #+begin_src emacs-lisp :tangle yes
-(use-package popwin
-  :config
-  (setq display-buffer-function 'popwin:display-buffer)
-  (setq popwin:special-display-config
-      (quote
-       (("*Ibuffer*" :position top :noselect t :height 30)
-        ("*Python Check*" :position top :noselect t :height 30)
-        ("*magit-log*")
-        ("*compilation*")
-        ("*Python Doc*")
-        ("*xref*")
-        ("*grep*")
-        ("*Help*")
-        ("*Completions*" :noselect t)
-        ("*Occur*" :noselect t)))))
+  (use-package popwin
+    :config
+    (progn
+      (setq popwin:special-display-config nil)
+      (push '("*Ibuffer*"
+              :dedicated t :position top    :stick t :noselect t   :height 30)
+            popwin:special-display-config)
+      (push '("*Backtrace*"
+              :dedicated t :position bottom :stick t :noselect nil :height 0.33)
+            popwin:special-display-config)
+      (push '("*compilation*"
+              :dedicated t :position bottom :stick t :noselect t   :height 0.2)
+            popwin:special-display-config)
+      (push '("*Compile-Log*"
+              :dedicated t :position bottom :stick t :noselect t   :height 0.33)
+            popwin:special-display-config)
+      (push '("*Help*"
+              :dedicated t :position bottom :stick t :noselect nil :height 0.33)
+            popwin:special-display-config)
+      (push '("*Shell Command Output*"
+              :dedicated t :position bottom :stick t :noselect nil :height 0.33)
+            popwin:special-display-config)
+      (push '(" *undo-tree*"
+              :dedicated t :position bottom :stick t :noselect nil :height 0.33)
+            popwin:special-display-config)
+      (push '("*Warnings*"
+              :dedicated t :position bottom :stick t :noselect nil :height 0.33)
+            popwin:special-display-config)
+      (push '("^\\*Man .*\\*$"
+              :regexp t    :position bottom :stick t :noselect nil :height 0.33)
+            popwin:special-display-config)
+      (popwin-mode 1)))
+
+
+    ;; (setq popwin:special-display-config
+    ;;     (quote
+    ;;      (("*Ibuffer*" :position top :noselect t :height 30)
+    ;;       ("*Python Check*" :position top :noselect t :height 30)
+    ;;       ("*compilation*")
+    ;;       ("*Python Doc*")
+    ;;       ("*xref*")
+    ;;       ("*grep*")
+    ;;       ("*Help*")
+    ;;       ("*Completions*" :noselect t)
+    ;;       ("*Occur*" :noselect t)))))
 #+end_src
 
 ** Go to a line by number
    I'm not really sure why this isn't bound somewhere already... I use
    this all the time. Am I the weird one?
 #+begin_src emacs-lisp :tangle yes
-(global-set-key (kbd "C-c t")  'goto-line)
+; (global-set-key (kbd "C-c t")  'goto-line)
 #+end_src
 ** Enable win-switch
 Super nice to switch between frames and buffers
 #+begin_src emacs-lisp :tangle yes
-(use-package win-switch
-  :bind (("C-x o" . win-switch-dispatch))
-  :config
-  (setq win-switch-provide-visual-feedback t)
-  (setq win-switch-feedback-background-color "purple")
-  (setq win-switch-feedback-foreground-color "white")
-  (win-switch-setup-keys-default))
+  (use-package win-switch
+    :bind (("C-x o" . win-switch-dispatch))
+    :config
+    (setq win-switch-provide-visual-feedback t)
+    (setq win-switch-feedback-background-color "purple")
+    (setq win-switch-feedback-foreground-color "white")
+    (win-switch-setup-keys-default))
 #+end_src
 ** Enable ibuffer
 #+begin_src emacs-lisp :tangle yes
@@ -589,14 +598,10 @@ Super nice to switch between frames and buffers
 ;;   'ibuffer-visit-buffer-other-window)
 
 #+end_src
-** Enable minimap
-#+begin_src emacs-lisp :tangle yes
-(use-package minimap
-  :config
-  (setq minimap-window-location "right")
-  (setq minimap-major-modes '(prog-mode org-mode)))
-#+end_src
 ** Enable =anzu=
+
+I keep forgetting what anzu is... but i think I like it
+
 #+begin_src emacs-lisp :tangle yes
 (use-package anzu
   :config (global-anzu-mode +1)
@@ -793,6 +798,7 @@ to set xterm-mode as a terminal option for this
    #+end_src
 * Disable warnings about large files
   I'm not afraid of large files, yo
+
 #+begin_src emacs-lisp :tangle yes
 (setq large-file-warning-threshold nil)
 #+end_src
@@ -908,14 +914,6 @@ to set xterm-mode as a terminal option for this
 #+end_src
 * VC
 
-** Magit
-  Magit is a great interface to git. Too bad we don't have one for
-  mercurial
-  #+begin_src emacs-lisp :tangle yes
-  (use-package magit
-    :bind ("C-x g" . magit-status))
-  #+end_src
-
 ** git-gutter-mode
 #+BEGIN_SRC emacs-lisp tangle: yes
   (use-package git-gutter
@@ -1006,20 +1004,6 @@ to set xterm-mode as a terminal option for this
      (concat "/sudo:root@localhost:"
              buffer-file-name))))
 #+end_src
-** Sticky Window
-  Sometimes I like having a dedicated buffer for compilation output or
-  other things
-
-#+begin_src emacs-lisp :tangle yes
-(defun windstick (&optional n)
-  (interactive "P")
-  (set-window-dedicated-p (selected-window) t))
-
-(defun windrelease (&optional n)
-  (interactive "P")
-  (set-window-dedicated-p (selected-window) nil))
-#+end_src
-
 ** Sort Lines In Paragraph
 #+begin_src emacs-lisp :tangle yes
 (defun jallen-sort-para ()
