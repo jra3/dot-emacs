@@ -4,16 +4,19 @@
 
 * packages and use-package bootstrapping
 
+** Setting up the packaging system
 #+BEGIN_SRC emacs-lisp tangle: yes
-
-  ;; Set up the packageing system
   (require 'package)
   (setq package-archives nil)
   (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
   (package-initialize)
+#+END_SRC
 
-  ;; Bootstrap `use-package' as my preferred frontend to `use-package`
+** Bootstrapping use-package
+   use-package is an amazing frontend to the package manager, and I use it heavily
+
+#+BEGIN_SRC emacs-lisp tangle: yes
   (unless (package-installed-p 'use-package)
       (package-refresh-contents)
       (package-install 'use-package))
@@ -23,26 +26,37 @@
       ; install packages from package archive automatically
       (require 'use-package-ensure)
       (setq use-package-always-ensure t))
-
+#+END_SRC
+** Set up auto-updating for my packages
+#+BEGIN_SRC emacs-lisp tangle: yes
+  (use-package auto-package-update
+    :config
+    (setq auto-package-update-delete-old-versions t)
+    (setq auto-package-update-hide-results t)
+    (auto-package-update-at-time "03:00"))
 #+END_SRC
 
 * Use dash
   Because dash is awesome
   #+begin_src emacs-lisp :tangle yes
     (use-package dash)
-  #+end_src
+  #+end_#+BEGIN_SRC
+
+  #+END_SRC
+
 * Path Fix for Mac
-  #+begin_src emacs-lisp :tangle yes
-    (use-package exec-path-from-shell
-      :if (memq window-system '(mac ns))
-      :config
-      (exec-path-from-shell-initialize))
-  #+end_src
+  Mac tries to hide your $PATH from you when using a graphical mode
+#+BEGIN_SRC emacs-lisp tangle: yes
+  (use-package exec-path-from-shell
+    :if (memq window-system '(mac ns))
+    :config
+    (exec-path-from-shell-initialize))
+#+END_SRC
 * Customization File
-  #+begin_src emacs-lisp :tangle yes
-    (setq custom-file "~/.emacs.d/custom.el")
-    (load (concat config-load-path custom-file))
-  #+end_src
+#+begin_src emacs-lisp :tangle yes
+  (setq custom-file "custom.el")
+  (load (concat config-load-path custom-file))
+#+end_src
 * Configure Helm
   Make everything fuzzy and also rebind functions.
   #+begin_src emacs-lisp :tangle yes

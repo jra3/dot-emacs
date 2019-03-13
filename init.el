@@ -6,38 +6,27 @@
 
 ;;; Code:
 
-
-;; Added by Package.el.  This must come before configurations of
-;; installed packages.  Don't delete this line.  If you don't want it,
-;; just comment it out by adding a semicolon to the start of the line.
-;; You may delete these explanatory comments.
-(package-initialize)
+;(package-initialize) We'll do this in config.org
 
 (defvar my-start-time (current-time) "Time when Emacs was started")
+
 (defvar config-load-path (file-name-directory (or load-file-name buffer-file-name)))
-(defvar config-org-files '("config.org"))
 
-;; Local customizations are loaded super-early to allow us to set
-;; proxies so that we can fetch packages
-(let ((local (concat config-load-path "local.el")))
-  (if (file-exists-p local)
-      (load local)))
+(defvar config-org-files
+  '("local-before.org" ;; local preamble, .gitignored
+    "config.org"
+    "local-after.org" ;; local coda, .gitignored
+    ))
 
-;; The bulk of my config lives in these org files
+;; org, it's the best
 (require 'org)
-(dolist (file config-org-files)
-  (org-babel-load-file (concat config-load-path file)))
 
-;; TODO move dired to config.org
-;; TODO move helm-myles to the extra dir
-(if (fboundp 'normal-top-level-add-subdirs-to-load-path)
-    (let* ((my-lisp-dir "~/.emacs.d/lisp")
-           (default-directory my-lisp-dir))
-      (add-to-list 'load-path my-lisp-dir)
-      (normal-top-level-add-subdirs-to-load-path)))
-
-(use-package load-dir
-  :config (setq load-dirs (concat config-load-path "extra/")))
+(mapc
+ (lambda (file)
+   (let ((org-file (concat config-load-path file)))
+     (if (file-exists-p org-file)
+         (org-babel-load-file org-file))))
+ config-org-files)
 
 (message "Start up time %.2fs" (float-time (time-subtract (current-time) my-start-time)))
 
