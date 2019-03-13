@@ -1,5 +1,5 @@
 .#*
-local.el
+local-*.org
 *.elc
 
 auto-save-list/
@@ -20,3 +20,4 @@ eshell/
 # Generated files
 config.el
 .org-id-locations
+.last-package-update-day
