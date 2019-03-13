@@ -1,5 +1,7 @@
 .#*
+*~
 local-*.org
+local-*.el
 *.elc
 
 auto-save-list/
