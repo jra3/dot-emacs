@@ -38,10 +38,8 @@
 
 * Use dash
   Because dash is awesome
-  #+begin_src emacs-lisp :tangle yes
+  #+BEGIN_SRC emacs-lisp :tangle yes
     (use-package dash)
-  #+end_#+BEGIN_SRC
-
   #+END_SRC
 
 * Path Fix for Mac
