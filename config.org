@@ -129,11 +129,21 @@ We ensure that we load org-habit and org-protocol
   :mode ("\\.org_archive\\'" . org-mode))
 #+end_src
 
-** My typical TODO sequence
+** GTD TODO and tags
+
+  TAGS: { project(p) }
+  TAGS: { @home(h) @office(o) @travelling(t) @phone(p) @email(m) @errands(e) }
+
   #+begin_src emacs-lisp :tangle yes
-    (setq
-     org-todo-keywords
-     '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)")))
+        (setq
+         org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)"))
+         org-tag-alist '((:startgroup . nil)
+                          ("@work" . ?w)
+                          ("@home" . ?h)
+                          ("@errands" . ?e)
+                          (:endgroup . nil)
+                          ("project" . ?p)))
+
   #+end_src
 ** Pretty headlines
 *** Make headlines more compact
@@ -179,8 +189,71 @@ We ensure that we load org-habit and org-protocol
 #+end_src
 ** Speed commands
 These are speed commands. They make the ORG go faster.
+
+I remove the bulk of the defaults because I really don't use many of these features...
 #+begin_src emacs-lisp :tangle yes
-  (setq org-use-speed-commands t)
+  (setq org-use-speed-commands t
+        org-speed-commands-default '(("Outline Navigation")
+                                     ;; ("n" org-speed-move-safe 'outline-next-visible-heading)
+                                     ;; ("p" org-speed-move-safe 'outline-previous-visible-heading)
+                                     ;; ("f" org-speed-move-safe 'org-forward-heading-same-level)
+                                     ;; ("b" org-speed-move-safe 'org-backward-heading-same-level)
+                                     ;; ("F" . org-next-block)
+                                     ;; ("B" . org-previous-block)
+                                     ;; ("u" org-speed-move-safe 'outline-up-heading)
+                                     ;; ("j" . org-goto)
+                                     ("g" org-refile t) ; goto a refile location
+                                     ("Outline Visibility")
+                                     ;; ("c" . org-cycle)
+                                     ;; ("C" . org-shifttab)
+                                     ;; (" " . org-display-outline-path)
+                                     ("s" . org-narrow-to-subtree)
+                                     ;; ("=" . org-columns)
+                                     ("Outline Structure Editing")
+                                     ;; ("U" . org-shiftmetaup)
+                                     ;; ("D" . org-shiftmetadown)
+                                     ("r" . org-metaright)
+                                     ("l" . org-metaleft)
+                                     ;; ("R" . org-shiftmetaright)
+                                     ;; ("L" . org-shiftmetaleft)
+                                     ("i" progn
+                                      (forward-char 1)
+                                      (call-interactively 'org-insert-heading-respect-content))
+                                     ;; ("^" . org-sort)
+                                     ("w" . org-refile)
+                                     ("a" . org-archive-subtree-default-with-confirmation)
+                                     ("@" . org-mark-subtree)
+                                     ("#" . org-toggle-comment)
+                                     ("Clock Commands")
+                                     ("I" . org-clock-in)
+                                     ("O" . org-clock-out)
+                                     ("Meta Data Editing")
+                                     ("t" . org-todo)
+                                     ;; ("," org-priority)
+                                     ;; ("0" org-priority 32)
+                                     ;; ("1" org-priority 65)
+                                     ;; ("2" org-priority 66)
+                                     ;; ("3" org-priority 67)
+                                     (":" . org-set-tags-command)
+                                     ;; ("e" . org-set-effort)
+                                     ;; ("E" . org-inc-effort)
+                                     ;; ("W" lambda
+                                     ;;  (m)
+                                     ;;  (interactive "sMinutes before warning: ")
+                                     ;;  (org-entry-put
+                                     ;;   (point)
+                                     ;;   "APPT_WARNTIME" m))
+                                     ("Agenda Views etc")
+                                     ("v" . org-agenda)
+                                     ("/" . org-sparse-tree)
+                                     ("Misc")
+                                     ("o" . org-open-at-point)
+                                     ("?" . org-speed-command-help)
+                                     ("<" org-agenda-set-restriction-lock 'subtree)
+                                     (">" org-agenda-remove-restriction-lock))
+
+
+        org-speed-commands-user '(("5" (lambda () (org-toggle-tag "read")))))
 #+end_src
 
 ** Notes file
@@ -197,112 +270,155 @@ These are speed commands. They make the ORG go faster.
           org-agenda-files jallen-default-org-agenda-files)
   #+end_src
 ** Refiling
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (setq org-outline-path-complete-in-steps nil
+        org-refile-allow-creating-parent-nodes 'confirm
         org-refile-use-outline-path t
-        org-refile-targets '(((concat org-directory "gtd.org") :maxlevel . 3)
-                             ((concat org-directory "someday.org") :level . 1)
-                             ((concat org-directory "tickler.org") :maxlevel . 2)))
-#+end_src
-** Configure projects
-#+begin_src emacs-lisp :tangle yes
-;(setq org-stuck-projects '("+project" ("TODO" "NEXT") () "\\<IGNORE\\>" ))
-;(setq org-tags-exclude-from-inheritance '("project"))
-#+end_src
+        org-tags-exclude-from-inheritance '("project")
+        org-refile-targets '(("~/org/gtd.org" :level . 1)
+                             ("~/org/gtd.org" :tag . "project")
+                             ("~/org/someday.org" :level . 1)
+                             ("~/org/tickler.org" :maxlevel . 2)))
+#+END_SRC
 ** TODO Agenda configurations
 
 #+begin_src emacs-lisp :tangle yes
-  (setq org-agenda-custom-commands
+    (setq org-agenda-custom-commands
 
-        '(("o" "At the office" tags-todo "@office"
-           ((org-agenda-overriding-header "Office")
-            (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
+          '(("w" "At work" tags-todo "@work"
+             ((org-agenda-overriding-header "Office")
+              (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
 
-          ("n" todo "TODO" nil ("next.html"))))
+            ("h" "At work"
+             (
+              (message "what")
 
-  (defun my-org-agenda-skip-all-siblings-but-first ()
-    "Skip all but the first non-done entry."
-    (let (should-skip-entry)
-      (unless (org-current-is-todo)
-        (setq should-skip-entry t))
-      (save-excursion
-        (while (and (not should-skip-entry) (org-goto-sibling t))
-          (when (org-current-is-todo)
-            (setq should-skip-entry t))))
-      (when should-skip-entry
-        (or (outline-next-heading)
-            (goto-char (point-max))))))
+              ;; Sweet habits with no evening reminder until the evening
+              (agenda "" ((org-agenda-overriding-header "Good Habits")
+                          (org-agenda-skip-function '(org-agenda-skip-if-scheduled-later))
+                          (org-agenda-files '("~/org/habits.org"))))
+              (tags-todo "@home"
+                         ((org-agenda-overriding-header "Home")
+                          (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
+             (tags "project")))
 
-  (defun org-current-is-todo ()
-    (string= "TODO" (org-get-todo-state)))
+            ;; # ("n" "Work... work"
+            ;; #  ((tags-todo "today" ((org-agenda-overriding-header "Today's items")
+            ;; #                       (org-agenda-files jallen-default-org-agenda-files)))
+            ;; #   (agenda "" ((org-agenda-span 1)))
+            ;; #   (tags "project" ((org-agenda-files '("~/org/work.org"))
+            ;; #                    (org-agenda-overriding-header "Work Projects")))
+            ;; #   (todo "NEXT" ((org-agenda-files '("~/org/work.org"))
+            ;; #                 (org-agenda-overriding-header "Work Next Items")))
+            ;; #   (tags "project" ((org-agenda-files '("~/org/gtd.org"))
+            ;; #                    (org-agenda-overriding-header "Personal Projects")))
+            ;; #   (todo "NEXT" ((org-agenda-files '("~/org/gtd.org"))
+            ;; #                 (org-agenda-overriding-header "Personal Next Items")))
+            ;; #   (tags-todo "inbox" ((org-agenda-files '("~/org/gtd.org"))
+            ;; #                       (org-agenda-overriding-header "Inbox")))
+            ;; #   )
+            ;; #  ((org-agenda-files '("~/org/work.org"))))
 
-  ;; (setq
-  ;;  org-agenda-custom-commands
-  ;;  '(
-  ;;    ;; ("w" todo "WAITING" nil ("waiting.txt"))
-  ;;    ;; ("n" todo "NEXT" nil ("next.html"))
-  ;;    ;; ("T" "Daily Action List"
-  ;;    ;;  (
-  ;;    ;;   (agenda "" ((org-agenda-ndays 1)
-  ;;    ;;               (org-agenda-sorting-strategy
-  ;;    ;;                (quote ((agenda time-up priority-down tag-up) )))
-  ;;    ;;               (org-deadline-warning-days 0)
-  ;;    ;;               ))))
+            ("n" todo "TODO" nil ("next.html"))))
 
-  ;;    ("h" "Habits and Chores"
-  ;;     ((agenda "" ((org-agenda-span 1)
-  ;;                  (org-deadline-warning-days 30))))
-  ;;     ((org-agenda-files (list jallen-org-habit-file))))
-  ;;    ("n" "Work... work"
-  ;;     ((tags-todo "today" ((org-agenda-overriding-header "Today's items")
-  ;;                          (org-agenda-files jallen-default-org-agenda-files)))
-  ;;      (agenda "" ((org-agenda-span 1)))
-  ;;      (tags "project" ((org-agenda-files '("~/org/work.org"))
-  ;;                       (org-agenda-overriding-header "Work Projects")))
-  ;;      (todo "NEXT" ((org-agenda-files '("~/org/work.org"))
-  ;;                    (org-agenda-overriding-header "Work Next Items")))
-  ;;      (tags "project" ((org-agenda-files '("~/org/gtd.org"))
-  ;;                       (org-agenda-overriding-header "Personal Projects")))
-  ;;      (todo "NEXT" ((org-agenda-files '("~/org/gtd.org"))
-  ;;                    (org-agenda-overriding-header "Personal Next Items")))
-  ;;      (tags-todo "inbox" ((org-agenda-files '("~/org/gtd.org"))
-  ;;                          (org-agenda-overriding-header "Inbox")))
-  ;;      )
-  ;;     ((org-agenda-files '("~/org/work.org"))))
+  (defun org-agenda-skip-if-scheduled-later ()
+    "If this function returns nil, the current match should not be skipped.
+  Otherwise, the function must return a position from where the search
+  should be continued."
+    (ignore-errors
+      (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+            (scheduled-seconds
+             (time-to-seconds
+              (org-time-string-to-time
+               (org-entry-get nil "SCHEDULED"))))
+            (now (time-to-seconds (current-time))))
+        (and scheduled-seconds
+             (>= scheduled-seconds now)
+             subtree-end))))
 
-  ;;    ("D" "Daily Action List"
-  ;;     ((agenda "habits" ((org-agenda-files '("~/org/habits.org"))))
-  ;;      (agenda "" ((org-agenda-span 1)
-  ;;                  (org-agenda-sorting-strategy
-  ;;                   (quote ((agenda time-up priority-down tag-up) )))
-  ;;                  (org-deadline-warning-days 0)
-  ;;                  ))))
+    (defun my-org-agenda-skip-all-siblings-but-first ()
+      "Skip all but the first non-done entry."
+      (let (should-skip-entry)
+        (unless (org-current-is-todo)
+          (setq should-skip-entry t))
+        (save-excursion
+          (while (and (not should-skip-entry) (org-goto-sibling t))
+            (when (org-current-is-todo)
+              (setq should-skip-entry t))))
+        (when should-skip-entry
+          (or (outline-next-heading)
+              (goto-char (point-max))))))
 
-  ;;    ("d" "Agenda + Next Actions"
-  ;;     ((agenda "honker" ((org-agenda-span 1)
-  ;;                        (org-agenda-sorting-strategy
-  ;;                         (quote ((agenda time-up priority-down tag-up) )))
-  ;;                        (org-deadline-warning-days 0)
-  ;;                        ))
-  ;;      (todo "NEXT")) nil ("next.html"))
+    (defun org-current-is-todo ()
+      (string= "TODO" (org-get-todo-state)))
 
-  ;;    ("w" "Weekly Agenda + Next Actions"
-  ;;     ((agenda "weekly" ((org-agenda-span 7)
-  ;;                        (org-agenda-sorting-strategy
-  ;;                         (quote ((agenda time-up priority-down tag-up) )))
-  ;;                        (org-deadline-warning-days 0)
-  ;;                        ))
-  ;;      (todo "NEXT"))
-  ;;     nil ("week.html"))
+    ;; (setq
+    ;;  org-agenda-custom-commands
+    ;;  '(
+    ;;    ;; ("w" todo "WAITING" nil ("waiting.txt"))
+    ;;    ;; ("n" todo "NEXT" nil ("next.html"))
+    ;;    ;; ("T" "Daily Action List"
+    ;;    ;;  (
+    ;;    ;;   (agenda "" ((org-agenda-ndays 1)
+    ;;    ;;               (org-agenda-sorting-strategy
+    ;;    ;;                (quote ((agenda time-up priority-down tag-up) )))
+    ;;    ;;               (org-deadline-warning-days 0)
+    ;;    ;;               ))))
 
-  ;;    ("W" "Weekly Review"
-  ;;     ((agenda "" ((org-agenda-span 7))) ;; review upcoming deadlines and appointments
-  ;;      ;; type "l" in the agenda to review logged items
-  ;;      (stuck "") ;; review stuck projects as designated by org-stuck-projects
-  ;;      (tags "project") ;; review all projects
-  ;;      (todo "MAYBE") ;; review someday/maybe items
-  ;;      (todo "WAITING"))) ;; review waiting items
-  ;;    ))
+    ;;    ("h" "Habits and Chores"
+    ;;     ((agenda "" ((org-agenda-span 1)
+    ;;                  (org-deadline-warning-days 30))))
+    ;;     ((org-agenda-files (list jallen-org-habit-file))))
+    ;;    ("n" "Work... work"
+    ;;     ((tags-todo "today" ((org-agenda-overriding-header "Today's items")
+    ;;                          (org-agenda-files jallen-default-org-agenda-files)))
+    ;;      (agenda "" ((org-agenda-span 1)))
+    ;;      (tags "project" ((org-agenda-files '("~/org/work.org"))
+    ;;                       (org-agenda-overriding-header "Work Projects")))
+    ;;      (todo "NEXT" ((org-agenda-files '("~/org/work.org"))
+    ;;                    (org-agenda-overriding-header "Work Next Items")))
+    ;;      (tags "project" ((org-agenda-files '("~/org/gtd.org"))
+    ;;                       (org-agenda-overriding-header "Personal Projects")))
+    ;;      (todo "NEXT" ((org-agenda-files '("~/org/gtd.org"))
+    ;;                    (org-agenda-overriding-header "Personal Next Items")))
+    ;;      (tags-todo "inbox" ((org-agenda-files '("~/org/gtd.org"))
+    ;;                          (org-agenda-overriding-header "Inbox")))
+    ;;      )
+    ;;     ((org-agenda-files '("~/org/work.org"))))
+
+    ;;    ("D" "Daily Action List"
+    ;;     ((agenda "habits" ((org-agenda-files '("~/org/habits.org"))))
+    ;;      (agenda "" ((org-agenda-span 1)
+    ;;                  (org-agenda-sorting-strategy
+    ;;                   (quote ((agenda time-up priority-down tag-up) )))
+    ;;                  (org-deadline-warning-days 0)
+    ;;                  ))))
+
+    ;;    ("d" "Agenda + Next Actions"
+    ;;     ((agenda "honker" ((org-agenda-span 1)
+    ;;                        (org-agenda-sorting-strategy
+    ;;                         (quote ((agenda time-up priority-down tag-up) )))
+    ;;                        (org-deadline-warning-days 0)
+    ;;                        ))
+    ;;      (todo "NEXT")) nil ("next.html"))
+
+    ;;    ("w" "Weekly Agenda + Next Actions"
+    ;;     ((agenda "weekly" ((org-agenda-span 7)
+    ;;                        (org-agenda-sorting-strategy
+    ;;                         (quote ((agenda time-up priority-down tag-up) )))
+    ;;                        (org-deadline-warning-days 0)
+    ;;                        ))
+    ;;      (todo "NEXT"))
+    ;;     nil ("week.html"))
+
+    ;;    ("W" "Weekly Review"
+    ;;     ((agenda "" ((org-agenda-span 7))) ;; review upcoming deadlines and appointments
+    ;;      ;; type "l" in the agenda to review logged items
+    ;;      (stuck "") ;; review stuck projects as designated by org-stuck-projects
+    ;;      (tags "project") ;; review all projects
+    ;;      (todo "MAYBE") ;; review someday/maybe items
+    ;;      (todo "WAITING"))) ;; review waiting items
+    ;;    ))
 #+end_src
 ** Agenda faces
 
@@ -382,6 +498,9 @@ These are speed commands. They make the ORG go faster.
      ("T" "Tickler" entry
       (file+headline (concat org-directory "tickler.org") "Tickler")
       "* %i%? \n %U")
+     ("p" "Project" entry
+      (file+headline (concat org-directory "gtd.org") "Projects")
+      "* %i%? :project: \n ")
 
      ("j" "Journal Entries")
      ("jm" "Precious Memory" entry ; Freeform journal entry
@@ -877,7 +996,7 @@ to set xterm-mode as a terminal option for this
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 #+end_src
 * Editing
-** Multiple Cursors
+** Multiple Cursors                                                             :today:
    Multi-cursor editing is so cool when you can do it. Useful when
    editing many similar lines. More interactive than macros.
 #+begin_src emacs-lisp :tangle yes
@@ -1478,11 +1597,12 @@ emacs -diff file1 file2
  #+END_SRC
 ** List of blogs
 #+begin_src emacs-lisp :tangle yes
-  (global-set-key (kbd "C-c C-n") 'newsticker-show-news)
-  (setq-default
-   newsticker-url-list
-   '(("Schneier on Security" "https://www.schneier.com/blog/atom.xml" nil nil nil)
-     ("Xah Emacs Blog" "http://ergoemacs.org/emacs/blog.xml" nil nil nil)
-     ("Arabesque" "https://sanctum.geek.nz/arabesque/feed/" nil nil nil)
-     ("Sacha Chua" "http://sachachua.com/blog/feed/" nil nil nil)))
+    (global-set-key (kbd "C-c C-n") 'newsticker-show-news)
+    (setq-default
+     newsticker-url-list
+     '(("Westside Rag" "https://www.westsiderag.com/feed" nil nil nil)
+       ("Schneier on Security" "https://www.schneier.com/blog/atom.xml" nil nil nil)
+       ("Xah Emacs Blog" "http://ergoemacs.org/emacs/blog.xml" nil nil nil)
+       ("Arabesque" "https://sanctum.geek.nz/arabesque/feed/" nil nil nil)
+       ("Sacha Chua" "http://sachachua.com/blog/feed/" nil nil nil)))
 #+end_src
