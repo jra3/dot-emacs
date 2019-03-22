@@ -420,6 +420,10 @@ I remove the bulk of the defaults because I really don't use many of these featu
     ;;      (todo "WAITING"))) ;; review waiting items
     ;;    ))
 #+end_src
+** No Priorities
+#+BEGIN_SRC emacs-lisp tangle: yes
+(setq org-enable-priority-commands nil)
+#+END_SRC
 ** Agenda faces
 
    #+begin_src emacs-lisp :tangle yes
@@ -629,6 +633,21 @@ I remove the bulk of the defaults because I really don't use many of these featu
 (add-hook 'org-shiftleft-final-hook 'windmove-left)
 (add-hook 'org-shiftdown-final-hook 'windmove-down)
 (add-hook 'org-shiftright-final-hook 'windmove-right)
+
+;; disable header todo cycling and just do windmove
+(defun jallen-org-header-windmove-right ()
+  (if (and (not (eq org-support-shift-select 'always))
+            (org-at-heading-p))
+      (windmove-right)))
+(defun jallen-org-header-windmove-left ()
+  (if (and (not (eq org-support-shift-select 'always))
+            (org-at-heading-p))
+      (windmove-left)))
+
+(add-hook 'org-shiftright-hook
+          #'jallen-org-header-windmove-right)
+(add-hook 'org-shiftleft-hook
+          #'jallen-org-header-windmove-left)
 #+end_src
 
 ** Manipulate Window Sizes
@@ -1604,5 +1623,6 @@ emacs -diff file1 file2
        ("Schneier on Security" "https://www.schneier.com/blog/atom.xml" nil nil nil)
        ("Xah Emacs Blog" "http://ergoemacs.org/emacs/blog.xml" nil nil nil)
        ("Arabesque" "https://sanctum.geek.nz/arabesque/feed/" nil nil nil)
+       ("XKCD" "https://xkcd.com/rss.xml" nil nil nil)
        ("Sacha Chua" "http://sachachua.com/blog/feed/" nil nil nil)))
 #+end_src
