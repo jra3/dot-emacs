@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: el (emacs-lisp)
 # --
-#+BEGIN_SRC emacs-lisp tangle: yes
+#+BEGIN_SRC emacs-lisp :tangle yes
 $0
 #+END_SRC
