@@ -502,33 +502,37 @@ I remove the bulk of the defaults because I really don't use many of these featu
   :diminish yas-minor-mode
   :config (yas-global-mode 1))
 #+end_src
+
 * Navigation
 ** Configure Windmove
    I like to use the S-<arrow> keys for moving windows
-#+begin_src emacs-lisp :tangle yes
-(windmove-default-keybindings)
+   #+begin_src emacs-lisp :tangle yes
+     (windmove-default-keybindings)
 
-;; Make windmove work in org-mode:
-(add-hook 'org-shiftup-final-hook 'windmove-up)
-(add-hook 'org-shiftleft-final-hook 'windmove-left)
-(add-hook 'org-shiftdown-final-hook 'windmove-down)
-(add-hook 'org-shiftright-final-hook 'windmove-right)
+     ;; Make windmove work in org-mode:
+     (add-hook 'org-shiftup-final-hook 'windmove-up)
+     (add-hook 'org-shiftleft-final-hook 'windmove-left)
+     (add-hook 'org-shiftdown-final-hook 'windmove-down)
+     (add-hook 'org-shiftright-final-hook 'windmove-right)
 
-;; disable header todo cycling and just do windmove
-(defun jallen-org-header-windmove-right ()
-  (if (and (not (eq org-support-shift-select 'always))
-            (org-at-heading-p))
-      (windmove-right)))
-(defun jallen-org-header-windmove-left ()
-  (if (and (not (eq org-support-shift-select 'always))
-            (org-at-heading-p))
-      (windmove-left)))
+     (define-key org-mode-map (kbd "C-c <left>") (lambda () (interactive) (org-todo 'left)))
+     (define-key org-mode-map (kbd "C-c <right>") (lambda () (interactive) (org-todo 'right)))
 
-(add-hook 'org-shiftright-hook
-          #'jallen-org-header-windmove-right)
-(add-hook 'org-shiftleft-hook
-          #'jallen-org-header-windmove-left)
-#+end_src
+     ;; disable header todo cycling and just do windmove
+     (defun jallen-org-header-windmove-right ()
+       (if (and (not (eq org-support-shift-select 'always))
+                (org-at-heading-p))
+           (windmove-right)))
+     (defun jallen-org-header-windmove-left ()
+       (if (and (not (eq org-support-shift-select 'always))
+                (org-at-heading-p))
+           (windmove-left)))
+
+     (add-hook 'org-shiftright-hook
+               #'jallen-org-header-windmove-right)
+     (add-hook 'org-shiftleft-hook
+               #'jallen-org-header-windmove-left)
+   #+end_src
 
 ** Manipulate Window Sizes
    C-x <arrow>
