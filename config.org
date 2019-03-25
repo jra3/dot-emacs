@@ -100,14 +100,36 @@ We ensure that we load org-habit and org-protocol
   TAGS: { @home(h) @office(o) @travelling(t) @phone(p) @email(m) @errands(e) }
 
   #+begin_src emacs-lisp :tangle yes
-        (setq
-         org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)"))
-         org-tag-alist '((:startgroup . nil)
-                          ("@work" . ?w)
-                          ("@home" . ?h)
-                          ("@errands" . ?e)
-                          (:endgroup . nil)
-                          ("project" . ?p)))
+    (setq org-todo-keywords
+          (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                  (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING")))
+
+          org-todo-keyword-faces
+          (quote (("TODO" :foreground "red" :weight bold)
+                  ("NEXT" :foreground "blue" :weight bold)
+                  ("DONE" :foreground "forest green" :weight bold)
+                  ("WAITING" :foreground "orange" :weight bold)
+                  ("HOLD" :foreground "magenta" :weight bold)
+                  ("CANCELLED" :foreground "forest green" :weight bold)
+                  ("MEETING" :foreground "forest green" :weight bold)
+                  ("PHONE" :foreground "forest green" :weight bold)))
+
+          org-todo-state-tags-triggers
+          (quote (("CANCELLED" ("CANCELLED" . t))
+                  ("WAITING" ("WAITING" . t))
+                  ("HOLD" ("WAITING") ("HOLD" . t))
+                  (done ("WAITING") ("HOLD"))
+                  ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
+                  ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
+                  ("DONE" ("WAITING") ("CANCELLED") ("HOLD"))))
+
+          org-tag-alist
+          '((:startgroup . nil)
+            ("@work" . ?w)
+            ("@home" . ?h)
+            ("@errands" . ?e)
+            (:endgroup . nil)
+            ("project" . ?p)))
 
   #+end_src
 ** Pretty headlines
