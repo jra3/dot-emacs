@@ -12,6 +12,29 @@
 
 (defvar config-load-path (file-name-directory (or load-file-name buffer-file-name)))
 
+(require 'package)
+(setq package-archives nil)
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(require 'use-package)
+(eval-when-compile
+  (require 'use-package)
+					; install packages from package archive automatically
+  (require 'use-package-ensure)
+  (setq use-package-always-ensure t))
+
+(use-package auto-package-update
+	     :config
+	     (setq auto-package-update-delete-old-versions t)
+	     (setq auto-package-update-hide-results t)
+	     (auto-package-update-at-time "03:00"))
+
+
 (defvar config-org-files
   '("local-before.org" ;; local preamble, .gitignored
     "config.org"

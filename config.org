@@ -1,41 +1,6 @@
 #+TITLE: Emacs Configuration
 #+AUTHOR: John Allen
 #+STARTUP: overview
-
-* packages and use-package bootstrapping
-
-** Setting up the packaging system
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (require 'package)
-  (setq package-archives nil)
-  (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  (package-initialize)
-#+END_SRC
-
-** Bootstrapping use-package
-   use-package is an amazing frontend to the package manager, and I use it heavily
-
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (unless (package-installed-p 'use-package)
-      (package-refresh-contents)
-      (package-install 'use-package))
-    (require 'use-package)
-    (eval-when-compile
-      (require 'use-package)
-      ; install packages from package archive automatically
-      (require 'use-package-ensure)
-      (setq use-package-always-ensure t))
-#+END_SRC
-** Set up auto-updating for my packages
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (use-package auto-package-update
-    :config
-    (setq auto-package-update-delete-old-versions t)
-    (setq auto-package-update-hide-results t)
-    (auto-package-update-at-time "03:00"))
-#+END_SRC
-
 * Use dash
   Because dash is awesome
   #+BEGIN_SRC emacs-lisp :tangle yes
@@ -51,13 +16,10 @@
     (exec-path-from-shell-initialize))
 #+END_SRC
 * Customization File
-
-  #+begin_src emacs-lisp :tangle yes
-  (setq custom-file "custom.el")
-  (load (concat config-load-path custom-file))
-
-  #+end_src
-
+#+begin_src emacs-lisp :tangle yes
+  (setq custom-file (concat config-load-path "custom.el"))
+  (load custom-file)
+#+end_src
 * Configure Helm
   Make everything fuzzy and also rebind functions.
   #+begin_src emacs-lisp :tangle yes
@@ -138,14 +100,36 @@ We ensure that we load org-habit and org-protocol
   TAGS: { @home(h) @office(o) @travelling(t) @phone(p) @email(m) @errands(e) }
 
   #+begin_src emacs-lisp :tangle yes
-        (setq
-         org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)"))
-         org-tag-alist '((:startgroup . nil)
-                          ("@work" . ?w)
-                          ("@home" . ?h)
-                          ("@errands" . ?e)
-                          (:endgroup . nil)
-                          ("project" . ?p)))
+    (setq org-todo-keywords
+          (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                  (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING")))
+
+          org-todo-keyword-faces
+          (quote (("TODO" :foreground "red" :weight bold)
+                  ("NEXT" :foreground "blue" :weight bold)
+                  ("DONE" :foreground "forest green" :weight bold)
+                  ("WAITING" :foreground "orange" :weight bold)
+                  ("HOLD" :foreground "magenta" :weight bold)
+                  ("CANCELLED" :foreground "forest green" :weight bold)
+                  ("MEETING" :foreground "forest green" :weight bold)
+                  ("PHONE" :foreground "forest green" :weight bold)))
+
+          org-todo-state-tags-triggers
+          (quote (("CANCELLED" ("CANCELLED" . t))
+                  ("WAITING" ("WAITING" . t))
+                  ("HOLD" ("WAITING") ("HOLD" . t))
+                  (done ("WAITING") ("HOLD"))
+                  ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
+                  ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
+                  ("DONE" ("WAITING") ("CANCELLED") ("HOLD"))))
+
+          org-tag-alist
+          '((:startgroup . nil)
+            ("@work" . ?w)
+            ("@home" . ?h)
+            ("@errands" . ?e)
+            (:endgroup . nil)
+            ("project" . ?p)))
 
   #+end_src
 ** Pretty headlines
@@ -188,7 +172,7 @@ We ensure that we load org-habit and org-protocol
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cc" 'org-capture)
-(global-set-key "\C-cb" 'org-iswitchb)
+(global-set-key "\C-cb" 'org-switchb)
 #+end_src
 ** Speed commands
 These are speed commands. They make the ORG go faster.
@@ -259,18 +243,24 @@ I remove the bulk of the defaults because I really don't use many of these featu
         org-speed-commands-user '(("5" (lambda () (org-toggle-tag "read")))))
 #+end_src
 
-** Notes file
-#+begin_src emacs-lisp :tangle yes
-  (setq  org-default-notes-file (concat org-directory "/notes.org"))
-#+end_src
-** Agenda files
+** Special files
 
   #+begin_src emacs-lisp :tangle yes
     (setq jallen-org-habit-file (concat org-directory "habits.org")
-          jallen-default-org-agenda-files
-          (--map (concat org-directory it)
-                 '("inbox.org" "gtd.org" "tickler.org"))
+          jallen-org-notes-file (concat org-directory "notes.org")
+          jallen-org-inbox-file (concat org-directory "inbox.org")
+          jallen-org-gtd-file (concat org-directory "gtd.org")
+          jallen-org-someday-file (concat org-directory "someday.org")
+          jallen-org-tickler-file (concat org-directory "tickler.org")
+
+          jallen-org-journal-file (concat org-directory "journal.org")
+          jallen-org-5-min-journal-file (concat org-directory "5-min-journal.org")
+          jallen-org-cbt-journal-file (concat org-directory "cbt-journal.org")
+
+          jallen-default-org-agenda-files (list jallen-org-inbox-file jallen-org-gtd-file jallen-org-tickler-file)
+          org-default-notes-file jallen-org-notes-file
           org-agenda-files jallen-default-org-agenda-files)
+
   #+end_src
 ** Refiling
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -278,51 +268,35 @@ I remove the bulk of the defaults because I really don't use many of these featu
         org-refile-allow-creating-parent-nodes 'confirm
         org-refile-use-outline-path t
         org-tags-exclude-from-inheritance '("project")
-        org-refile-targets '(("~/org/gtd.org" :level . 1)
-                             ("~/org/gtd.org" :tag . "project")
-                             ("~/org/someday.org" :level . 1)
-                             ("~/org/tickler.org" :maxlevel . 2)))
+        org-refile-targets '((jallen-org-gtd-file :level . 1)
+                             (jallen-org-gtd-file :tag . "project")
+                             (jallen-org-someday-file :level . 1)
+                             (jallen-org-tickler-file :maxlevel . 2)))
 #+END_SRC
-** TODO Agenda configurations
+** Agenda configurations
+   CLOSED: [2019-03-24 Sun 16:29]
 
 #+begin_src emacs-lisp :tangle yes
-    (setq org-agenda-custom-commands
+  (setq org-agenda-custom-commands
+        '(
 
-          '(("w" "At work" tags-todo "@work"
-             ((org-agenda-overriding-header "Office")
-              (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
+          ("w" "At work" tags-todo "@work"
+           ((org-agenda-overriding-header "Office")
+            (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
 
-            ("h" "At work"
-             (
-              (message "what")
+          ("h" "At work"
+           ((message "what")
 
-              ;; Sweet habits with no evening reminder until the evening
-              (agenda "" ((org-agenda-overriding-header "Good Habits")
-                          (org-agenda-skip-function '(org-agenda-skip-if-scheduled-later))
-                          (org-agenda-files '("~/org/habits.org"))))
-              (tags-todo "@home"
-                         ((org-agenda-overriding-header "Home")
-                          (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
-             (tags "project")))
+            ;; Sweet habits with no evening reminder until the evening
+            (agenda "" ((org-agenda-overriding-header "Good Habits")
+                        (org-agenda-skip-function '(org-agenda-skip-if-scheduled-later))
+                        (org-agenda-files (list jallen-org-habit-file))))
+            (tags-todo "@home"
+                       ((org-agenda-overriding-header "Home")
+                        (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
+            (tags "project")))
 
-            ;; # ("n" "Work... work"
-            ;; #  ((tags-todo "today" ((org-agenda-overriding-header "Today's items")
-            ;; #                       (org-agenda-files jallen-default-org-agenda-files)))
-            ;; #   (agenda "" ((org-agenda-span 1)))
-            ;; #   (tags "project" ((org-agenda-files '("~/org/work.org"))
-            ;; #                    (org-agenda-overriding-header "Work Projects")))
-            ;; #   (todo "NEXT" ((org-agenda-files '("~/org/work.org"))
-            ;; #                 (org-agenda-overriding-header "Work Next Items")))
-            ;; #   (tags "project" ((org-agenda-files '("~/org/gtd.org"))
-            ;; #                    (org-agenda-overriding-header "Personal Projects")))
-            ;; #   (todo "NEXT" ((org-agenda-files '("~/org/gtd.org"))
-            ;; #                 (org-agenda-overriding-header "Personal Next Items")))
-            ;; #   (tags-todo "inbox" ((org-agenda-files '("~/org/gtd.org"))
-            ;; #                       (org-agenda-overriding-header "Inbox")))
-            ;; #   )
-            ;; #  ((org-agenda-files '("~/org/work.org"))))
-
-            ("n" todo "TODO" nil ("next.html"))))
+          ("n" todo "TODO" nil ("next.html"))))
 
   (defun org-agenda-skip-if-scheduled-later ()
     "If this function returns nil, the current match should not be skipped.
@@ -339,90 +313,27 @@ I remove the bulk of the defaults because I really don't use many of these featu
              (>= scheduled-seconds now)
              subtree-end))))
 
-    (defun my-org-agenda-skip-all-siblings-but-first ()
-      "Skip all but the first non-done entry."
-      (let (should-skip-entry)
-        (unless (org-current-is-todo)
-          (setq should-skip-entry t))
-        (save-excursion
-          (while (and (not should-skip-entry) (org-goto-sibling t))
-            (when (org-current-is-todo)
-              (setq should-skip-entry t))))
-        (when should-skip-entry
-          (or (outline-next-heading)
-              (goto-char (point-max))))))
+  (defun my-org-agenda-skip-all-siblings-but-first ()
+    "Skip all but the first non-done entry."
+    (let (should-skip-entry)
+      (unless (org-current-is-todo)
+        (setq should-skip-entry t))
+      (save-excursion
+        (while (and (not should-skip-entry) (org-goto-sibling t))
+          (when (org-current-is-todo)
+            (setq should-skip-entry t))))
+      (when should-skip-entry
+        (or (outline-next-heading)
+            (goto-char (point-max))))))
 
-    (defun org-current-is-todo ()
-      (string= "TODO" (org-get-todo-state)))
+  (defun org-current-is-todo ()
+    (string= "TODO" (org-get-todo-state)))
 
-    ;; (setq
-    ;;  org-agenda-custom-commands
-    ;;  '(
-    ;;    ;; ("w" todo "WAITING" nil ("waiting.txt"))
-    ;;    ;; ("n" todo "NEXT" nil ("next.html"))
-    ;;    ;; ("T" "Daily Action List"
-    ;;    ;;  (
-    ;;    ;;   (agenda "" ((org-agenda-ndays 1)
-    ;;    ;;               (org-agenda-sorting-strategy
-    ;;    ;;                (quote ((agenda time-up priority-down tag-up) )))
-    ;;    ;;               (org-deadline-warning-days 0)
-    ;;    ;;               ))))
-
-    ;;    ("h" "Habits and Chores"
-    ;;     ((agenda "" ((org-agenda-span 1)
-    ;;                  (org-deadline-warning-days 30))))
-    ;;     ((org-agenda-files (list jallen-org-habit-file))))
-    ;;    ("n" "Work... work"
-    ;;     ((tags-todo "today" ((org-agenda-overriding-header "Today's items")
-    ;;                          (org-agenda-files jallen-default-org-agenda-files)))
-    ;;      (agenda "" ((org-agenda-span 1)))
-    ;;      (tags "project" ((org-agenda-files '("~/org/work.org"))
-    ;;                       (org-agenda-overriding-header "Work Projects")))
-    ;;      (todo "NEXT" ((org-agenda-files '("~/org/work.org"))
-    ;;                    (org-agenda-overriding-header "Work Next Items")))
-    ;;      (tags "project" ((org-agenda-files '("~/org/gtd.org"))
-    ;;                       (org-agenda-overriding-header "Personal Projects")))
-    ;;      (todo "NEXT" ((org-agenda-files '("~/org/gtd.org"))
-    ;;                    (org-agenda-overriding-header "Personal Next Items")))
-    ;;      (tags-todo "inbox" ((org-agenda-files '("~/org/gtd.org"))
-    ;;                          (org-agenda-overriding-header "Inbox")))
-    ;;      )
-    ;;     ((org-agenda-files '("~/org/work.org"))))
-
-    ;;    ("D" "Daily Action List"
-    ;;     ((agenda "habits" ((org-agenda-files '("~/org/habits.org"))))
-    ;;      (agenda "" ((org-agenda-span 1)
-    ;;                  (org-agenda-sorting-strategy
-    ;;                   (quote ((agenda time-up priority-down tag-up) )))
-    ;;                  (org-deadline-warning-days 0)
-    ;;                  ))))
-
-    ;;    ("d" "Agenda + Next Actions"
-    ;;     ((agenda "honker" ((org-agenda-span 1)
-    ;;                        (org-agenda-sorting-strategy
-    ;;                         (quote ((agenda time-up priority-down tag-up) )))
-    ;;                        (org-deadline-warning-days 0)
-    ;;                        ))
-    ;;      (todo "NEXT")) nil ("next.html"))
-
-    ;;    ("w" "Weekly Agenda + Next Actions"
-    ;;     ((agenda "weekly" ((org-agenda-span 7)
-    ;;                        (org-agenda-sorting-strategy
-    ;;                         (quote ((agenda time-up priority-down tag-up) )))
-    ;;                        (org-deadline-warning-days 0)
-    ;;                        ))
-    ;;      (todo "NEXT"))
-    ;;     nil ("week.html"))
-
-    ;;    ("W" "Weekly Review"
-    ;;     ((agenda "" ((org-agenda-span 7))) ;; review upcoming deadlines and appointments
-    ;;      ;; type "l" in the agenda to review logged items
-    ;;      (stuck "") ;; review stuck projects as designated by org-stuck-projects
-    ;;      (tags "project") ;; review all projects
-    ;;      (todo "MAYBE") ;; review someday/maybe items
-    ;;      (todo "WAITING"))) ;; review waiting items
-    ;;    ))
 #+end_src
+** No Priorities
+#+BEGIN_SRC emacs-lisp tangle: yes
+(setq org-enable-priority-commands nil)
+#+END_SRC
 ** Agenda faces
 
    #+begin_src emacs-lisp :tangle yes
@@ -454,12 +365,8 @@ I remove the bulk of the defaults because I really don't use many of these featu
 *** Logging time of task completion
 #+begin_src emacs-lisp :tangle yes
   (setq org-log-done 'time ; log the time a task is marked done
+        org-clock-out-remove-zero-time-clocks t
         org-log-into-drawer t) ; timestamps go in a drawer, not the body
-#+end_src
-*** Logging time spent on tasks
-#+begin_src emacs-lisp :tangle yes
-  (setq org-clock-into-drawer t
-        org-clock-out-remove-zero-time-clocks t)
 #+end_src
 *** Editing timestamps
 #+begin_src emacs-lisp :tangle yes
@@ -468,12 +375,8 @@ I remove the bulk of the defaults because I really don't use many of these featu
 *** Save the running clock and all clock history when exiting Emacs, load it on startp
 #+begin_src emacs-lisp :tangle yes
   (org-clock-persistence-insinuate)
-  (setq org-clock-persist 'history)
-  (setq org-clock-in-resume t)
-#+end_src
-*** Update the state of tasks when they get clocked
-#+begin_src emacs-lisp :tangle yes
-(setq org-clock-in-switch-to-state "STARTED")
+  (setq org-clock-persist 'history
+        org-clock-in-resume t)
 #+end_src
 *** Show clocked in task in header-line
 #+begin_src emacs-lisp :tangle yes
@@ -496,37 +399,37 @@ I remove the bulk of the defaults because I really don't use many of these featu
    org-capture-templates
    '(
      ("t" "Todo [inbox]" entry ; New inbox item to be processed
-      (file+headline (concat org-directory "inbox.org") "Tasks")
+      (file+headline jallen-org-inbox-file "Tasks")
       "* TODO %?\n  %i\n")
      ("T" "Tickler" entry
-      (file+headline (concat org-directory "tickler.org") "Tickler")
+      (file+headline jallen-org-tickler-file "Tickler")
       "* %i%? \n %U")
      ("p" "Project" entry
-      (file+headline (concat org-directory "gtd.org") "Projects")
+      (file+headline jallen-org-gtd-file "Projects")
       "* %i%? :project: \n ")
 
      ("j" "Journal Entries")
      ("jm" "Precious Memory" entry ; Freeform journal entry
-      (file+datetree (concat org-directory "journal.org"))
+      (file+datetree jallen-org-journal-file)
       "* %? :memory:\n  %i\n  %a")
      ("jl" "Today I Learned" entry ; Breif TIL journal entry
-      (file+datetree (concat org-directory "journal.org") "TIL")
+      (file+datetree jallen-org-journal-file "TIL")
       "* %?\nLearned on %U :til:\n  %i\n  %a")
      ("j." "Journal" entry ; Freeform journal entry
-      (file+datetree (concat org-directory "journal.org"))
+      (file+datetree jallen-org-journal-file)
       "* %?\nEntered on %U\n  %i\n  %a")
 
      ("5" "5 Minute Journal")
-     ("5m" "Morning Entry" entry (file+datetree "~/org/5-min-journal.org")
+     ("5m" "Morning Entry" entry (file+datetree jallen-org-5-min-journal-file)
       "* Morning\n  I am grateful for...\n  - %?\n  - \n  - \n\n  What will I do to make today great?\n  - \n  - \n  - \n\n  I am ...")
-     ("5e" "Evening Entry" entry (file+datetree "~/org/5-min-journal.org")
+     ("5e" "Evening Entry" entry (file+datetree jallen-org-5-min-journal-file)
       "* Evening\n  3 amazing things that happened today...\n  - %?\n  - \n  - \n\n  How could I have made today even better?\n  - \n")
 
-     ("f" "CBT" entry (file "~/org/cbt-journal.org")
+     ("f" "CBT" entry (file jallen-org-cbt-journal-file)
       "* %U\n** Activating Event\n** thoughts/Beliefs\n** emotional Consequences\n")
 
      ("n" "notes" entry ; Generic notebook entry
-      (file+datetree "~/org/notes.org")
+      (file+datetree jallen-org-notes-file)
       "* %? %U\n")
      ))
  #+end_src
@@ -621,18 +524,37 @@ I remove the bulk of the defaults because I really don't use many of these featu
   :diminish yas-minor-mode
   :config (yas-global-mode 1))
 #+end_src
+
 * Navigation
 ** Configure Windmove
    I like to use the S-<arrow> keys for moving windows
-#+begin_src emacs-lisp :tangle yes
-(windmove-default-keybindings)
+   #+begin_src emacs-lisp :tangle yes
+     (windmove-default-keybindings)
 
-;; Make windmove work in org-mode:
-(add-hook 'org-shiftup-final-hook 'windmove-up)
-(add-hook 'org-shiftleft-final-hook 'windmove-left)
-(add-hook 'org-shiftdown-final-hook 'windmove-down)
-(add-hook 'org-shiftright-final-hook 'windmove-right)
-#+end_src
+     ;; Make windmove work in org-mode:
+     (add-hook 'org-shiftup-final-hook 'windmove-up)
+     (add-hook 'org-shiftleft-final-hook 'windmove-left)
+     (add-hook 'org-shiftdown-final-hook 'windmove-down)
+     (add-hook 'org-shiftright-final-hook 'windmove-right)
+
+     (define-key org-mode-map (kbd "C-c <left>") (lambda () (interactive) (org-todo 'left)))
+     (define-key org-mode-map (kbd "C-c <right>") (lambda () (interactive) (org-todo 'right)))
+
+     ;; disable header todo cycling and just do windmove
+     (defun jallen-org-header-windmove-right ()
+       (if (and (not (eq org-support-shift-select 'always))
+                (org-at-heading-p))
+           (windmove-right)))
+     (defun jallen-org-header-windmove-left ()
+       (if (and (not (eq org-support-shift-select 'always))
+                (org-at-heading-p))
+           (windmove-left)))
+
+     (add-hook 'org-shiftright-hook
+               #'jallen-org-header-windmove-right)
+     (add-hook 'org-shiftleft-hook
+               #'jallen-org-header-windmove-left)
+   #+end_src
 
 ** Manipulate Window Sizes
    C-x <arrow>
@@ -1742,5 +1664,6 @@ emacs -diff file1 file2
        ("Schneier on Security" "https://www.schneier.com/blog/atom.xml" nil nil nil)
        ("Xah Emacs Blog" "http://ergoemacs.org/emacs/blog.xml" nil nil nil)
        ("Arabesque" "https://sanctum.geek.nz/arabesque/feed/" nil nil nil)
+       ("XKCD" "https://xkcd.com/rss.xml" nil nil nil)
        ("Sacha Chua" "http://sachachua.com/blog/feed/" nil nil nil)))
 #+end_src
