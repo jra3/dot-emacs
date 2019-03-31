@@ -255,9 +255,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
   (setq org-outline-path-complete-in-steps nil
         org-refile-allow-creating-parent-nodes 'confirm
         org-refile-use-outline-path t
-        org-tags-exclude-from-inheritance '("project")
         org-refile-targets '((jallen-org-gtd-file :level . 1)
-                             (jallen-org-gtd-file :tag . "projects" :mas)
                              (jallen-org-someday-file :level . 1)
                              (jallen-org-tickler-file :maxlevel . 2)))
 #+END_SRC
@@ -1638,22 +1636,10 @@ to set xterm-mode as a terminal option for this
                                       xref-find-definitions-other-frame
                                       xref-find-references))
 
-  (use-package lsp-hack)
 #+END_SRC
 
 #+RESULTS:
 
-** pyre
-#+BEGIN_SRC emacs-lisp tangle: yes
-(lsp-define-stdio-client
- lsp-pyre "python"
- (lsp-make-traverser #'(lambda (dir)
-                         (directory-files
-                          dir
-                          nil
-                          "\\.pyre_configuration.local")))
- '("pyre" "persistent"))
-#+END_SRC
 ** cquery
 #+BEGIN_SRC emacs-lisp tangle: yes
 (use-package cquery

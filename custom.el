@@ -33,7 +33,7 @@
  '(newsticker-use-full-width nil t)
  '(package-selected-packages
    (quote
-    (which-key hgrc-mode hgignore-mode gitconfig-mode gitignore-mode web-mode js-comint hack-mode yaml-mode google-c-style rainbow-mode package-lint rainbow-delimiters elisp-slime-nav cquery lsp-ui company-lsp lsp-mode flycheck git-gutter multiple-cursors tangotango-theme expand-region ag anzu ibuffer-git ibuffer-vc win-switch popwin yasnippet helm-xref helm-descbinds helm-flx flx exec-path-from-shell auto-package-update use-package)))
+    (thrift which-key hgrc-mode hgignore-mode gitconfig-mode gitignore-mode web-mode js-comint hack-mode yaml-mode google-c-style rainbow-mode package-lint rainbow-delimiters elisp-slime-nav cquery lsp-ui company-lsp lsp-mode flycheck git-gutter multiple-cursors tangotango-theme expand-region ag anzu ibuffer-git ibuffer-vc win-switch popwin yasnippet helm-xref helm-descbinds helm-flx flx exec-path-from-shell auto-package-update use-package)))
  '(shr-width 80))
 
 (custom-set-faces
