@@ -127,6 +127,7 @@ We ensure that we load org-habit and org-protocol
           '((:startgroup . nil)
             ("@work" . ?w)
             ("@home" . ?h)
+            ("@sag" . ?s)
             ("@errands" . ?e)
             (:endgroup . nil)
             ("project" . ?p)))
@@ -1604,78 +1605,60 @@ to set xterm-mode as a terminal option for this
           (other-window 1))))
   #+end_src
 * LSP
-** Basic
+** TODO Basic
+   move xref stuff to a general xref section
 #+BEGIN_SRC emacs-lisp tangle: yes
 
-    (use-package lsp-mode
-      :config
-      (setq
-       lsp-print-io t ;; debug
-       lsp-ui-sideline-show-code-actions nil
-       lsp-ui-sideline-show-hover nil
-       lsp-highlight-symbol-at-point nil
-       ))
+  (use-package lsp-mode
+    :commands lsp
+    :config
+    (setq xref-prompt-for-identifier '(not
+                                       xref-find-definitions
+                                       xref-find-definitions-other-window
+                                       xref-find-definitions-other-frame
+                                       xref-find-references)))
 
-    (use-package company-lsp
-      :after (lsp-mode company-mode)
-      :config
-      (push 'company-lsp company-backends)
-      (setq company-lsp-enable-snippet t
-            company-lsp-cache-candidates t))
+  (use-package company-lsp
+    :commands company-lsp
+    :config
+    (push 'company-lsp company-backends))
+    ;; (setq company-lsp-enable-snippet t ;; wut
+    ;;       company-transformers nil ;; wut
+    ;;       company-lsp-async t ;; probs good
+    ;;       company-lsp-cache-candidates nil ;; nil or t?
+    ;;       company-lsp-cache-candidates t))
 
-    (use-package lsp-ui
-      :init (add-hook 'lsp-mode-hook 'lsp-ui-mode))
-      :config
-      (setq
-        company-transformers nil
-        company-lsp-async t
-        company-lsp-cache-candidates nil
-        xref-prompt-for-identifier '(not
-                                      xref-find-definitions
-                                      xref-find-definitions-other-window
-                                      xref-find-definitions-other-frame
-                                      xref-find-references))
+    (use-package lsp-ui :commands lsp-ui-mode)
 
 #+END_SRC
 
-#+RESULTS:
-
 ** cquery
 #+BEGIN_SRC emacs-lisp tangle: yes
-(use-package cquery
-  :if
-  (file-exists-p "/bin/cquery")
-  :bind
-  (:map c-mode-base-map
-    ("M-." . xref-find-definitions)
-    ("C-t h c" . cquery-call-hierarchy)
-    ("C-t h i" . cquery-inheritance-hierarchy)
-    ("C-t i" . lsp-ui-sideline-toggle-symbols-info)
-    ("C-t I". helm-imenu)
-    ("C-t h m" . cquery-member-hierarchy)
-    ("C-t ." . lsp-ui-peek-find-definitions)
-    ("C-t ?" . lsp-ui-peek-find-references))
-  :preface
-  (defun cquery//enable ()
-    (condition-case nil
-      (lsp-cquery-enable)
-      (user-error nil)))
-  :init
-  (add-hook 'c-mode-common-hook #'cquery//enable)
-  :config
-  (setq
-    cquery-executable "/bin/cquery"
-    cquery-extra-args '("--log-file=/tmp/cq.log")
-    cquery-extra-init-params '(:completion (:detailedLabel t))
-    cquery-sem-highlight-method 'font-lock
-    company-transformers nil
-    company-lsp-async t
-    company-lsp-cache-candidates nil
-    xref-prompt-for-identifier '(not
-                                  xref-find-definitions
-                                  xref-find-definitions-other-window
-                                  xref-find-definitions-other-frame
-                                  xref-find-references)))
+  (use-package cquery
+    :if
+    (file-exists-p "/bin/cquery")
+    :bind
+    (:map c-mode-base-map
+      ("M-." . xref-find-definitions)
+      ("C-t h c" . cquery-call-hierarchy)
+      ("C-t h i" . cquery-inheritance-hierarchy)
+      ("C-t i" . lsp-ui-sideline-toggle-symbols-info)
+      ("C-t I". helm-imenu)
+      ("C-t h m" . cquery-member-hierarchy)
+      ("C-t ." . lsp-ui-peek-find-definitions)
+      ("C-t ?" . lsp-ui-peek-find-references))
+    :preface
+    (defun cquery//enable ()
+      (condition-case nil
+        (lsp-cquery-enable)
+        (user-error nil)))
+    :init
+    (add-hook 'c-mode-common-hook #'cquery//enable)
+    :config
+    (setq cquery-executable "/bin/cquery"
+          cquery-extra-args '("--log-file=/tmp/cq.log")
+          cquery-extra-init-params '(:completion (:detailedLabel t))
+          cquery-sem-highlight-method 'font-lock))
 #+END_SRC
 * Modes
 ** elisp
@@ -1857,7 +1840,7 @@ emacs -diff file1 file2
       :init
       (add-hook 'hack-mode-hook
                 (lambda ()
-                  (lsp-hack-enable)
+                  (lsp)
                   (flycheck-mode t)
                   (subword-mode t)
                   ;(company-mode t)
