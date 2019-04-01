@@ -1609,24 +1609,21 @@ to set xterm-mode as a terminal option for this
    move xref stuff to a general xref section
 #+BEGIN_SRC emacs-lisp tangle: yes
 
-  (use-package lsp-mode
-    :commands lsp
-    :config
-    (setq xref-prompt-for-identifier '(not
-                                       xref-find-definitions
-                                       xref-find-definitions-other-window
-                                       xref-find-definitions-other-frame
-                                       xref-find-references)))
+    (use-package lsp-mode
+      :config
+      (setq
+       lsp-print-io t ;; debug
+       lsp-ui-sideline-show-code-actions nil
+       lsp-ui-sideline-show-hover nil
+       lsp-highlight-symbol-at-point nil
+       ))
 
-  (use-package company-lsp
-    :commands company-lsp
-    :config
-    (push 'company-lsp company-backends))
-    ;; (setq company-lsp-enable-snippet t ;; wut
-    ;;       company-transformers nil ;; wut
-    ;;       company-lsp-async t ;; probs good
-    ;;       company-lsp-cache-candidates nil ;; nil or t?
-    ;;       company-lsp-cache-candidates t))
+    (use-package company-lsp
+      :after (lsp-mode company-mode)
+      :config
+      (push 'company-lsp company-backends)
+      (setq company-lsp-enable-snippet t
+            company-lsp-cache-candidates t))
 
     (use-package lsp-ui :commands lsp-ui-mode)
 
@@ -1806,7 +1803,7 @@ emacs -diff file1 file2
 #+END_SRC
 *** Setup =python-mode=
    #+begin_src emacs-lisp :tangle yes
-   (add-hook 'python-mode-hook 'electric-operator-mode)
+   (add-hook 'python-mode-hook 'lsp)
    (setq python-shell-interpreter "/usr/bin/ipython")
    (setq py-basic-offset 4)
    #+end_src
