@@ -1,6 +1,7 @@
 .#*
 *~
 local-*.org
+package-bootstrap.el
 local-*.el
 *.elc
 
@@ -23,3 +24,5 @@ eshell/
 config.el
 .org-id-locations
 .last-package-update-day
+.lsp-session-*
+.cask
