@@ -129,8 +129,7 @@ We ensure that we load org-habit and org-protocol
             ("@home" . ?h)
             ("@sag" . ?s)
             ("@errands" . ?e)
-            (:endgroup . nil)
-            ("project" . ?p)))
+            (:endgroup . nil)))
 
   #+end_src
 ** Pretty headlines
