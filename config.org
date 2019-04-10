@@ -585,7 +585,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
              ;;   (tags "project")))
 
              (" " "Agenda"
-              ((agenda "" nil)
+              ((agenda "" ((org-agenda-span 3)))
 
                (agenda "" ((org-agenda-overriding-header "Good Habits")
                            (org-agenda-skip-function '(org-agenda-skip-if-scheduled-later))
@@ -595,11 +595,11 @@ I remove the bulk of the defaults because I really don't use many of these featu
                           ((org-agenda-overriding-header "Tasks to Refile")
                            (org-tags-match-list-sublevels nil)))
 
-                (tags-todo "-CANCELLED/!"
-                           ((org-agenda-overriding-header "Stuck Projects")
-                            (org-agenda-skip-function 'bh/skip-non-stuck-projects)
-                            (org-agenda-sorting-strategy
-                             '(category-keep))))
+               (tags-todo "-CANCELLED/!"
+                          ((org-agenda-overriding-header "Stuck Projects")
+                           (org-agenda-skip-function 'bh/skip-non-stuck-projects)
+                           (org-agenda-sorting-strategy
+                            '(category-keep))))
 
                 (tags-todo "-HOLD-CANCELLED/!"
                            ((org-agenda-overriding-header "Projects")
@@ -811,7 +811,6 @@ I remove the bulk of the defaults because I really don't use many of these featu
      'org-capture-before-finalize-hook
      '5-min-journal-complete-on-capture)
   #+end_src
-** Working with agendas
 ** Exporting
 *** Exporter Setup
 #+begin_src emacs-lisp :tangle yes
