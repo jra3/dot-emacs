@@ -59,7 +59,8 @@
 * Configuring =org-mode=
 ** Set environment
 #+begin_src emacs-lisp :tangle yes
-  (setq org-directory "~/org/")
+  (setq org-directory "~/org/"
+        org-tags-exclude-from-inheritance '("BUCKET"))
 
   (defun org-file-path (filename)
     "Return the absolute address of an org file, given its relative name."
@@ -70,7 +71,13 @@
     (interactive)
     (find-file (concat org-directory
                        (helm-comp-read "Select your org file: "
-                                       (directory-files org-directory nil "\.org$")))))
+                                         (directory-files org-directory nil "\.org$")))))
+
+  ;; Auto save all buffers in agenda mode
+  (add-hook 'org-agenda-mode-hook
+            (lambda ()
+              (add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
+              (auto-save-mode)))
 #+end_src
 
 ** Modules
@@ -128,6 +135,7 @@ We ensure that we load org-habit and org-protocol
             ("@work" . ?w)
             ("@home" . ?h)
             ("@sag" . ?s)
+            ("@weekend" . ?W)
             ("@errands" . ?e)
             (:endgroup . nil)))
 
@@ -252,10 +260,18 @@ I remove the bulk of the defaults because I really don't use many of these featu
   #+end_src
 ** Refiling
 #+BEGIN_SRC emacs-lisp :tangle yes
+  ;; Also enable based on a project tag?
+  (defun jallen/filter-refile-targets ()
+    (interactive)
+    (or (member "BUCKET" (org-get-tags))
+        (bh/is-project-p)))
+
   (setq org-outline-path-complete-in-steps nil
         org-refile-allow-creating-parent-nodes 'confirm
         org-refile-use-outline-path t
-        org-refile-targets '((jallen-org-gtd-file :level . 1)
+        org-refile-target-verify-function 'jallen/filter-refile-targets
+
+        org-refile-targets '((jallen-org-gtd-file :maxlevel . 4)
                              (jallen-org-someday-file :level . 1)
                              (jallen-org-tickler-file :maxlevel . 2)))
 #+END_SRC
@@ -643,10 +659,6 @@ I remove the bulk of the defaults because I really don't use many of these featu
                             (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
                             (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)))
 
-                (tags "-REFILE/"
-                      ((org-agenda-overriding-header "Tasks to Archive")
-                       (org-agenda-skip-function 'bh/skip-non-archivable-tasks)
-                       (org-tags-match-list-sublevels nil)))
                ))
 
 
