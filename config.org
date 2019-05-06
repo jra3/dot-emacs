@@ -59,6 +59,10 @@
 * Configuring =org-mode=
 ** Set environment
 #+begin_src emacs-lisp :tangle yes
+  (setq org-enforce-todo-dependencies t)
+  (setq org-agenda-sticky t)
+  (setq org-cycle-separator-lines 0)
+
   (setq org-directory "~/org/"
         org-tags-exclude-from-inheritance '("BUCKET"))
 
@@ -71,7 +75,7 @@
     (interactive)
     (find-file (concat org-directory
                        (helm-comp-read "Select your org file: "
-                                         (directory-files org-directory nil "\.org$")))))
+                                       (directory-files org-directory nil "\.org$")))))
 
   ;; Auto save all buffers in agenda mode
   (add-hook 'org-agenda-mode-hook
@@ -298,7 +302,6 @@ I remove the bulk of the defaults because I really don't use many of these featu
 *** Agenda helpers
 
    #+BEGIN_SRC emacs-lisp :tangle yes
-
      (defun random-cmp (a b)
        "Randomly returns 1 and -1 with equal probability and nil with a neglibible probability"
        (let ((rnd1 (random))
@@ -607,73 +610,60 @@ I remove the bulk of the defaults because I really don't use many of these featu
    #+BEGIN_SRC emacs-lisp :tangle yes
 
      (setq org-agenda-custom-commands
-           '(
+           '((" " "Agenda"
 
-             (" " "Agenda"
-              ((agenda "" ((org-agenda-span 3)
-                           (org-agenda-skip-function '(org-agenda-skip-if-scheduled-later))
-                           (org-agenda-sorting-strategy '(habit-down category-keep))))
+              (agenda "" ((org-agenda-overriding-header "Today's Schedule:")
+                          (org-agenda-span 'day)
+                          (org-agenda-ndays 1)
+                          (org-agenda-start-on-weekday nil)
+                          (org-agenda-start-day "+0d")
+                          (org-agenda-todo-ignore-deadlines nil)))
 
-               (tags-todo "REFILE"
-                          ((org-agenda-overriding-header "Tasks to Refile")
-                           (org-tags-match-list-sublevels nil)))
+              (tags-todo "REFILE"
+                         ((org-agenda-overriding-header "Tasks to Refile")
+                          (org-tags-match-list-sublevels nil)))
 
-               (tags-todo "-CANCELLED/!"
-                          ((org-agenda-overriding-header "Stuck Projects")
-                           (org-agenda-skip-function 'bh/skip-non-stuck-projects)
-                           (org-agenda-files (list jallen-org-gtd-file))
-                           (org-agenda-sorting-strategy
-                            '(category-keep))))
+              (tags-todo "-CANCELLED/!"
+                         ((org-agenda-overriding-header "Stuck Projects")
+                          (org-agenda-skip-function 'bh/skip-non-stuck-projects)
+                          (org-agenda-files (list jallen-org-gtd-file))
+                          (org-agenda-sorting-strategy
+                           '(category-keep))))
 
-               (tags-todo "-CANCELLED/!NEXT"
-                          ((org-agenda-overriding-header (concat "Next Actions"
-                                                                 (if bh/hide-scheduled-and-waiting-next-tasks
-                                                                     ""
-                                                                   " (including WAITING and SCHEDULED tasks)")))
-                           (org-agenda-skip-function 'bh/skip-projects-and-habits)
-                           (org-agenda-files (list jallen-org-gtd-file))
-                           (org-tags-match-list-sublevels t)
-                           (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
-                           (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
-                           (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
-                           (org-agenda-sorting-strategy
-                            '(todo-state-down effort-up category-keep))))
+              (tags-todo "-CANCELLED/!NEXT"
+                         ((org-agenda-overriding-header (concat "Next Actions"
+                                                                (if bh/hide-scheduled-and-waiting-next-tasks
+                                                                    ""
+                                                                  " (including WAITING and SCHEDULED tasks)")))
+                          (org-agenda-skip-function 'bh/skip-projects-and-habits)
+                          (org-agenda-files (list jallen-org-gtd-file))
+                          (org-tags-match-list-sublevels t)
+                          (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+                          (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
+                          (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
+                          (org-agenda-sorting-strategy
+                           '(todo-state-down effort-up category-keep))))
 
-               (tags-todo "-HOLD-CANCELLED/!"
-                          ((org-agenda-overriding-header "Projects")
-                           (org-agenda-files (list jallen-org-gtd-file))
-                           (org-agenda-skip-function 'bh/skip-non-projects)
-                           (org-tags-match-list-sublevels 'indented)
-                           (org-agenda-sorting-strategy
-                            '(category-keep))))
-
-               ;; (tags-todo "-REFILE-CANCELLED-WAITING-HOLD/!"
-               ;;            ((org-agenda-overriding-header (concat "Project Subtasks"
-               ;;                                                   (if bh/hide-scheduled-and-waiting-next-tasks
-               ;;                                                       ""
-               ;;                                                     " (including WAITING and SCHEDULED tasks)")))
-               ;;             (org-agenda-skip-function 'bh/skip-non-project-tasks)
-               ;;             (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
-               ;;             (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
-               ;;             (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
-               ;;             (org-agenda-sorting-strategy
-               ;;              '(category-keep))))
-
-               (tags-todo "-CANCELLED+WAITING|HOLD/!"
-                          ((org-agenda-overriding-header (concat "Waiting and Postponed Tasks"
-                                                                 (if bh/hide-scheduled-and-waiting-next-tasks
-                                                                     ""
-                                                                   " (including WAITING and SCHEDULED tasks)")))
-                           (org-agenda-skip-function 'bh/skip-non-tasks)
-                           (org-tags-match-list-sublevels nil)
-                           (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
-                           (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)))
-
-               ))
+              (tags-todo "-HOLD-CANCELLED/!"
+                         ((org-agenda-overriding-header "Projects")
+                          (org-agenda-files (list jallen-org-gtd-file))
+                          (org-agenda-skip-function 'bh/skip-non-projects)
+                          (org-tags-match-list-sublevels 'indented)
+                          (org-agenda-sorting-strategy
+                           '(category-keep))))
 
 
+              (tags-todo "-CANCELLED+WAITING|HOLD/!"
+                         ((org-agenda-overriding-header (concat "Waiting and Postponed Tasks"
+                                                                (if bh/hide-scheduled-and-waiting-next-tasks
+                                                                    ""
+                                                                  " (including WAITING and SCHEDULED tasks)")))
+                          (org-agenda-skip-function 'bh/skip-non-tasks)
+                          (org-tags-match-list-sublevels nil)
+                          (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+                          (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks))))
 
-             ("n" todo "TODO" nil ("next.html"))))
+             ))
    #+END_SRC
 
 *** Agenda faces
@@ -773,9 +763,6 @@ I remove the bulk of the defaults because I really don't use many of these featu
      ("T" "Tickler" entry
       (file+headline jallen-org-tickler-file "Tickler")
       "* %i%? \n %U")
-     ("p" "Project" entry
-      (file+headline jallen-org-gtd-file "Projects")
-      "* %i%? \n ")
 
      ("j" "Journal Entries")
      ("jm" "Precious Memory" entry ; Freeform journal entry
@@ -820,19 +807,36 @@ I remove the bulk of the defaults because I really don't use many of these featu
         ("Morning Entry"
          (progn
            (org-id-goto "FEE1A918-0FFE-446F-A954-5B7A6DE29D3F")
+           (revert-buffer nil t)
            (org-todo "DONE")
+           (save-buffer)
            (bury-buffer)))
         ("Evening Entry"
          (progn
            (org-id-goto "81125689-466F-4C87-9898-FB344CDD175F")
+           (revert-buffer nil t)
            (org-todo "DONE")
+           (save-buffer)
            (bury-buffer)))
-        (_ (message "Capture complete!")))
-      )
+        (_ (message "Capture complete!"))))
     (add-hook
      'org-capture-before-finalize-hook
      '5-min-journal-complete-on-capture)
   #+end_src
+** Revert/Save around captures
+#+BEGIN_SRC emacs-lisp :tangle yes
+
+  ;; ;; Revert buffer before capture
+  ;; (add-hook
+  ;;  'org-capture-mode-hook
+  ;;  (lambda () (message (buffer-name)) (revert-buffer)) ;
+
+  ;; Save after capture
+  (add-hook
+   'org-capture-before-finalize-hook
+   (lambda () (save-buffer)))
+
+#+END_SRC
 ** Exporting
 *** Exporter Setup
 #+begin_src emacs-lisp :tangle yes
