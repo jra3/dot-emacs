@@ -105,12 +105,15 @@ We ensure that we load org-habit and org-protocol
   :mode ("\\.org_archive\\'" . org-mode))
 #+end_src
 
-** GTD TODO and tags
+** GTD TODO, tags, effort
 
   TAGS: { project(p) }
   TAGS: { @home(h) @office(o) @travelling(t) @phone(p) @email(m) @errands(e) }
 
   #+begin_src emacs-lisp :tangle yes
+    (setq org-global-properties
+          '(("Effort_ALL". "0:05 0:30 1:00 2:00 4:00 8:00")))
+
     (setq org-todo-keywords
           (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
                   (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING")))
@@ -137,13 +140,25 @@ We ensure that we load org-habit and org-protocol
           org-tags-exclude-from-inheritance '("BUCKET")
 
           org-tag-alist
-          '((:startgroup . nil)
+          '((:startgrouptag)
+            ("Context" . nil)
+            (:startgroup) ; mutually exclusive
             ("@work" . ?w)
             ("@home" . ?h)
             ("@sag" . ?s)
             ("@weekend" . ?W)
             ("@errands" . ?e)
-            (:endgroup . nil)))
+            (:endgroup)
+
+            (:startgrouptag)
+            ("People" . nil)
+            (:grouptags) ; not mutually exclusive
+            ("genevieve")
+            ("jonathan")
+            ("dave")
+            ("madhura")
+            (:endgrouptag)
+            ))
 
   #+end_src
 ** Pretty headlines
@@ -208,7 +223,7 @@ These are speed commands. They make the ORG go faster.
 I remove the bulk of the defaults because I really don't use many of these features...
 #+begin_src emacs-lisp :tangle yes
   (setq org-use-speed-commands t
-        org-speed-commands-user '(;; ("Outline Navigation")
+        org-speed-commands-user '(("Outline Navigation")
                                   ("u" . ignore)
                                   ("j" . ignore)
                                   ("g" org-refile t) ; goto a refile location
@@ -217,7 +232,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
                                   (" " . ignore)
                                   ("s" . org-narrow-to-subtree)
                                   ("=" . ignore)
-                                  ;; ("Outline Structure Editing")
+                                  ("Outline Structure Editing")
                                   ("U" . ignore)
                                   ("D" . ignore)
                                   ("r" org-todo 'right)
@@ -235,7 +250,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
                                   ("Clock Commands")
                                   ("I" . org-clock-in)
                                   ("O" . org-clock-out)
-                                  ;;("Meta Data Editing")
+                                  ("Meta Data Editing")
                                   ("T" . org-todo)
                                   ("," ignore)
                                   ("0" ignore)
@@ -243,13 +258,13 @@ I remove the bulk of the defaults because I really don't use many of these featu
                                   ("2" ignore)
                                   ("3" ignore)
                                   (":" . org-set-tags-command)
-                                  ("e" . ignore)
+                                  ;;("e" . ignore)
                                   ("E" . ignore)
                                   ("W" . widen)
-                                  ;; ("Agenda Views etc")
+                                  ("Agenda Views etc")
                                   ("v" . org-agenda)
                                   ("/" . org-sparse-tree)
-                                  ;; ("Misc")
+                                  ("Misc")
                                   ("o" . org-open-at-point)
                                   ("?" . org-speed-command-help)
                                   ("<" org-agenda-set-restriction-lock 'subtree)
@@ -611,59 +626,56 @@ I remove the bulk of the defaults because I really don't use many of these featu
 
      (setq org-agenda-custom-commands
            '((" " "Agenda"
+              ((agenda "" ((org-agenda-overriding-header "Today's Schedule:")
+                           (org-agenda-span 'day)
+                           (org-agenda-ndays 1)
+                           (org-agenda-start-on-weekday nil)
+                           (org-agenda-start-day "+0d")
+                           (org-agenda-todo-ignore-deadlines nil)))
 
-              (agenda "" ((org-agenda-overriding-header "Today's Schedule:")
-                          (org-agenda-span 'day)
-                          (org-agenda-ndays 1)
-                          (org-agenda-start-on-weekday nil)
-                          (org-agenda-start-day "+0d")
-                          (org-agenda-todo-ignore-deadlines nil)))
+               (tags-todo "REFILE"
+                          ((org-agenda-overriding-header "Tasks to Refile")
+                           (org-tags-match-list-sublevels nil)))
 
-              (tags-todo "REFILE"
-                         ((org-agenda-overriding-header "Tasks to Refile")
-                          (org-tags-match-list-sublevels nil)))
+               (tags-todo "-CANCELLED/!"
+                          ((org-agenda-overriding-header "Stuck Projects")
+                           (org-agenda-skip-function 'bh/skip-non-stuck-projects)
+                           (org-agenda-files (list jallen-org-gtd-file))
+                           (org-agenda-sorting-strategy
+                            '(category-keep))))
 
-              (tags-todo "-CANCELLED/!"
-                         ((org-agenda-overriding-header "Stuck Projects")
-                          (org-agenda-skip-function 'bh/skip-non-stuck-projects)
-                          (org-agenda-files (list jallen-org-gtd-file))
-                          (org-agenda-sorting-strategy
-                           '(category-keep))))
+               (tags-todo "-CANCELLED/!NEXT"
+                          ((org-agenda-overriding-header (concat "Next Actions"
+                                                                 (if bh/hide-scheduled-and-waiting-next-tasks
+                                                                     ""
+                                                                   " (including WAITING and SCHEDULED tasks)")))
+                           (org-agenda-skip-function 'bh/skip-projects-and-habits)
+                           (org-agenda-files (list jallen-org-gtd-file))
+                           (org-tags-match-list-sublevels t)
+                           (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+                           (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
+                           (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
+                           (org-agenda-sorting-strategy
+                            '(todo-state-down effort-up category-keep))))
 
-              (tags-todo "-CANCELLED/!NEXT"
-                         ((org-agenda-overriding-header (concat "Next Actions"
-                                                                (if bh/hide-scheduled-and-waiting-next-tasks
-                                                                    ""
-                                                                  " (including WAITING and SCHEDULED tasks)")))
-                          (org-agenda-skip-function 'bh/skip-projects-and-habits)
-                          (org-agenda-files (list jallen-org-gtd-file))
-                          (org-tags-match-list-sublevels t)
-                          (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
-                          (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
-                          (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
-                          (org-agenda-sorting-strategy
-                           '(todo-state-down effort-up category-keep))))
-
-              (tags-todo "-HOLD-CANCELLED/!"
-                         ((org-agenda-overriding-header "Projects")
-                          (org-agenda-files (list jallen-org-gtd-file))
-                          (org-agenda-skip-function 'bh/skip-non-projects)
-                          (org-tags-match-list-sublevels 'indented)
-                          (org-agenda-sorting-strategy
-                           '(category-keep))))
+               (tags-todo "-HOLD-CANCELLED/!"
+                          ((org-agenda-overriding-header "Projects")
+                           (org-agenda-files (list jallen-org-gtd-file))
+                           (org-agenda-skip-function 'bh/skip-non-projects)
+                           (org-tags-match-list-sublevels 'indented)
+                           (org-agenda-sorting-strategy
+                            '(category-keep))))
 
 
-              (tags-todo "-CANCELLED+WAITING|HOLD/!"
-                         ((org-agenda-overriding-header (concat "Waiting and Postponed Tasks"
-                                                                (if bh/hide-scheduled-and-waiting-next-tasks
-                                                                    ""
-                                                                  " (including WAITING and SCHEDULED tasks)")))
-                          (org-agenda-skip-function 'bh/skip-non-tasks)
-                          (org-tags-match-list-sublevels nil)
-                          (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
-                          (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks))))
-
-             ))
+               (tags-todo "-CANCELLED+WAITING|HOLD/!"
+                          ((org-agenda-overriding-header (concat "Waiting and Postponed Tasks"
+                                                                 (if bh/hide-scheduled-and-waiting-next-tasks
+                                                                     ""
+                                                                   " (including WAITING and SCHEDULED tasks)")))
+                           (org-agenda-skip-function 'bh/skip-non-tasks)
+                           (org-tags-match-list-sublevels nil)
+                           (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+                           (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)))))))
    #+END_SRC
 
 *** Agenda faces
@@ -854,6 +866,12 @@ I remove the bulk of the defaults because I really don't use many of these featu
   powered by <p class=\"creator\">%c</p><p class=\"validation\">%v</p>"))))
 #+end_src
 
+** org-protocol
+   For some reason I need to explicitly require this. I thought it
+   would be pulled in as an org-module.
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (require 'org-protocol)
+#+END_SRC
 * Snippets
   Snippets are are awesome. They are found in ~/emacs.d/snippets
 #+begin_src emacs-lisp :tangle yes
