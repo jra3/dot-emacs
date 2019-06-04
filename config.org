@@ -1873,7 +1873,6 @@ emacs -diff file1 file2
   #+end_src
 ** Hack
 
-
 #+BEGIN_SRC emacs-lisp tangle: yes
     (use-package hack-mode
       :init
@@ -1883,13 +1882,7 @@ emacs -diff file1 file2
                   (flycheck-mode t)
                   (subword-mode t)
                   ;(company-mode t)
-  ))
-      :mode "\\.phpt?\\'"
-      :mode "\\.hhi\\'")
-
-    ;; Set PHP mode based on the #! line
-    (add-to-list 'interpreter-mode-alist '("php" . hack-mode))
-
+                  )))
 #+END_SRC
 
 ** JS + Web
