@@ -1,0 +1,4 @@
+# -*- mode: snippet -*-
+# name: fb (fb link)
+# --
+[[fb:$0]]
