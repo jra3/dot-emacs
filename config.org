@@ -324,7 +324,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
         org-refile-target-verify-function 'jallen/filter-refile-targets
 
         org-refile-targets '((jallen-org-gtd-file :maxlevel . 4)
-                             (jallen-org-someday-file :level . 2)
+                             (jallen-org-someday-file :maxlevel . 2)
                              (jallen-org-tickler-file :maxlevel . 2)))
 #+END_SRC
 ** Agendas configurations
