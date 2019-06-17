@@ -42,6 +42,12 @@
  '(org-agenda-files
    (quote
     ("~/org/habits.org" "~/org/keebs.org" "~/org/inbox.org" "~/org/gtd.org" "~/org/tickler.org")))
+ '(org-agenda-sorting-strategy
+   (quote
+    ((agenda habit-down effort-up time-up priority-down category-keep)
+     (todo priority-down category-keep)
+     (tags priority-down category-keep)
+     (search category-keep))))
  '(org-clock-task-overrun-text "Don't be such a punk")
  '(package-selected-packages
    (quote
