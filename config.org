@@ -304,6 +304,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
           jallen-org-journal-file (concat org-directory "journal.org")
           jallen-org-5-min-journal-file (concat org-directory "5-min-journal.org")
           jallen-org-cbt-journal-file (concat org-directory "cbt-journal.org")
+          jallen-org-diet-journal-file (concat org-directory "diet-journal.org")
 
           jallen-default-org-agenda-files (list jallen-org-inbox-file jallen-org-gtd-file jallen-org-tickler-file)
           org-default-notes-file jallen-org-notes-file
@@ -733,7 +734,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
   #+begin_src emacs-lisp :tangle yes
     (setq org-agenda-use-time-grid nil
           org-agenda-dim-blocked-tasks nil ;; Do not dim blocked tasks
-          org-agenda-compact-blocks t      ;; Compact the block agenda view
+          org-agenda-compact-blocks nil      ;; Compact the block agenda view
           org-agenda-restore-windows-after-quit t
           org-agenda-start-on-weekday nil
           org-agenda-span 1
@@ -791,10 +792,10 @@ I remove the bulk of the defaults because I really don't use many of these featu
    '(
      ("t" "Todo [inbox]" entry ; New inbox item to be processed
       (file+headline jallen-org-inbox-file "Tasks")
-      "* TODO %?\n  %i\n")
+      "* TODO %?\n %i\n")
      ("T" "Tickler" entry
       (file+headline jallen-org-tickler-file "Tickler")
-      "* %i%? \n %U")
+      "* TODO %i%? \n SCHEDULED: <%(org-read-date nil nil \"+1d\")>")
 
      ("j" "Journal Entries")
      ("jm" "Precious Memory" entry ; Freeform journal entry
@@ -813,8 +814,15 @@ I remove the bulk of the defaults because I really don't use many of these featu
      ("5e" "Evening Entry" entry (file+datetree jallen-org-5-min-journal-file)
       "* Evening\n  3 amazing things that happened today...\n  - %?\n  - \n  - \n\n  How could I have made today even better?\n  - \n")
 
-     ("f" "CBT" entry (file jallen-org-cbt-journal-file)
-      "* %U\n** Activating Event\n** thoughts/Beliefs\n** emotional Consequences\n")
+     ("f" "Food")
+     ("fb" "Breakfast" entry (file+datetree jallen-org-diet-journal-file)
+      "* Breakfast\n %U %?")
+     ("fl" "Lunch" entry (file+datetree jallen-org-diet-journal-file)
+      "* Lunch\n %U %?")
+     ("fd" "Dinner" entry (file+datetree jallen-org-diet-journal-file)
+      "* Dinner\n %U %?")
+     ("fs" "Snack" entry (file+datetree jallen-org-diet-journal-file)
+      "* Snack\n %U %?")
 
      ("n" "notes" entry ; Generic notebook entry
       (file+datetree jallen-org-notes-file)
