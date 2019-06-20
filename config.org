@@ -861,27 +861,27 @@ I remove the bulk of the defaults because I really don't use many of these featu
 ** Auto habit tracking for 5-min-journal
    The ids in here are hardcoded the the random ids in my habits.org
   #+begin_src emacs-lisp :tangle yes
-    (defun 5-min-journal-complete-on-capture ()
-      "To be run in org-capture-before-finalize-hook"
-      (pcase (plist-get org-capture-current-plist :description)
-        ("Morning Entry"
-         (progn
-           (org-id-goto "FEE1A918-0FFE-446F-A954-5B7A6DE29D3F")
-           (revert-buffer nil t)
-           (org-todo "DONE")
-           (save-buffer)
-           (bury-buffer)))
-        ("Evening Entry"
-         (progn
-           (org-id-goto "81125689-466F-4C87-9898-FB344CDD175F")
-           (revert-buffer nil t)
-           (org-todo "DONE")
-           (save-buffer)
-           (bury-buffer)))
-        (_ (message "Capture complete!"))))
-    (add-hook
-     'org-capture-before-finalize-hook
-     '5-min-journal-complete-on-capture)
+            (defun jallen/habit-id-checkoff (id)
+              "Mark the habit with id as DONE"
+              (org-id-goto id)
+              (revert-buffer nil t)
+              (org-todo "DONE")
+              (save-buffer)
+              (bury-buffer))
+
+            (defun jallen/complete-on-capture ()
+              "To be run in org-capture-before-finalize-hook"
+              (pcase (plist-get org-capture-current-plist :description)
+                ("Morning Entry" (jallen/habit-id-checkoff "FEE1A918-0FFE-446F-A954-5B7A6DE29D3F"))
+                ("Breakfast" (jallen/habit-id-checkoff "04E10333-848C-4328-B029-96AFDEEB9728"))
+                ("Lunch" (jallen/habit-id-checkoff "88A42399-6041-4F0B-8255-17301AC69F74"))
+                ("Dinner" (jallen/habit-id-checkoff "D4CFC543-13A6-40C3-A82F-880191F60CF5"))
+                ("Evening Entry" (jallen/habit-id-checkoff "81125689-466F-4C87-9898-FB344CDD175F"))
+                (_ (message "Capture complete!"))))
+
+            (add-hook
+             'org-capture-before-finalize-hook
+             'jallen/complete-on-capture)
   #+end_src
 ** Revert/Save around captures
 #+BEGIN_SRC emacs-lisp :tangle yes
