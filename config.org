@@ -162,6 +162,7 @@ We ensure that we load org-habit and org-protocol
             ("@anywhere" . ?a)
             (:grouptags) ; mutually exclusive
             ("@work" . ?w)
+            ("@fablab" . ?f)
             ("@sag" . ?s)
             ("@weekend" . ?W)
             ("@computer" . ?c)
@@ -184,6 +185,7 @@ We ensure that we load org-habit and org-protocol
             ("dave" . ?D)
             ("madhura" . ?M)
             ("lenni" . ?L)
+            ("z" . ?Z)
             (:endgrouptag)
 
             (:startgrouptag)
