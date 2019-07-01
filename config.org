@@ -839,6 +839,11 @@ I remove the bulk of the defaults because I really don't use many of these featu
   (add-hook 'org-clock-cancel-hook
             #'jallen-hide-org-clock-from-header-line)
 #+end_src
+*** org-clocking-luxafor
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+
+#+END_SRC
 
 ** =org-capture= templates
 #+begin_src emacs-lisp :tangle yes

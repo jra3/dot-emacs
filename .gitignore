@@ -26,3 +26,6 @@ config.el
 .last-package-update-day
 .lsp-session-*
 .cask
+
+# Lux packagbe
+lux/node_modules
