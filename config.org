@@ -170,6 +170,7 @@ We ensure that we load org-habit and org-protocol
             ("@home" .?h)
             (:endgroup)
 
+
             ;; home subgroup
             (:startgroup)
             ("@home" . ?h)
@@ -186,6 +187,17 @@ We ensure that we load org-habit and org-protocol
             ("madhura" . ?M)
             ("lenni" . ?L)
             ("z" . ?Z)
+            ("Roadmap" . ?R)
+            (:endgrouptag)
+
+            (:startgrouptag)
+            ("Roadmap" . ?R)
+            (:grouptags) ; not mutually exclusive
+            ;; TODO make this a regex...
+            ("H12019" . ?1)
+            ("H22019" . ?2)
+            ("H12020" . ?3)
+            ("H22020" . ?4)
             (:endgrouptag)
 
             (:startgrouptag)
