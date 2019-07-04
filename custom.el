@@ -49,9 +49,15 @@
      (tags priority-down category-keep)
      (search category-keep))))
  '(org-clock-task-overrun-text "Don't be such a punk")
+ '(org-pomodoro-finished-sound-p nil)
+ '(org-pomodoro-format "P~%s")
+ '(org-pomodoro-length 2)
+ '(org-pomodoro-long-break-sound-p nil)
+ '(org-pomodoro-overtime-sound-p nil)
+ '(org-pomodoro-play-sounds nil)
  '(package-selected-packages
    (quote
-    (wttrin bbdb thrift yasnippet yaml-mode win-switch which-key web-mode use-package tangotango-theme rainbow-mode rainbow-delimiters popwin package-lint multiple-cursors lsp-ui lsp-hack js-comint ibuffer-vc ibuffer-git hgrc-mode hgignore-mode helm-xref helm-flx helm-descbinds hack-mode google-c-style gitignore-mode gitconfig-mode git-gutter flycheck expand-region exec-path-from-shell elisp-slime-nav cquery company-lsp auto-package-update anzu ag)))
+    (org-pomodoro wttrin arduino-mode bbdb thrift yasnippet yaml-mode win-switch which-key web-mode use-package tangotango-theme rainbow-mode rainbow-delimiters popwin package-lint multiple-cursors lsp-ui lsp-hack js-comint ibuffer-vc ibuffer-git hgrc-mode hgignore-mode helm-xref helm-flx helm-descbinds hack-mode google-c-style gitignore-mode gitconfig-mode git-gutter flycheck expand-region exec-path-from-shell elisp-slime-nav cquery company-lsp auto-package-update anzu ag)))
  '(shr-width 80))
 
 (custom-set-faces

@@ -299,6 +299,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
                                   ("@" . org-mark-subtree)
                                   ("#" . org-toggle-comment)
                                   ("Clock Commands")
+                                  ("P" . org-pomodoro)
                                   ("I" . org-clock-in)
                                   ("O" . org-clock-out)
                                   ("Meta Data Editing")
@@ -798,6 +799,11 @@ I remove the bulk of the defaults because I really don't use many of these featu
 #+END_SRC
 
 ** Clocks
+*** Org Pomodoro
+#+BEGIN_SRC emacs-lisp :tangle yes
+(use-package org-pomodoro)
+#+END_SRC
+
 *** Logging time of task completion
 #+begin_src emacs-lisp :tangle yes
   (setq org-log-done 'time ; log the time a task is marked done
@@ -805,30 +811,35 @@ I remove the bulk of the defaults because I really don't use many of these featu
         org-log-into-drawer t) ; timestamps go in a drawer, not the body
 #+end_src
 *** Editing timestamps
+
 #+begin_src emacs-lisp :tangle yes
   (setq org-edit-timestamp-down-means-later t)
 #+end_src
+
 *** Save the running clock and all clock history when exiting Emacs, load it on startp
 #+begin_src emacs-lisp :tangle yes
   (org-clock-persistence-insinuate)
   (setq org-clock-persist 'history
         org-clock-in-resume t)
 #+end_src
+
+
 *** Show clocked in task in header-line
 #+begin_src emacs-lisp :tangle yes
-(defun jallen-show-org-clock-in-header-line ()
-  (setq-default header-line-format '((" " org-mode-line-string " "))))
+  ;; (defun jallen-show-org-clock-in-header-line ()
+  ;;   (setq-default frame-title-format '((" " org-mode-line-timer " "))))
 
-(defun jallen-hide-org-clock-from-header-line ()
-  (setq-default header-line-format nil))
+  ;; (defun jallen-hide-org-clock-from-header-line ()
+  ;;   (setq-default header-line-format nil))
 
-(add-hook 'org-clock-in-hook
-          #'jallen-show-org-clock-in-header-line)
-(add-hook 'org-clock-out-hook
-          #'jallen-hide-org-clock-from-header-line)
-(add-hook 'org-clock-cancel-hook
-          #'jallen-hide-org-clock-from-header-line)
+  (add-hook 'org-clock-in-hook
+            #'jallen-show-org-clock-in-header-line)
+  (add-hook 'org-clock-out-hook
+            #'jallen-hide-org-clock-from-header-line)
+  (add-hook 'org-clock-cancel-hook
+            #'jallen-hide-org-clock-from-header-line)
 #+end_src
+
 ** =org-capture= templates
 #+begin_src emacs-lisp :tangle yes
   (setq
