@@ -832,16 +832,52 @@ I remove the bulk of the defaults because I really don't use many of these featu
   ;; (defun jallen-hide-org-clock-from-header-line ()
   ;;   (setq-default header-line-format nil))
 
-  (add-hook 'org-clock-in-hook
-            #'jallen-show-org-clock-in-header-line)
-  (add-hook 'org-clock-out-hook
-            #'jallen-hide-org-clock-from-header-line)
-  (add-hook 'org-clock-cancel-hook
-            #'jallen-hide-org-clock-from-header-line)
+  ;; (add-hook 'org-clock-in-hook
+  ;;           #'jallen-show-org-clock-in-header-line)
+  ;; (add-hook 'org-clock-out-hook
+  ;;           #'jallen-hide-org-clock-from-header-line)
+  ;; (add-hook 'org-clock-cancel-hook
+  ;;           #'jallen-hide-org-clock-from-header-line)
 #+end_src
 *** org-clocking-luxafor
 
 #+BEGIN_SRC emacs-lisp :tangle yes
+  ;; Some of the usual Luxafor patterns.
+  (defconst org-clocking-luxafor-patterns
+    '(
+      off    ""
+      red    "f00"
+      green  "0f0")
+    "Simple strings to pass to script")
+
+  (defvar org-clocking-luxafor-clock-in-pattern 'red
+    "Luxafor pattern to use for 'org-mode' clock-in.")
+
+  (defvar org-clocking-luxafor-clock-out-pattern 'green
+    "Luxafor pattern to use for 'org-mode' clock-out.")
+
+  (defun org-clocking-luxafor-change-pattern (pattern)
+    "Given the PATTERN name, write the associated raw byte string
+    to the Luxafor device."
+    (let ((pattern-string (plist-get org-clocking-luxafor-patterns pattern)))
+      (when pattern-string
+        (shell-command-to-string
+         (format "node ~/.emacs.d/lux/luxafor-set.js %s" pattern-string)))))
+
+  (defun org-clocking-luxafor-clock-in ()
+    "Function to be called from 'org-mode' clock-in hook to change Luxafor LEDs."
+    (org-clocking-luxafor-change-pattern org-clocking-luxafor-clock-in-pattern)
+    ;; Return true, so the hook doesnt think we finished in error
+    t)
+
+  (defun org-clocking-luxafor-clock-out ()
+    "Function to be called from 'org-mode' clock-out hook to change Luxafor LEDs."
+    (org-clocking-luxafor-change-pattern org-clocking-luxafor-clock-out-pattern)
+    ;; Return true, so the hook doesnt think we finished in error
+    t)
+
+  (add-hook 'org-clock-in-hook #'org-clocking-luxafor-clock-in)
+  (add-hook 'org-clock-out-hook #'org-clocking-luxafor-clock-out)
 
 #+END_SRC
 
