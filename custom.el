@@ -50,11 +50,7 @@
      (search category-keep))))
  '(org-archive-location "   \"~/org/archive.org::* From %s\"")
  '(org-clock-task-overrun-text "Don't be such a punk")
- '(org-pomodoro-finished-sound-p nil)
  '(org-pomodoro-format "P~%s")
- '(org-pomodoro-length 2)
- '(org-pomodoro-long-break-sound-p nil)
- '(org-pomodoro-overtime-sound-p nil)
  '(org-pomodoro-play-sounds nil)
  '(package-selected-packages
    (quote
