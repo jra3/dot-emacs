@@ -368,6 +368,11 @@ I remove the bulk of the defaults because I really don't use many of these featu
    :PROPERTIES:
    :ORDERED:  t
    :END:
+*** Keymap changes
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (define-key org-agenda-mode-map "P" 'org-pomodoro)
+  (define-key org-agenda-mode-map "N" nil)
+#+END_SRC
 *** Random sorting
 #+BEGIN_SRC emacs-lisp :tangle yes
   (defun org-random-cmp (a b)
