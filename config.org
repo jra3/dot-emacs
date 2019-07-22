@@ -332,19 +332,15 @@ I remove the bulk of the defaults because I really don't use many of these featu
 ** Special files
 
   #+begin_src emacs-lisp :tangle yes
-    (setq jallen-org-habit-file (concat org-directory "habits.org")
-          jallen-org-notes-file (concat org-directory "notes.org")
-          jallen-org-inbox-file (concat org-directory "inbox.org")
+    (setq jallen-org-notes-file (concat org-directory "notes.org")
           jallen-org-gtd-file (concat org-directory "gtd.org")
-          jallen-org-someday-file (concat org-directory "someday.org")
-          jallen-org-tickler-file (concat org-directory "tickler.org")
 
           jallen-org-journal-file (concat org-directory "journal.org")
           jallen-org-5-min-journal-file (concat org-directory "5-min-journal.org")
           jallen-org-cbt-journal-file (concat org-directory "cbt-journal.org")
           jallen-org-diet-journal-file (concat org-directory "diet-journal.org")
 
-          jallen-default-org-agenda-files (list jallen-org-inbox-file jallen-org-gtd-file jallen-org-tickler-file)
+          jallen-default-org-agenda-files (list jallen-org-gtd-file)
           org-default-notes-file jallen-org-notes-file
           org-agenda-files jallen-default-org-agenda-files)
 
@@ -362,9 +358,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
         org-refile-use-outline-path t
         org-refile-target-verify-function 'jallen/filter-refile-targets
 
-        org-refile-targets '((jallen-org-gtd-file :maxlevel . 4)
-                             (jallen-org-someday-file :maxlevel . 2)
-                             (jallen-org-tickler-file :maxlevel . 2)))
+        org-refile-targets '((jallen-org-gtd-file :maxlevel . 4)))
 #+END_SRC
 
 ** Agendas configurations
@@ -704,13 +698,13 @@ I remove the bulk of the defaults because I really don't use many of these featu
                           ((org-agenda-overriding-header "Tasks to Refile")
                            (org-tags-match-list-sublevels nil)))
 
-               (tags-todo "-CANCELLED/!"
+               (tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
                           ((org-agenda-overriding-header "Stuck Projects")
                            (org-agenda-skip-function 'bh/skip-non-stuck-projects)
                            (org-agenda-files (list jallen-org-gtd-file))
                            ))
 
-               (tags-todo "-CANCELLED/!NEXT"
+               (tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!NEXT"
                           ((org-agenda-overriding-header (concat "Next Actions"
                                                                  (if bh/hide-scheduled-and-waiting-next-tasks
                                                                      ""
@@ -728,14 +722,14 @@ I remove the bulk of the defaults because I really don't use many of these featu
                            (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
                            ))
 
-               (tags-todo "-HOLD-CANCELLED/!"
+               (tags-todo "-HOLD-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
                           ((org-agenda-overriding-header "Projects")
                            (org-agenda-files (list jallen-org-gtd-file))
                            (org-agenda-skip-function 'bh/skip-non-projects)
                            (org-tags-match-list-sublevels 'indented)
                            ))
 
-               (tags-todo "-CANCELLED+WAITING|HOLD/!"
+               (tags-todo "-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"-CANCELLED+WAITING|HOLD/!"
                           ((org-agenda-overriding-header (concat "Waiting and Postponed Tasks"
                                                                  (if bh/hide-scheduled-and-waiting-next-tasks
                                                                      ""
@@ -890,10 +884,10 @@ I remove the bulk of the defaults because I really don't use many of these featu
    org-capture-templates
    '(
      ("t" "Todo [inbox]" entry ; New inbox item to be processed
-      (file+headline jallen-org-inbox-file "Tasks")
-      "* TODO %?\n %i\n")
+      (file+headline jallen-org-gtd-file "Inbox")
+      "* TODO %?\n %i\n\n")
      ("T" "Tickler" entry
-      (file+headline jallen-org-tickler-file "Tickler")
+      (file+headline jallen-org-gtd-file "Tickler")
       "* TODO %i%? \n SCHEDULED: <%(org-read-date nil nil \"+1d\")>")
 
      ("j" "Journal Entries")
@@ -932,10 +926,10 @@ I remove the bulk of the defaults because I really don't use many of these featu
 #+begin_src emacs-lisp :tangle yes
   (require 'org-habit)
   (setq org-habit-preceding-days 7
-          org-habit-following-days 1
-          org-habit-show-habits-only-for-today t
-          org-habit-graph-column 52
-          org-habit-show-all-today nil)
+        org-habit-following-days 1
+        org-habit-show-habits-only-for-today t
+        org-habit-graph-column 52
+        org-habit-show-all-today nil)
 #+end_src
 ** Auto habit tracking for 5-min-journal et al.
    The ids in here are hardcoded the the random ids in my habits.org

@@ -39,16 +39,13 @@
  '(newsticker-date-format "(%A %D %H:%M)" t)
  '(newsticker-html-renderer (quote shr-render-region) t)
  '(newsticker-use-full-width nil t)
- '(org-agenda-files
-   (quote
-    ("~/org/habits.org" "~/org/keebs.org" "~/org/inbox.org" "~/org/gtd.org" "~/org/tickler.org")))
  '(org-agenda-sorting-strategy
    (quote
     ((agenda habit-down effort-up time-up priority-down category-keep)
      (todo priority-down category-keep)
      (tags priority-down category-keep)
      (search category-keep))))
- '(org-archive-location "   \"~/org/archive.org::* From %s\"")
+ '(org-archive-location "~/org/archive/archive.org::* From %s")
  '(org-clock-task-overrun-text "Don't be such a punk")
  '(org-pomodoro-format "P~%s")
  '(org-pomodoro-play-sounds nil)
