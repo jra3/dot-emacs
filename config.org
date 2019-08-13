@@ -701,7 +701,6 @@ I remove the bulk of the defaults because I really don't use many of these featu
                (tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
                           ((org-agenda-overriding-header "Stuck Projects")
                            (org-agenda-skip-function 'bh/skip-non-stuck-projects)
-                           (org-agenda-files (list jallen-org-gtd-file))
                            ))
 
                (tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!NEXT"
@@ -710,7 +709,6 @@ I remove the bulk of the defaults because I really don't use many of these featu
                                                                      ""
                                                                    " (including WAITING and SCHEDULED tasks)")))
                            (org-agenda-skip-function 'bh/skip-projects-and-habits)
-                           (org-agenda-files (list jallen-org-gtd-file))
                            (org-tags-match-list-sublevels t)
 
                            ;; random sorting so I don't stare at the meaningless order
@@ -722,9 +720,8 @@ I remove the bulk of the defaults because I really don't use many of these featu
                            (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
                            ))
 
-               (tags-todo "-HOLD-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
+               (tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
                           ((org-agenda-overriding-header "Projects")
-                           (org-agenda-files (list jallen-org-gtd-file))
                            (org-agenda-skip-function 'bh/skip-non-projects)
                            (org-tags-match-list-sublevels 'indented)
                            ))
@@ -934,28 +931,25 @@ I remove the bulk of the defaults because I really don't use many of these featu
 ** Auto habit tracking for 5-min-journal et al.
    The ids in here are hardcoded the the random ids in my habits.org
   #+begin_src emacs-lisp :tangle yes
-            (defun jallen/habit-id-checkoff (id)
-              "Mark the habit with id as DONE"
-              (org-id-goto id)
-              (revert-buffer nil t)
-              (org-todo "DONE")
-              (save-buffer)
-              (bury-buffer))
+    (defun jallen/habit-id-checkoff (id)
+      "Mark the habit with id as DONE"
+      (org-id-goto id)
+      (org-todo "DONE"))
 
-            (defun jallen/complete-on-capture ()
-              "To be run in org-capture-before-finalize-hook"
-              (pcase (plist-get org-capture-current-plist :description)
-                ("Morning Entry" (jallen/habit-id-checkoff "FEE1A918-0FFE-446F-A954-5B7A6DE29D3F"))
-                ("Breakfast" (jallen/habit-id-checkoff "04E10333-848C-4328-B029-96AFDEEB9728"))
-                ("Lunch" (jallen/habit-id-checkoff "88A42399-6041-4F0B-8255-17301AC69F74"))
-                ("Dinner" (jallen/habit-id-checkoff "D4CFC543-13A6-40C3-A82F-880191F60CF5"))
-                ("Evening Entry" (jallen/habit-id-checkoff "81125689-466F-4C87-9898-FB344CDD175F"))
-                ("Weekly Report" (jallen/habit-id-checkoff "2BFA322E-1B16-4C62-868F-92BEE62D091E"))
-                (_ (message "Capture complete!"))))
+    (defun jallen/complete-on-capture ()
+      "To be run in org-capture-before-finalize-hook"
+      (pcase (plist-get org-capture-current-plist :description)
+        ("Morning Entry" (jallen/habit-id-checkoff "FEE1A918-0FFE-446F-A954-5B7A6DE29D3F"))
+        ("Breakfast" (jallen/habit-id-checkoff "04E10333-848C-4328-B029-96AFDEEB9728"))
+        ("Lunch" (jallen/habit-id-checkoff "88A42399-6041-4F0B-8255-17301AC69F74"))
+        ("Dinner" (jallen/habit-id-checkoff "D4CFC543-13A6-40C3-A82F-880191F60CF5"))
+        ("Evening Entry" (jallen/habit-id-checkoff "81125689-466F-4C87-9898-FB344CDD175F"))
+        ("Weekly Report" (jallen/habit-id-checkoff "2BFA322E-1B16-4C62-868F-92BEE62D091E"))
+        (_ (message "Capture complete!"))))
 
-            (add-hook
-             'org-capture-before-finalize-hook
-             'jallen/complete-on-capture)
+    (add-hook
+     'org-capture-before-finalize-hook
+     'jallen/complete-on-capture)
   #+end_src
 ** Revert/Save around captures
 #+BEGIN_SRC emacs-lisp :tangle yes
