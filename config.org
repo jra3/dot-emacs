@@ -643,6 +643,18 @@ I remove the bulk of the defaults because I really don't use many of these featu
             (t
              nil)))))
 
+     (defun jra3/skip-habits-on-hold ()
+       "Skip habit tasks that are hold TODO status"
+       (save-restriction
+         (widen)
+         (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+           (cond
+            ((and (org-is-habit-p)
+                  (member (org-get-todo-state) (list "HOLD")))
+             subtree-end)
+            (t
+             nil)))))
+
      (defun bh/skip-non-subprojects ()
        "Skip trees that are not projects"
        (let ((next-headline (save-excursion (outline-next-heading))))
@@ -688,6 +700,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
      (setq org-agenda-custom-commands
            '((" " "Agenda"
               ((agenda "" ((org-agenda-overriding-header "Today's Schedule:")
+                           (org-agenda-skip-function 'jra3/skip-habits-on-hold)
                            (org-agenda-span 'day)
                            (org-agenda-ndays 30)
                            (org-agenda-start-on-weekday nil)
@@ -933,8 +946,9 @@ I remove the bulk of the defaults because I really don't use many of these featu
   #+begin_src emacs-lisp :tangle yes
     (defun jallen/habit-id-checkoff (id)
       "Mark the habit with id as DONE"
-      (org-id-goto id)
-      (org-todo "DONE"))
+      (save-excursion
+        (org-id-goto id)
+        (org-todo "DONE")))
 
     (defun jallen/complete-on-capture ()
       "To be run in org-capture-before-finalize-hook"
