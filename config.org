@@ -334,13 +334,15 @@ I remove the bulk of the defaults because I really don't use many of these featu
   #+begin_src emacs-lisp :tangle yes
     (setq jallen-org-notes-file (concat org-directory "notes.org")
           jallen-org-gtd-file (concat org-directory "gtd.org")
+          jallen-org-habits-file (concat org-directory "habits.org")
 
           jallen-org-journal-file (concat org-directory "journal.org")
           jallen-org-5-min-journal-file (concat org-directory "5-min-journal.org")
           jallen-org-cbt-journal-file (concat org-directory "cbt-journal.org")
           jallen-org-diet-journal-file (concat org-directory "diet-journal.org")
 
-          jallen-default-org-agenda-files (list jallen-org-gtd-file)
+          ;; TODO we have a separate habits file to allos beorg to ignore habits. this is a bit unfortunate
+          jallen-default-org-agenda-files (list jallen-org-gtd-file jallen-org-habits-file)
           org-default-notes-file jallen-org-notes-file
           org-agenda-files jallen-default-org-agenda-files)
 
