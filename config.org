@@ -338,6 +338,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
 
           jallen-org-journal-file (concat org-directory "journal.org")
           jallen-org-5-min-journal-file (concat org-directory "5-min-journal.org")
+          jallen-org-weekly-report-file (concat org-directory "weekly.org")
           jallen-org-cbt-journal-file (concat org-directory "cbt-journal.org")
           jallen-org-diet-journal-file (concat org-directory "diet-journal.org")
 
@@ -833,21 +834,6 @@ I remove the bulk of the defaults because I really don't use many of these featu
 #+end_src
 
 
-*** Show clocked in task in header-line
-#+begin_src emacs-lisp :tangle yes
-  ;; (defun jallen-show-org-clock-in-header-line ()
-  ;;   (setq-default frame-title-format '((" " org-mode-line-timer " "))))
-
-  ;; (defun jallen-hide-org-clock-from-header-line ()
-  ;;   (setq-default header-line-format nil))
-
-  ;; (add-hook 'org-clock-in-hook
-  ;;           #'jallen-show-org-clock-in-header-line)
-  ;; (add-hook 'org-clock-out-hook
-  ;;           #'jallen-hide-org-clock-from-header-line)
-  ;; (add-hook 'org-clock-cancel-hook
-  ;;           #'jallen-hide-org-clock-from-header-line)
-#+end_src
 *** org-clocking-luxafor
 
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -856,6 +842,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
     '(
       off    ""
       red    "f00"
+      yellow "ff0"
       green  "0f0")
     "Simple strings to pass to script")
 
@@ -863,6 +850,9 @@ I remove the bulk of the defaults because I really don't use many of these featu
     "Luxafor pattern to use for 'org-mode' clock-in.")
 
   (defvar org-clocking-luxafor-clock-out-pattern 'green
+    "Luxafor pattern to use for 'org-mode' clock-out.")
+
+  (defvar org-clocking-luxafor-break-over-pattern 'yellow
     "Luxafor pattern to use for 'org-mode' clock-out.")
 
   (defun org-clocking-luxafor-change-pattern (pattern)
@@ -928,6 +918,9 @@ I remove the bulk of the defaults because I really don't use many of these featu
       "* Dinner\n %U %?")
      ("fs" "Snack" entry (file+datetree jallen-org-diet-journal-file)
       "* Snack\n %U %?")
+
+     ("w" "Weekly Report" item (file+olp+datetree jallen-org-weekly-report-file)
+      "- %?%i\n" :tree-type week)
 
      ("n" "notes" entry ; Generic notebook entry
       (file+datetree jallen-org-notes-file)
