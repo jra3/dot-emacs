@@ -185,11 +185,11 @@ We ensure that we load org-habit and org-protocol
             (:startgrouptag)
             ("@work" . ?w)
             (:grouptags) ; not mutually exclusive
-            ("jonathan" . ?J)
+            ("francis" . ?F)
             ("dave" . ?D)
             ("madhura" . ?M)
             ("lenni" . ?L)
-            ("z" . ?Z)
+            ("goth" . ?G)
             ("Roadmap" . ?R)
             (:endgrouptag)
 
@@ -204,7 +204,7 @@ We ensure that we load org-habit and org-protocol
             (:endgrouptag)
 
             (:startgrouptag)
-            ("Family" . nil)
+            ("Family" . ?A)
             (:grouptags) ; not mutually exclusive
             ("genevieve" . ?g)
             ("mimi" . ?m)
@@ -343,7 +343,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
           jallen-org-diet-journal-file (concat org-directory "diet-journal.org")
 
           ;; TODO we have a separate habits file to allos beorg to ignore habits. this is a bit unfortunate
-          jallen-default-org-agenda-files (list jallen-org-gtd-file jallen-org-habits-file)
+          jallen-default-org-agenda-files (list jallen-org-gtd-file)
           org-default-notes-file jallen-org-notes-file
           org-agenda-files jallen-default-org-agenda-files)
 
@@ -703,6 +703,15 @@ I remove the bulk of the defaults because I really don't use many of these featu
      (setq org-agenda-custom-commands
            '((" " "Agenda"
               ((agenda "" ((org-agenda-overriding-header "Today's Schedule:")
+                           (org-agenda-skip-function 'jra3/skip-habits-on-hold)
+                           (org-agenda-span 'day)
+                           (org-agenda-ndays 30)
+                           (org-agenda-start-on-weekday nil)
+                           (org-agenda-start-day "+0d")
+                           (org-agenda-todo-ignore-deadlines nil)))
+
+               (agenda "" ((org-agenda-overriding-header "Habits and Chores:")
+                           (org-agenda-files (list jallen-org-habits-file))
                            (org-agenda-skip-function 'jra3/skip-habits-on-hold)
                            (org-agenda-span 'day)
                            (org-agenda-ndays 30)
@@ -2056,7 +2065,7 @@ emacs -diff file1 file2
                   (lsp)
                   (flycheck-mode t)
                   (subword-mode t)
-                  ;(company-mode t)
+                  (company-mode t)
                   )))
 #+END_SRC
 
