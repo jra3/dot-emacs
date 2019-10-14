@@ -726,6 +726,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
                (tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
                           ((org-agenda-overriding-header "Stuck Projects")
                            (org-agenda-skip-function 'bh/skip-non-stuck-projects)
+                           (org-agenda-sorting-strategy '(todo-state-up))
                            ))
 
                (tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!NEXT"
