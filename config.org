@@ -1836,53 +1836,58 @@ to set xterm-mode as a terminal option for this
    move xref stuff to a general xref section
 #+BEGIN_SRC emacs-lisp tangle: yes
 
-    (use-package lsp-mode
-      :config
-      (setq
-       lsp-print-io t ;; debug
-       lsp-ui-sideline-show-code-actions nil
-       lsp-ui-sideline-show-hover nil
-       lsp-highlight-symbol-at-point nil
-       ))
+  (use-package lsp-mode
+    :config
+    (setq
+     lsp-ui-sideline-show-code-actions nil
+     lsp-ui-sideline-show-hover nil
+     lsp-highlight-symbol-at-point nil))
 
-    (use-package company-lsp
-      :after (lsp-mode company-mode)
-      :config
-      (push 'company-lsp company-backends)
-      (setq company-lsp-enable-snippet t
-            company-lsp-cache-candidates t))
+  (use-package company-lsp
+    :after (lsp-mode company-mode)
+    :config
+    (push 'company-lsp company-backends)
+    (setq company-lsp-enable-snippet t
+          company-lsp-cache-candidates t))
 
-    (use-package lsp-ui :commands lsp-ui-mode)
+  (use-package lsp-ui :commands lsp-ui-mode)
 
 #+END_SRC
 
 ** cquery
 #+BEGIN_SRC emacs-lisp tangle: yes
-  (use-package cquery
-    :if
-    (file-exists-p "/bin/cquery")
-    :bind
-    (:map c-mode-base-map
-      ("M-." . xref-find-definitions)
-      ("C-t h c" . cquery-call-hierarchy)
-      ("C-t h i" . cquery-inheritance-hierarchy)
-      ("C-t i" . lsp-ui-sideline-toggle-symbols-info)
-      ("C-t I". helm-imenu)
-      ("C-t h m" . cquery-member-hierarchy)
-      ("C-t ." . lsp-ui-peek-find-definitions)
-      ("C-t ?" . lsp-ui-peek-find-references))
-    :preface
-    (defun cquery//enable ()
-      (condition-case nil
-        (lsp-cquery-enable)
-        (user-error nil)))
-    :init
-    (add-hook 'c-mode-common-hook #'cquery//enable)
-    :config
-    (setq cquery-executable "/bin/cquery"
-          cquery-extra-args '("--log-file=/tmp/cq.log")
-          cquery-extra-init-params '(:completion (:detailedLabel t))
-          cquery-sem-highlight-method 'font-lock))
+  ;; (use-package cquery
+  ;;   :if
+  ;;   (file-exists-p "/bin/cquery")
+  ;;   :bind
+  ;;   (:map c-mode-base-map
+  ;;     ("M-." . xref-find-definitions)
+  ;;     ("C-t h c" . cquery-call-hierarchy)
+  ;;     ("C-t h i" . cquery-inheritance-hierarchy)
+  ;;     ("C-t i" . lsp-ui-sideline-toggle-symbols-info)
+  ;;     ("C-t I". helm-imenu)
+  ;;     ("C-t h m" . cquery-member-hierarchy)
+  ;;     ("C-t ." . lsp-ui-peek-find-definitions)
+  ;;     ("C-t ?" . lsp-ui-peek-find-references))
+  ;;   :preface
+  ;;   (defun cquery//enable ()
+  ;;     (condition-case nil
+  ;;       (lsp-cquery-enable)
+  ;;       (user-error nil)))
+  ;;   :init
+  ;;   (add-hook 'c-mode-common-hook #'cquery//enable)
+  ;;   :config
+  ;;   (setq cquery-executable "/bin/cquery"
+  ;;         cquery-extra-args '("--log-file=/tmp/cq.log")
+  ;;         cquery-extra-init-params '(:completion (:detailedLabel t))
+  ;;         cquery-sem-highlight-method 'font-lock))
+#+END_SRC
+* Hideshow
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (require 'hideshow)
+  (define-key hs-minor-mode-map "\C-\M-i" 'hs-toggle-hiding) ;; C-tab
+  (define-key hs-minor-mode-map "\C-\M-y" 'hs-show-all)      ;; C-S-tab
 #+END_SRC
 * Modes
 ** elisp
@@ -1925,55 +1930,62 @@ to set xterm-mode as a terminal option for this
 )
 #+end_src
 ** C++
+
 #+begin_src emacs-lisp :tangle yes
-(use-package google-c-style)
+
+  (use-package google-c-style
+               :config
+               (add-hook 'c-mode-common-hook 'google-set-c-style)
+               (add-hook 'c-mode-common-hook 'google-make-newline-indent))
+
 #+end_src
 
 Tweaks to support enums better
 #+begin_src emacs-lisp :tangle yes
-(defun inside-class-enum-p (pos)
-  "Checks if POS is within the braces of a C++ \"enum class\"."
-  (ignore-errors
-    (save-excursion
-      (goto-char pos)
-      (up-list -1)
-      (backward-sexp 1)
-      (looking-back "enum[ \t]+class[ \t]+[^}]+"))))
 
-(defun align-enum-class (langelem)
-  (if (inside-class-enum-p (c-langelem-pos langelem))
-      0
-    (c-lineup-topmost-intro-cont langelem)))
+  ;; (defun inside-class-enum-p (pos)
+  ;;   "Checks if POS is within the braces of a C++ \"enum class\"."
+  ;;   (ignore-errors
+  ;;     (save-excursion
+  ;;       (goto-char pos)
+  ;;       (up-list -1)
+  ;;       (backward-sexp 1)
+  ;;       (looking-back "enum[ \t]+class[ \t]+[^}]+"))))
 
-(defun align-enum-class-closing-brace (langelem)
-  (if (inside-class-enum-p (c-langelem-pos langelem))
-      '-
-    '+))
+  ;; (defun align-enum-class (langelem)
+  ;;   (if (inside-class-enum-p (c-langelem-pos langelem))
+  ;;       0
+  ;;     (c-lineup-topmost-intro-cont langelem)))
 
-(defun fix-enum-class ()
-  "Setup `c++-mode' to better handle \"class enum\"."
-  (add-to-list 'c-offsets-alist
-               '(topmost-intro-cont . align-enum-class))
-  (add-to-list 'c-offsets-alist
-               '(statement-cont . align-enum-class-closing-brace)))
+  ;; (defun align-enum-class-closing-brace (langelem)
+  ;;   (if (inside-class-enum-p (c-langelem-pos langelem))
+  ;;       '-
+  ;;     '+))
+
+  ;; (defun fix-enum-class ()
+  ;;   "Setup `c++-mode' to better handle \"class enum\"."
+  ;;   (add-to-list 'c-offsets-alist
+  ;;                '(topmost-intro-cont . align-enum-class))
+  ;;   (add-to-list 'c-offsets-alist
+  ;;                '(statement-cont . align-enum-class-closing-brace)))
+
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
+
   (use-package cpp
     :diminish c++-mode
     :mode "\\.h$"
     :bind (:map c++-mode-map
            ("C-c o" . ff-get-other-file))
     :config
-    (add-hook 'c++-mode-hook 'fix-enum-class)
+    ;; (add-hook 'c++-mode-hook 'fix-enum-class)
     (add-hook 'c++-mode-hook
               (lambda ()
                 (subword-mode 1)
                 (setq-local require-final-newline t)
-                (setq-local compilation-auto-jump-to-first-error t)
-                ))
-    (add-hook 'c-mode-common-hook 'google-set-c-style)
-    (add-hook 'c-mode-common-hook 'google-make-newline-indent))
+                (setq-local compilation-auto-jump-to-first-error t))))
+
 #+end_src
 
 ** ediff
@@ -2030,7 +2042,7 @@ emacs -diff file1 file2
 #+END_SRC
 *** Setup =python-mode=
    #+begin_src emacs-lisp :tangle yes
-   (add-hook 'python-mode-hook 'lsp)
+   ;; (add-hook 'python-mode-hook 'lsp)
    (setq python-shell-interpreter "/usr/bin/ipython")
    (setq py-basic-offset 4)
    #+end_src
@@ -2041,8 +2053,7 @@ emacs -diff file1 file2
    #+end_src
 ** Thrift
  #+begin_src emacs-lisp :tangle yes
-   (use-package thrift
-     :mode "\\.thrift\\'")
+   (use-package thrift)
 #+end_src
 ** JSON
   #+begin_src emacs-lisp :tangle yes
@@ -2056,18 +2067,19 @@ emacs -diff file1 file2
               ("\\.markdown\\'" . markdown-mode)
               ("README\\.md\\'" . gfm-mode)))
   #+end_src
+
 ** Hack
 
 #+BEGIN_SRC emacs-lisp tangle: yes
-    (use-package hack-mode
-      :init
-      (add-hook 'hack-mode-hook
-                (lambda ()
-                  (lsp)
-                  (flycheck-mode t)
-                  (subword-mode t)
-                  (company-mode t)
-                  )))
+  ;; (use-package hack-mode
+  ;;   :init
+  ;;   (add-hook 'hack-mode-hook
+  ;;             (lambda ()
+  ;;               (lsp)
+  ;;               (flycheck-mode t)
+  ;;               (subword-mode t)
+  ;;               ;(company-mode t)
+  ;;               )))
 #+END_SRC
 
 ** JS + Web
