@@ -84,7 +84,7 @@
   (setq org-cycle-separator-lines 0)
 
   (setq org-directory "~/org/"
-  org-tags-exclude-from-inheritance '("BUCKET" "PROJECTS"))
+        org-tags-exclude-from-inheritance '("BUCKET" "PROJECTS"))
 
   (defun org-file-path (filename)
     "Return the absolute address of an org file, given its relative name."
@@ -94,17 +94,25 @@
     "Leverage Helm to quickly open any org files."
     (interactive)
     (find-file (concat org-directory
-           (helm-comp-read "Select your org file: "
-               (directory-files org-directory nil "\.org$")))))
+                       (helm-comp-read "Select your org file: "
+                                       (directory-files org-directory nil "\.org$")))))
+
+  (defun org-save-regular-buffers ()
+    "org-save-all-org-buffers saves agenda buffers annoyingly..."
+    (save-some-buffers t (lambda () (and (derived-mode-p 'org-mode)
+                                         (not (derived-mode-p 'org-agenda-mode))
+                                         )))
+    (when (featurep 'org-id) (org-id-locations-save))
+    )
 
   ;; Auto save all buffers in agenda mode
   (add-hook 'org-agenda-mode-hook
-      (lambda ()
-        (define-key org-agenda-mode-map "Y" 'org-todo-yesterday)
-        (define-key org-agenda-mode-map "P" 'org-pomodoro)
-        (define-key org-agenda-mode-map "N" nil)
-        (add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
-        (auto-save-mode)))
+            (lambda ()
+              (define-key org-agenda-mode-map "Y" 'org-todo-yesterday)
+              (define-key org-agenda-mode-map "P" 'org-pomodoro)
+              (define-key org-agenda-mode-map "N" nil)
+              (add-hook 'auto-save-hook 'org-save-regular-buffers nil t)
+              (auto-save-mode)))
 #+end_src
 
 ** Modules
@@ -700,67 +708,72 @@ I remove the bulk of the defaults because I really don't use many of these featu
 *** Custom commands
 
    #+BEGIN_SRC emacs-lisp :tangle yes
-     (setq org-agenda-custom-commands
-           '((" " "Agenda"
-              ((agenda "" ((org-agenda-overriding-header "Today's Schedule:")
-                           (org-agenda-skip-function 'jra3/skip-habits-on-hold)
-                           (org-agenda-span 'day)
-                           (org-agenda-ndays 30)
-                           (org-agenda-start-on-weekday nil)
-                           (org-agenda-start-day "+0d")
-                           (org-agenda-todo-ignore-deadlines nil)))
+          (setq org-agenda-custom-commands
+                '(("C" "Clarify"
 
-               (agenda "" ((org-agenda-overriding-header "Habits and Chores:")
-                           (org-agenda-files (list jallen-org-habits-file))
-                           (org-agenda-skip-function 'jra3/skip-habits-on-hold)
-                           (org-agenda-span 'day)
-                           (org-agenda-ndays 30)
-                           (org-agenda-start-on-weekday nil)
-                           (org-agenda-start-day "+0d")
-                           (org-agenda-todo-ignore-deadlines nil)))
+                   ((tags-todo "REFILE"
+                               ((org-agenda-overriding-header "Tasks to Refile")
+                                (org-tags-match-list-sublevels nil)))
 
-               (tags-todo "REFILE"
-                          ((org-agenda-overriding-header "Tasks to Refile")
-                           (org-tags-match-list-sublevels nil)))
+                    (tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
+                               ((org-agenda-overriding-header "Stuck Projects")
+                                (org-agenda-skip-function 'bh/skip-non-stuck-projects)
+                                (org-agenda-sorting-strategy '(todo-state-up))
+                                )))
+                   )
 
-               (tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
-                          ((org-agenda-overriding-header "Stuck Projects")
-                           (org-agenda-skip-function 'bh/skip-non-stuck-projects)
-                           (org-agenda-sorting-strategy '(todo-state-up))
-                           ))
+                  (" " "Agenda"
+                   ((agenda "" ((org-agenda-overriding-header "Today's Schedule:")
+                                (org-agenda-skip-function 'jra3/skip-habits-on-hold)
+                                (org-agenda-span 'day)
+                                (org-agenda-ndays 30)
+                                (org-agenda-start-on-weekday nil)
+                                (org-agenda-start-day "+0d")
+                                (org-agenda-todo-ignore-deadlines nil)))
 
-               (tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!NEXT"
-                          ((org-agenda-overriding-header (concat "Next Actions"
-                                                                 (if bh/hide-scheduled-and-waiting-next-tasks
-                                                                     ""
-                                                                   " (including WAITING and SCHEDULED tasks)")))
-                           (org-agenda-skip-function 'bh/skip-projects-and-habits)
-                           (org-tags-match-list-sublevels t)
+                    (agenda "" ((org-agenda-overriding-header "Habits and Chores:")
+                                (org-agenda-files (list jallen-org-habits-file))
+                                (org-agenda-skip-function 'jra3/skip-habits-on-hold)
+                                (org-agenda-span 'day)
+                                (org-agenda-ndays 30)
+                                (org-agenda-start-on-weekday nil)
+                                (org-agenda-start-day "+0d")
+                                (org-agenda-todo-ignore-deadlines nil)))
 
-                           ;; random sorting so I don't stare at the meaningless order
-                           (org-agenda-cmp-user-defined 'org-random-cmp)
-                           (org-agenda-sorting-strategy '(user-defined-up))
+                    (tags-todo "-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"-CANCELLED+WAITING|HOLD/!"
+                               ((org-agenda-overriding-header (concat "Waiting and Postponed Tasks"
+                                                                      (if bh/hide-scheduled-and-waiting-next-tasks
+                                                                          ""
+                                                                        " (including WAITING and SCHEDULED tasks)")))
+                                (org-agenda-skip-function 'bh/skip-non-tasks)
+                                (org-tags-match-list-sublevels nil)
+                                (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+                                (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)))
 
-                           (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
-                           (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
-                           (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
-                           ))
+                    (tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!NEXT"
+                               ((org-agenda-overriding-header (concat "Next Actions"
+                                                                      (if bh/hide-scheduled-and-waiting-next-tasks
+                                                                          ""
+                                                                        " (including WAITING and SCHEDULED tasks)")))
+                                (org-agenda-skip-function 'bh/skip-projects-and-habits)
+                                (org-tags-match-list-sublevels t)
 
-               (tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
-                          ((org-agenda-overriding-header "Projects")
-                           (org-agenda-skip-function 'bh/skip-non-projects)
-                           (org-tags-match-list-sublevels 'indented)
-                           ))
+                                ;; random sorting so I don't stare at the meaningless order
+                                (org-agenda-cmp-user-defined 'org-random-cmp)
+                                (org-agenda-sorting-strategy '(user-defined-up))
 
-               (tags-todo "-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"-CANCELLED+WAITING|HOLD/!"
-                          ((org-agenda-overriding-header (concat "Waiting and Postponed Tasks"
-                                                                 (if bh/hide-scheduled-and-waiting-next-tasks
-                                                                     ""
-                                                                   " (including WAITING and SCHEDULED tasks)")))
-                           (org-agenda-skip-function 'bh/skip-non-tasks)
-                           (org-tags-match-list-sublevels nil)
-                           (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
-                           (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)))))))
+                                (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+                                (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
+                                (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
+                                ))
+
+                    (tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
+                               ((org-agenda-overriding-header "Projects")
+                                (org-agenda-skip-function 'bh/skip-non-projects)
+                                (org-tags-match-list-sublevels 'indented)
+                                ))
+
+                    ))))
    #+END_SRC
 
 *** Agenda faces
