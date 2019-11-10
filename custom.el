@@ -35,6 +35,9 @@
     (company-tasks company-reviewers company-bbdb company-nxml company-css company-capf
                    (company-dabbrev-code company-keywords))))
  '(company-minimum-prefix-length 1)
+ '(helm-ff-lynx-style-map t)
+ '(helm-flx-for-helm-locate t)
+ '(helm-flx-mode t)
  '(lsp-restart (quote auto-restart))
  '(newsticker-date-format "(%A %D %H:%M)" t)
  '(newsticker-html-renderer (quote shr-render-region) t)
