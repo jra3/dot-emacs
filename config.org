@@ -98,12 +98,13 @@
                                        (directory-files org-directory nil "\.org$")))))
 
   (defun org-save-regular-buffers ()
+    (interactive)
     "org-save-all-org-buffers saves agenda buffers annoyingly..."
     (save-some-buffers t (lambda () (and (derived-mode-p 'org-mode)
                                          (not (derived-mode-p 'org-agenda-mode))
                                          )))
     (when (featurep 'org-id) (org-id-locations-save))
-    )
+    (message "Saving all Org buffers... done"))
 
   ;; Auto save all buffers in agenda mode
   (add-hook 'org-agenda-mode-hook
