@@ -318,10 +318,12 @@ I remove the bulk of the defaults because I really don't use many of these featu
                                   ("Meta Data Editing")
                                   ("T" . org-todo)
                                   ("," ignore)
-                                  ("0" ignore)
-                                  ("1" ignore)
-                                  ("2" ignore)
-                                  ("3" ignore)
+                                  ("0" progn (org-delete-property "EFFORT"))
+                                  ("1" progn (org-set-effort 1))
+                                  ("2" progn (org-set-effort 2))
+                                  ("3" progn (org-set-effort 3))
+                                  ("4" progn (org-set-effort 4))
+                                  ("5" progn (org-set-effort 5))
                                   (":" . org-set-tags-command)
                                   ;;("e" . ignore)
                                   ("E" . ignore)
@@ -761,8 +763,8 @@ I remove the bulk of the defaults because I really don't use many of these featu
                                 (org-tags-match-list-sublevels t)
 
                                 ;; random sorting so I don't stare at the meaningless order
-                                (org-agenda-cmp-user-defined 'org-random-cmp)
-                                (org-agenda-sorting-strategy '(user-defined-up))
+                                ;; (org-agenda-cmp-user-defined 'org-random-cmp)
+                                (org-agenda-sorting-strategy '(effort-up))
 
                                 (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
                                 (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
