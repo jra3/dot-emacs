@@ -97,23 +97,24 @@
                        (helm-comp-read "Select your org file: "
                                        (directory-files org-directory nil "\.org$")))))
 
-  (defun org-save-regular-buffers ()
-    (interactive)
-    "org-save-all-org-buffers saves agenda buffers annoyingly..."
-    (save-some-buffers t (lambda () (and (derived-mode-p 'org-mode)
-                                         (not (derived-mode-p 'org-agenda-mode))
-                                         )))
-    (when (featurep 'org-id) (org-id-locations-save))
-    (message "Saving all Org buffers... done"))
+
+  (eval-after-load "org"
+    '(defun org-save-all-org-buffers ()
+       (interactive)
+       "org-save-all-org-buffers saves agenda buffers annoyingly..."
+       (save-some-buffers t (lambda () (and (derived-mode-p 'org-mode)
+                                            (not (derived-mode-p 'org-agenda-mode))
+                                            )))
+       (when (featurep 'org-id) (org-id-locations-save))
+       (message "Saving all org buffers... done")))
 
   ;; Auto save all buffers in agenda mode
   (add-hook 'org-agenda-mode-hook
             (lambda ()
-              (define-key org-agenda-mode-map "s" 'org-save-regular-buffers)
               (define-key org-agenda-mode-map "Y" 'org-todo-yesterday)
               (define-key org-agenda-mode-map "P" 'org-pomodoro)
               (define-key org-agenda-mode-map "N" nil)
-              (add-hook 'auto-save-hook 'org-save-regular-buffers nil t)
+              (add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
               (auto-save-mode)))
 #+end_src
 
