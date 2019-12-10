@@ -1994,20 +1994,15 @@ Tweaks to support enums better
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
+  (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 
-  (use-package cpp
-    :diminish c++-mode
-    :mode "\\.h$"
-    :bind (:map c++-mode-map
-           ("C-c o" . ff-get-other-file))
-    :config
-    ;; (add-hook 'c++-mode-hook 'fix-enum-class)
-    (add-hook 'c++-mode-hook
-              (lambda ()
-                (subword-mode 1)
-                (setq-local require-final-newline t)
-                (setq-local compilation-auto-jump-to-first-error t))))
+  (define-key c++-mode-map "C-c o" 'ff-get-other-file)
 
+  (add-hook 'c++-mode-hook
+            (lambda ()
+              (subword-mode 1)
+              (setq-local require-final-newline t)
+              (setq-local compilation-auto-jump-to-first-error t))))
 #+end_src
 
 ** ediff
