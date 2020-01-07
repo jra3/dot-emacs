@@ -114,6 +114,7 @@
               (define-key org-agenda-mode-map "Y" 'org-todo-yesterday)
               (define-key org-agenda-mode-map "P" 'org-pomodoro)
               (define-key org-agenda-mode-map "N" nil)
+              (cd "/tmp")
               (add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
               (auto-save-mode)))
 #+end_src
