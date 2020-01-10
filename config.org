@@ -1503,12 +1503,22 @@ to set xterm-mode as a terminal option for this
 
 ** Align lines on ' = '
 #+begin_src emacs-lisp :tangle yes
-(global-set-key (kbd "C-c =") 'align-eq)
+  (global-set-key (kbd "C-c =") 'align-eq)
 #+end_src
 ** Revert a buffer
 #+begin_src emacs-lisp :tangle yes
-(global-set-key (kbd "C-c r") 'revert-buffer)
+  (global-set-key (kbd "C-c r") 'revert-buffer)
 #+end_src
+** Unfill paragraphs
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (defun unfill-paragraph ()
+    "Takes a multi-line paragraph and makes it into a single line of text."
+    (interactive)
+    (let ((fill-column (point-max)))
+      (fill-paragraph nil)))
+
+  (global-set-key (kbd "M-Q") 'unfill-paragraph)
+#+END_SRC
 * VC
 
 ** git-gutter-mode
