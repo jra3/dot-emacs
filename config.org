@@ -2008,7 +2008,7 @@ Tweaks to support enums better
             (lambda ()
               (subword-mode 1)
               (setq-local require-final-newline t)
-              (setq-local compilation-auto-jump-to-first-error t))))
+              (setq-local compilation-auto-jump-to-first-error t)))
 #+end_src
 
 ** ediff
