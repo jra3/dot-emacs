@@ -1970,50 +1970,15 @@ to set xterm-mode as a terminal option for this
 ** C++
 
 #+begin_src emacs-lisp :tangle yes
-
   (use-package google-c-style
-               :config
-               (add-hook 'c-mode-common-hook 'google-set-c-style)
-               (add-hook 'c-mode-common-hook 'google-make-newline-indent))
-
-#+end_src
-
-Tweaks to support enums better
-#+begin_src emacs-lisp :tangle yes
-
-  ;; (defun inside-class-enum-p (pos)
-  ;;   "Checks if POS is within the braces of a C++ \"enum class\"."
-  ;;   (ignore-errors
-  ;;     (save-excursion
-  ;;       (goto-char pos)
-  ;;       (up-list -1)
-  ;;       (backward-sexp 1)
-  ;;       (looking-back "enum[ \t]+class[ \t]+[^}]+"))))
-
-  ;; (defun align-enum-class (langelem)
-  ;;   (if (inside-class-enum-p (c-langelem-pos langelem))
-  ;;       0
-  ;;     (c-lineup-topmost-intro-cont langelem)))
-
-  ;; (defun align-enum-class-closing-brace (langelem)
-  ;;   (if (inside-class-enum-p (c-langelem-pos langelem))
-  ;;       '-
-  ;;     '+))
-
-  ;; (defun fix-enum-class ()
-  ;;   "Setup `c++-mode' to better handle \"class enum\"."
-  ;;   (add-to-list 'c-offsets-alist
-  ;;                '(topmost-intro-cont . align-enum-class))
-  ;;   (add-to-list 'c-offsets-alist
-  ;;                '(statement-cont . align-enum-class-closing-brace)))
-
+    :config
+    (add-hook 'c-mode-common-hook 'google-set-c-style)
+    (add-hook 'c-mode-common-hook 'google-make-newline-indent))
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
   (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
-
-  (define-key c++-mode-map "C-c o" 'ff-get-other-file)
-
+  (define-key org-mode-map (kbd "C-c o") 'ff-get-other-file)
   (add-hook 'c++-mode-hook
             (lambda ()
               (subword-mode 1)
