@@ -16,12 +16,13 @@ const device = new Luxafor();
 // Set the text to send
 const args = process.argv.slice(2)
 if (args[0] && args[0].length) {
-  color = args[0];
+    cmd = args[0];
 }
 
-console.log(args);
-if (color) {
-  device.setColor('#'+color, 0xFF);
-} else {
-  device.off();
+if (cmd == "off") {
+    device.off();
+} else if (cmd == "set") {
+    device.setColor(args[1], 0xFF);
+} else if (cmd == "flash") {
+    device.flash(args[1], 0xFF, args[2], args[3]);
 }
