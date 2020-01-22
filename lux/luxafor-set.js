@@ -20,9 +20,14 @@ if (args[0] && args[0].length) {
 }
 
 if (cmd == "off") {
-    device.off();
+  console.log("off");
+  device.off();
 } else if (cmd == "set") {
-    device.setColor(args[1], 0xFF);
+  console.log("set");
+  device.setColor(args[1], 0xFF);
 } else if (cmd == "flash") {
-    device.flash(args[1], 0xFF, args[2], args[3]);
+  console.log("flash");
+  device.flash(args[1], 0xFF, 40, -1);
+} else {
+
 }

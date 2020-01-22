@@ -874,35 +874,35 @@ I remove the bulk of the defaults because I really don't use many of these featu
 *** org-clocking-luxafor
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-    ;; Some of the usual Luxafor patterns.
-    (defconst org-clocking-luxafor-patterns
-      '(
-        off    "off"
-        red    "set f00"
-        yellow "flash ff0 40 -1"
-        green  "set 0f0")
-      "Simple strings to pass to script")
+  ;; Some of the usual Luxafor patterns.
+  (defconst org-clocking-luxafor-patterns
+    '(
+      off    "off"
+      red    "set f00"
+      yellow "flash ff0"
+      green  "set 0f0")
+    "Simple strings to pass to script")
 
-    (defvar org-clocking-luxafor-off-pattern 'off
-      "Luxafor pattern to use for 'org-mode' clock-in.")
+  (defvar org-clocking-luxafor-off-pattern 'off
+    "Luxafor pattern to use for 'org-mode' clock-in.")
 
-    (defvar org-clocking-luxafor-clock-in-pattern 'red
-      "Luxafor pattern to use for 'org-mode' clock-in.")
+  (defvar org-clocking-luxafor-clock-in-pattern 'red
+    "Luxafor pattern to use for 'org-mode' clock-in.")
 
-    (defvar org-clocking-luxafor-clock-out-pattern 'green
-      "Luxafor pattern to use for 'org-mode' clock-out.")
+  (defvar org-clocking-luxafor-clock-out-pattern 'green
+    "Luxafor pattern to use for 'org-mode' clock-out.")
 
-    (defvar org-clocking-luxafor-break-over-pattern 'yellow
-      "Luxafor pattern to use for 'org-mode' clock-out.")
+  (defvar org-clocking-luxafor-break-over-pattern 'yellow
+    "Luxafor pattern to use for 'org-mode' clock-out.")
 
-    (defun org-clocking-luxafor-change-pattern (pattern)
-      "Given the PATTERN name, write the associated raw byte string
+  (defun org-clocking-luxafor-change-pattern (pattern)
+    "Given the PATTERN name, write the associated raw byte string
       to the Luxafor device."
-      (let ((pattern-string (plist-get org-clocking-luxafor-patterns pattern)))
-        (message pattern-string)
-        (when pattern-string
-          (shell-command-to-string
-           (format "node ~/.emacs.d/lux/luxafor-set.js %s" pattern-string)))))
+    (let ((pattern-string (plist-get org-clocking-luxafor-patterns pattern)))
+      (message pattern-string)
+      (when pattern-string
+        (shell-command-to-string
+         (format "node ~/.emacs.d/lux/luxafor-set.js %s" pattern-string)))))
 
   (defun org-clocking-luxafor-off ()
     (org-clocking-luxafor-change-pattern org-clocking-luxafor-off-pattern)
@@ -919,25 +919,20 @@ I remove the bulk of the defaults because I really don't use many of these featu
     ;; Return true, so the hook doesnt think we finished in error
     t)
 
-
-  (org-clocking-luxafor-change-pattern 'party)
-
   (defun org-clocking-luxafor-break-over ()
     (org-clocking-luxafor-change-pattern org-clocking-luxafor-break-over-pattern)
     ;; Return true, so the hook doesnt think we finished in error
     t)
 
-  (add-hook 'org-pomodoro-started-hook #'org-clocking-luxafor-clock-in)
-  (add-hook 'org-pomodoro-overtime-hook #'org-clocking-luxafor-clock-in)
-
-  (add-hook 'org-pomodoro-finished #'org-clocking-luxafor-clock-out)
   (add-hook 'org-pomodoro-killed-hook #'org-clocking-luxafor-off)
+  (add-hook 'org-pomodoro-started-hook #'org-clocking-luxafor-clock-in)
+  ;;(add-hook 'org-pomodoro-overtime-hook #'org-clocking-luxafor-clock-in)
+  (add-hook 'org-pomodoro-finished-hook #'org-clocking-luxafor-clock-out)
   (add-hook 'org-pomodoro-break-finished-hook #'org-clocking-luxafor-break-over)
 
   ;; (defvar org-pomodoro-long-break-finished-hook nil
   ;; (defvar org-pomodoro-short-break-finished-hook nil
-  ;;(defvar org-pomodoro-tick-hook nil
-
+  ;; (defvar org-pomodoro-tick-hook nil
 #+END_SRC
 
 ** =org-capture= templates
@@ -1152,17 +1147,17 @@ I remove the bulk of the defaults because I really don't use many of these featu
       (popwin-mode 1)))
 
 
-    ;; (setq popwin:special-display-config
-    ;;     (quote
-    ;;      (("*Ibuffer*" :position top :noselect t :height 30)
-    ;;       ("*Python Check*" :position top :noselect t :height 30)
-    ;;       ("*compilation*")
-    ;;       ("*Python Doc*")
-    ;;       ("*xref*")
-    ;;       ("*grep*")
-    ;;       ("*Help*")
-    ;;       ("*Completions*" :noselect t)
-    ;;       ("*Occur*" :noselect t)))))
+  ;; (setq popwin:special-display-config
+  ;;     (quote
+  ;;      (("*Ibuffer*" :position top :noselect t :height 30)
+  ;;       ("*Python Check*" :position top :noselect t :height 30)
+  ;;       ("*compilation*")
+  ;;       ("*Python Doc*")
+  ;;       ("*xref*")
+  ;;       ("*grep*")
+  ;;       ("*Help*")
+  ;;       ("*Completions*" :noselect t)
+  ;;       ("*Occur*" :noselect t)))))
 #+end_src
 
 ** Go to a line by number
@@ -1251,9 +1246,15 @@ I keep forgetting what anzu is... but i think I like it
               (define-key LaTeX-mode-map "\C-xn"
                 nil)))
 
+  (defun jallen-org-src-save-or-close () (interactive)
+         (indent-region (point-min) (point-max))
+         (if (buffer-modified-p)
+             (save-buffer)
+           (org-edit-src-exit)))
+
   (eval-after-load 'org-src
     '(define-key org-src-mode-map
-       "\C-x\C-s" #'org-edit-src-exit))
+       "\C-x\C-s" #'jallen-org-src-save-or-close))
 #+END_SRC
 ** expand-region
    it's awsome
