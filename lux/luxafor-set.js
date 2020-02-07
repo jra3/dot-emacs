@@ -27,7 +27,7 @@ if (cmd == "off") {
   device.setColor(args[1], 0xFF);
 } else if (cmd == "flash") {
   console.log("flash");
-  device.flash(args[1], 0xFF, 40, -1);
+  device.flash(args[1], 0xFF, 40, 1);
 } else {
 
 }

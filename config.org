@@ -244,6 +244,13 @@ We ensure that we load org-habit and org-protocol
   (set-face-attribute 'org-level-1 nil :foreground "dodger blue" :weight 'bold :height 1.0)
   (set-face-attribute 'org-level-2 nil :foreground "#edd400" :weight 'bold :height 1.0)
 #+end_src
+** Columns, get your columns here
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(setq org-columns-default-format "%50ITEM(Task) %2PRIORITY %10Effort(Effort){:} %10CLOCKSUM")
+
+#+END_SRC
+
 ** Enter follows links at point
 
    Because how the hell else should it work?
@@ -357,6 +364,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
   #+begin_src emacs-lisp :tangle yes
     (setq jallen-org-notes-file (concat org-directory "notes.org")
           jallen-org-gtd-file (concat org-directory "gtd.org")
+          jallen-org-reference-file (concat org-directory "reference.org")
           jallen-org-habits-file (concat org-directory "habits.org")
 
           jallen-org-journal-file (concat org-directory "journal.org")
@@ -373,7 +381,6 @@ I remove the bulk of the defaults because I really don't use many of these featu
   #+end_src
 ** Refiling
 #+BEGIN_SRC emacs-lisp :tangle yes
-
   ;; Also enable based on a project tag?
   (defun jallen/filter-refile-targets ()
     (or (member "BUCKET" (org-get-tags))
@@ -384,7 +391,8 @@ I remove the bulk of the defaults because I really don't use many of these featu
         org-refile-use-outline-path t
         org-refile-target-verify-function 'jallen/filter-refile-targets
 
-        org-refile-targets '((jallen-org-gtd-file :maxlevel . 4)))
+        org-refile-targets '((jallen-org-gtd-file :maxlevel . 4)
+                             (jallen-org-reference-file :maxlevel . 4)))
 #+END_SRC
 
 ** Agendas configurations
@@ -787,6 +795,17 @@ I remove the bulk of the defaults because I really don't use many of these featu
                            (org-tags-match-list-sublevels 'indented)
                            ))
 
+
+               (tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
+                          ((org-agenda-overriding-header "Stuck Projects")
+                           (org-agenda-skip-function 'bh/skip-non-stuck-projects)
+                           (org-agenda-sorting-strategy '(todo-state-up))
+                           ))
+
+               (tags-todo "REFILE"
+                          ((org-agenda-overriding-header "Tasks to Refile")
+                           (org-tags-match-list-sublevels nil)))
+
                ))))
    #+END_SRC
 
@@ -879,20 +898,20 @@ I remove the bulk of the defaults because I really don't use many of these featu
     '(
       off    "off"
       red    "set f00"
-      yellow "flash ff0"
+      yellow "set ff0"
+      over   "flash ff0"
       green  "set 0f0")
     "Simple strings to pass to script")
 
   (defvar org-clocking-luxafor-off-pattern 'off
     "Luxafor pattern to use for 'org-mode' clock-in.")
-
   (defvar org-clocking-luxafor-clock-in-pattern 'red
     "Luxafor pattern to use for 'org-mode' clock-in.")
-
   (defvar org-clocking-luxafor-clock-out-pattern 'green
     "Luxafor pattern to use for 'org-mode' clock-out.")
-
-  (defvar org-clocking-luxafor-break-over-pattern 'yellow
+  (defvar org-clocking-luxafor-break-over-pattern 'over
+    "Luxafor pattern to use for 'org-mode' clock-out.")
+  (defvar org-clocking-luxafor-break-really-over-pattern 'yellow
     "Luxafor pattern to use for 'org-mode' clock-out.")
 
   (defun org-clocking-luxafor-change-pattern (pattern)
@@ -920,6 +939,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
     t)
 
   (defun org-clocking-luxafor-break-over ()
+    (org-clocking-luxafor-change-pattern org-clocking-luxafor-break-really-over-pattern)
     (org-clocking-luxafor-change-pattern org-clocking-luxafor-break-over-pattern)
     ;; Return true, so the hook doesnt think we finished in error
     t)
@@ -946,6 +966,9 @@ I remove the bulk of the defaults because I really don't use many of these featu
      ("T" "Tickler" entry
       (file+headline jallen-org-gtd-file "Tickler")
       "* TODO %i%? \n SCHEDULED: <%(org-read-date nil nil \"+1d\")>")
+     ("." "Do Task Now [inbox]" entry ; New inbox item to be processed
+      (file+headline jallen-org-gtd-file "Tasks")
+      "** NEXT %?\n %i\n\n")
 
      ("j" "Journal Entries")
      ("jm" "Precious Memory" entry ; Freeform journal entry
@@ -1028,6 +1051,10 @@ I remove the bulk of the defaults because I really don't use many of these featu
    'org-capture-before-finalize-hook
    (lambda () (save-buffer)))
 
+#+END_SRC
+** Regenerate Dynamic Blocks on save
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (add-hook 'before-save-hook 'org-update-all-dblocks)
 #+END_SRC
 ** Exporting
 *** Exporter Setup
