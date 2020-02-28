@@ -2037,6 +2037,9 @@ to set xterm-mode as a terminal option for this
 ** C++
 
 #+begin_src emacs-lisp :tangle yes
+  (use-package modern-cpp-font-lock
+    :ensure t)
+
   (use-package google-c-style
     :config
     (add-hook 'c-mode-common-hook 'google-set-c-style)
@@ -2049,6 +2052,7 @@ to set xterm-mode as a terminal option for this
   (add-hook 'c++-mode-hook
             (lambda ()
               (subword-mode 1)
+              (modern-c++-font-lock-mode)
               (setq-local require-final-newline t)
               (setq-local compilation-auto-jump-to-first-error t)))
 #+end_src
@@ -2136,15 +2140,15 @@ emacs -diff file1 file2
 ** Hack
 
 #+BEGIN_SRC emacs-lisp tangle: yes
-  ;; (use-package hack-mode
-  ;;   :init
-  ;;   (add-hook 'hack-mode-hook
-  ;;             (lambda ()
-  ;;               (lsp)
-  ;;               (flycheck-mode t)
-  ;;               (subword-mode t)
-  ;;               ;(company-mode t)
-  ;;               )))
+  (use-package hack-mode
+    :init
+    (add-hook 'hack-mode-hook
+              (lambda ()
+                (lsp)
+                (flycheck-mode t)
+                (subword-mode t)
+                (company-mode t)
+                )))
 #+END_SRC
 
 ** JS + Web
@@ -2244,3 +2248,40 @@ emacs -diff file1 file2
        ("XKCD" "https://xkcd.com/rss.xml" nil nil nil)
        ("Sacha Chua" "http://sachachua.com/blog/feed/" nil nil nil)))
 #+end_src
+* Scratch
+** lsp-thrift
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+
+    (require 'lsp-mode)
+
+    (defgroup lsp-thrift nil
+      "Thrift."
+      :group 'lsp-mode
+      :tag "Thrift")
+
+    (defcustom lsp-thrift-command '("/usr/local/bin/thrift-lsp")
+      "thrift-lsp command."
+      :group 'lsp-thrift
+      :risky t
+      :type 'list)
+
+    (lsp-register-client
+     (make-lsp-client :new-connection (lsp-stdio-connection (lambda () lsp-thrift-command))
+                      :major-modes '(thrift-mode)
+                      :priority -1
+                      :server-id 'thrift))
+
+    (setq lsp-language-id-configuration
+          (append lsp-language-id-configuration  '((thrift-mode . "thrift"))))
+
+  (locate-dominating-file "/data/users/jallen/fbsource/fbcode/strobelight/if/service.thrift" "fbcode")
+
+         ;; 'fbcode',
+         ;; 'fbandroid',
+         ;; 'fbobjc',
+         ;; 'configerator-hg/source',
+         ;; 'opsfiles-hg',
+         ;; 'configerator-eden/source',
+         ;; 'opsfiles-eden
+#+END_SRC

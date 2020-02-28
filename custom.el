@@ -54,7 +54,7 @@
  '(org-pomodoro-play-sounds nil)
  '(package-selected-packages
    (quote
-    (markdown-mode lsp-mode org-pomodoro wttrin arduino-mode bbdb thrift yasnippet yaml-mode win-switch which-key web-mode use-package tangotango-theme rainbow-mode rainbow-delimiters popwin package-lint multiple-cursors lsp-ui lsp-hack js-comint ibuffer-vc ibuffer-git hgrc-mode hgignore-mode helm-xref helm-flx helm-descbinds hack-mode google-c-style gitignore-mode gitconfig-mode git-gutter flycheck expand-region exec-path-from-shell elisp-slime-nav cquery company-lsp auto-package-update anzu ag)))
+    (modern-cpp-font-lock gnu-elpa-keyring-update markdown-mode lsp-mode org-pomodoro wttrin arduino-mode bbdb thrift yasnippet yaml-mode win-switch which-key web-mode use-package tangotango-theme rainbow-mode rainbow-delimiters popwin package-lint multiple-cursors lsp-ui lsp-hack js-comint ibuffer-vc ibuffer-git hgrc-mode hgignore-mode helm-xref helm-flx helm-descbinds hack-mode google-c-style gitignore-mode gitconfig-mode git-gutter flycheck expand-region exec-path-from-shell elisp-slime-nav cquery company-lsp auto-package-update anzu ag)))
  '(shr-width 80))
 
 (custom-set-faces
