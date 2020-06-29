@@ -12,8 +12,6 @@
 
 (defvar config-load-path (file-name-directory (or load-file-name buffer-file-name)))
 
-
-
 (defvar config-org-files
   '("local-bootstrap.org" ;; local preamble, .gitignored
     "package-bootstrap.org"
@@ -22,7 +20,8 @@
     "local-after.org" ;; local coda, .gitignored
     ))
 
-;; org, it's the best
+(require 'package)
+(package-initialize)
 (require 'org)
 
 (mapc

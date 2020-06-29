@@ -373,9 +373,10 @@ I remove the bulk of the defaults because I really don't use many of these featu
           jallen-org-weekly-report-file (concat org-directory "weekly.org")
           jallen-org-cbt-journal-file (concat org-directory "cbt-journal.org")
           jallen-org-diet-journal-file (concat org-directory "diet-journal.org")
+          jallen-org-sync-calendar (concat org-directory "cal.org")
 
           ;; TODO we have a separate habits file to allos beorg to ignore habits. this is a bit unfortunate
-          jallen-default-org-agenda-files (list jallen-org-gtd-file)
+          jallen-default-org-agenda-files (list jallen-org-gtd-file jallen-org-sync-calendar)
           org-default-notes-file jallen-org-notes-file
           org-agenda-files jallen-default-org-agenda-files)
 
@@ -754,7 +755,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
            jallen-oacc-today
            '(agenda ""
                     ((org-agenda-overriding-header "Agenda:")
-                     (org-agenda-span 'fortnight)
+                     (org-agenda-span 'day)
                      (org-agenda-ndays 30)
                      (org-agenda-start-on-weekday nil)
                      (org-agenda-start-day "+0d")
@@ -817,10 +818,11 @@ I remove the bulk of the defaults because I really don't use many of these featu
                         jallen-oacc-stuck
                         ))
 
-            (list " " "GTD"
+            (list "j" "GTD"
                   (list jallen-oacc-today
                         jallen-oacc-habits
                         jallen-oacc-next
+                        jallen-oacc-stuck
                         jallen-oacc-projects
                         jallen-oacc-chores
                         jallen-oacc-waiting))))
@@ -1025,7 +1027,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
 ** Habits
 #+begin_src emacs-lisp :tangle yes
   (require 'org-habit)
-  (setq org-habit-preceding-days 7
+  (setq org-habit-preceding-days 14
         org-habit-following-days 1
         org-habit-show-habits-only-for-today t
         org-habit-graph-column 52
@@ -1072,6 +1074,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
 ** Regenerate Dynamic Blocks on save
 #+BEGIN_SRC emacs-lisp :tangle yes
   (add-hook 'before-save-hook 'org-update-all-dblocks)
+  (add-hook 'before-save-hook 'org-table-recalculate-buffer-tables)
 #+END_SRC
 ** Exporting
 *** Exporter Setup
@@ -1095,6 +1098,33 @@ I remove the bulk of the defaults because I really don't use many of these featu
    would be pulled in as an org-module.
 #+BEGIN_SRC emacs-lisp :tangle yes
   (require 'org-protocol)
+#+END_SRC
+** org-roam
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package org-roam
+        :ensure t
+        :hook
+        (after-init . org-roam-mode)
+        :custom
+        (org-roam-directory (concat org-directory "roam"))
+        :bind (:map org-roam-mode-map
+                (("C-c n l" . org-roam)
+                 ("C-c n f" . org-roam-find-file)
+                 ("C-c n g" . org-roam-graph-show))
+                :map org-mode-map
+                (("C-c n i" . org-roam-insert))
+                (("C-c n I" . org-roam-insert-immediate))))
+
+  (use-package org-roam-server
+    :ensure t
+    :config
+    (setq org-roam-server-host "127.0.0.1"
+          org-roam-server-port 5555
+          org-roam-server-export-inline-images t
+          org-roam-server-authenticate nil
+          org-roam-server-label-truncate t
+          org-roam-server-label-truncate-length 60
+          org-roam-server-label-wrap-length 20))
 #+END_SRC
 * Snippets
   Snippets are are awesome. They are found in ~/emacs.d/snippets
@@ -1479,7 +1509,7 @@ to set xterm-mode as a terminal option for this
 #+end_src
 * Revert Files When They Change On Disk
 #+begin_src emacs-lisp :tangle yes
-(global-auto-revert-mode t)
+  (global-auto-revert-mode t)
 #+end_src
 * Simple Behavior Customizations
 ** Set fill-column to sensible default for me
