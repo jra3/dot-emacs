@@ -766,6 +766,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
            '(agenda ""
                     ((org-agenda-overriding-header "Habits:")
                      (org-agenda-remove-tags t)
+                     (org-agenda-use-time-grid nil)
                      (org-agenda-files (list jallen-org-habits-file))
                      (org-agenda-skip-function 'jra3/skip-habits-on-hold)
                      (org-agenda-span 'day)
@@ -861,7 +862,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
 #+end_src
 *** Buffer setup
   #+begin_src emacs-lisp :tangle yes
-    (setq org-agenda-use-time-grid nil
+    (setq org-agenda-use-time-grid t
           org-agenda-dim-blocked-tasks nil ;; Do not dim blocked tasks
           org-agenda-compact-blocks nil      ;; Compact the block agenda view
           org-agenda-restore-windows-after-quit t
@@ -987,7 +988,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
       "* TODO %i%? \n SCHEDULED: <%(org-read-date nil nil \"+1d\")>")
      ("." "Do Task Now [inbox]" entry ; New inbox item to be processed
       (file+headline jallen-org-gtd-file "Tasks")
-      "** NEXT %?\n %i\n\n")
+      "** NEXT %? \n  SCHEDULED: <%<%Y-%m-%d %H:%M>>\n %i\n\n")
 
      ("j" "Journal Entries")
      ("jm" "Precious Memory" entry ; Freeform journal entry
@@ -1099,15 +1100,25 @@ I remove the bulk of the defaults because I really don't use many of these featu
 #+BEGIN_SRC emacs-lisp :tangle yes
   (require 'org-protocol)
 #+END_SRC
+** org-download
+#+BEGIN_SRC emacs-lisp :tangle yes
+(use-package org-download
+  :after org
+  :bind
+  (:map org-mode-map
+        (("s-Y" . org-download-screenshot)
+         ("s-y" . org-download-yank))))
+#+END_SRC
 ** org-roam
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package org-roam
-        :ensure t
-        :hook
-        (after-init . org-roam-mode)
-        :custom
-        (org-roam-directory (concat org-directory "roam"))
-        :bind (:map org-roam-mode-map
+    :ensure t
+    :hook
+    (after-init . org-roam-mode)
+    (org-mode . company-mode)
+    :custom
+    (org-roam-directory (concat org-directory "roam"))
+    :bind (:map org-roam-mode-map
                 (("C-c n l" . org-roam)
                  ("C-c n f" . org-roam-find-file)
                  ("C-c n g" . org-roam-graph-show))
@@ -1125,6 +1136,11 @@ I remove the bulk of the defaults because I really don't use many of these featu
           org-roam-server-label-truncate t
           org-roam-server-label-truncate-length 60
           org-roam-server-label-wrap-length 20))
+
+  (use-package company-org-roam
+    :config
+    (push 'company-org-roam company-backends))
+
 #+END_SRC
 * Snippets
   Snippets are are awesome. They are found in ~/emacs.d/snippets
@@ -2232,6 +2248,19 @@ emacs -diff file1 file2
        (add-to-list 'web-mode-indentation-params '("lineup-concats" . nil))
        (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil)))
    #+end_src
+** Go
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package go-mode
+       :defer t
+       :ensure t
+       :mode ("\\.go\\'" . go-mode)
+       :init
+       (setq compile-command "echo Building... && go build -v && echo Testing... && go test -v && echo Linter... && golint")
+       (setq compilation-read-command nil)
+       (add-hook 'go-mode-hook 'custom-go-mode)
+       :bind (("M-," . compile)
+              ("M-." . godef-jump)))
+   #+END_SRC
 ** Config File Formats
   #+begin_src emacs-lisp :tangle yes
     (use-package gitignore-mode)

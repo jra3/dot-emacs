@@ -30,10 +30,6 @@
  ;; If there is more than one, they won't work right.
  '(auto-package-update-delete-old-versions nil)
  '(bbdb-file-remote "/usr/share/emacs/bbdb")
- '(company-backends
-   (quote
-    (company-tasks company-reviewers company-bbdb company-nxml company-css company-capf
-                   (company-dabbrev-code company-keywords))))
  '(company-minimum-prefix-length 1)
  '(helm-ff-lynx-style-map t)
  '(helm-flx-for-helm-locate t)
@@ -42,20 +38,29 @@
  '(newsticker-date-format "(%A %D %H:%M)" t)
  '(newsticker-html-renderer (quote shr-render-region) t)
  '(newsticker-use-full-width nil t)
+ '(org-agenda-current-time-string "> you are here <")
  '(org-agenda-sorting-strategy
    (quote
     ((agenda habit-down effort-up time-up priority-down category-keep)
      (todo priority-down category-keep)
      (tags priority-down category-keep)
      (search category-keep))))
+ '(org-agenda-time-grid
+   (quote
+    ((daily today require-timed remove-match)
+     (900 1000 1100 1200 1300 1400 1500 1600 1700 1800)
+     "......" "----------------")))
+ '(org-agenda-timegrid-use-ampm nil)
  '(org-archive-location "~/org/archive/archive.org::* From %s")
  '(org-clock-task-overrun-text "Don't be such a punk")
+ '(org-download-method (quote directory))
+ '(org-download-screenshot-method "screencapture -i %s")
  '(org-pomodoro-format "P~%s")
  '(org-pomodoro-play-sounds nil)
  '(org-roam-directory "~/org/roam")
  '(package-selected-packages
    (quote
-    (org-d20 org-gcal modern-cpp-font-lock gnu-elpa-keyring-update markdown-mode lsp-mode org-pomodoro wttrin arduino-mode bbdb thrift yasnippet yaml-mode win-switch which-key web-mode use-package tangotango-theme rainbow-mode rainbow-delimiters popwin package-lint multiple-cursors lsp-ui lsp-hack js-comint ibuffer-vc ibuffer-git hgrc-mode hgignore-mode helm-xref helm-flx helm-descbinds hack-mode google-c-style gitignore-mode gitconfig-mode git-gutter flycheck expand-region exec-path-from-shell elisp-slime-nav cquery company-lsp auto-package-update anzu ag)))
+    (go-mode org-download org-roam-protocol company-org-roam org-d20 org-gcal modern-cpp-font-lock gnu-elpa-keyring-update markdown-mode lsp-mode org-pomodoro wttrin arduino-mode bbdb thrift yasnippet yaml-mode win-switch which-key web-mode use-package tangotango-theme rainbow-mode rainbow-delimiters popwin package-lint multiple-cursors lsp-ui lsp-hack js-comint ibuffer-vc ibuffer-git hgrc-mode hgignore-mode helm-xref helm-flx helm-descbinds hack-mode google-c-style gitignore-mode gitconfig-mode git-gutter flycheck expand-region exec-path-from-shell elisp-slime-nav cquery company-lsp auto-package-update anzu ag)))
  '(shr-width 80))
 
 (custom-set-faces
