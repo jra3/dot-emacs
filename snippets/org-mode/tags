@@ -1,0 +1,4 @@
+#name : Tags line
+#contributor : Rick Moynihan <rick@sourcesmouth.co.uk>
+# --
+tags: ${1:tag}
