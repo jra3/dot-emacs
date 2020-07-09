@@ -323,6 +323,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
                                   ("N" progn
                                    (forward-char 1)
                                    (org-insert-todo-heading-respect-content 2)
+                                   (org-todo "NEXT")
                                    (org-demote-subtree))
                                   ("^" . ignore)
                                   ("w" . org-refile)
@@ -376,7 +377,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
           jallen-org-sync-calendar (concat org-directory "cal.org")
 
           ;; TODO we have a separate habits file to allos beorg to ignore habits. this is a bit unfortunate
-          jallen-default-org-agenda-files (list jallen-org-gtd-file jallen-org-sync-calendar)
+          jallen-default-org-agenda-files (list jallen-org-gtd-file)
           org-default-notes-file jallen-org-notes-file
           org-agenda-files jallen-default-org-agenda-files)
 
@@ -760,6 +761,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
                      (org-agenda-start-on-weekday nil)
                      (org-agenda-start-day "+0d")
                      (org-agenda-show-all-dates nil)
+                     (org-agenda-files (list jallen-org-gtd-file jallen-org-sync-calendar))
                      (org-agenda-todo-ignore-deadlines nil)))
 
            jallen-oacc-habits
