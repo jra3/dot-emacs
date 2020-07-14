@@ -34,6 +34,7 @@
  '(helm-ff-lynx-style-map t)
  '(helm-flx-for-helm-locate t)
  '(helm-flx-mode t)
+ '(helm-mode-reverse-history nil)
  '(lsp-restart (quote auto-restart))
  '(newsticker-date-format "(%A %D %H:%M)" t)
  '(newsticker-html-renderer (quote shr-render-region) t)

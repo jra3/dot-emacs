@@ -1935,6 +1935,17 @@ to set xterm-mode as a terminal option for this
 
   (add-hook 'compilation-filter-hook 'bcp--update-modeline)
 #+END_SRC
+** Colors
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(require 'ansi-color)
+
+(defun colorize-compilation-buffer ()
+  (toggle-read-only)
+  (ansi-color-apply-on-region compilation-filter-start (point))
+  (toggle-read-only))
+(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+#+END_SRC
 * Code Format
   :LOGBOOK:
   - State "MAYBE"      from "TODO"       [2019-02-13 Wed 10:37]
@@ -2037,21 +2048,35 @@ to set xterm-mode as a terminal option for this
    move xref stuff to a general xref section
 #+BEGIN_SRC emacs-lisp tangle: yes
 
-  (use-package lsp-mode
-    :config
-    (setq
-     lsp-ui-sideline-show-code-actions nil
-     lsp-ui-sideline-show-hover nil
-     lsp-highlight-symbol-at-point nil))
+      ;; (use-package lsp-mode
+      ;;   :config
+      ;;   (setq
+      ;;    lsp-ui-sideline-show-code-actions nil
+      ;;    lsp-ui-sideline-show-hover nil
+      ;;    lsp-highlight-symbol-at-point nil))
 
-  (use-package company-lsp
-    :after (lsp-mode company-mode)
-    :config
-    (push 'company-lsp company-backends)
-    (setq company-lsp-enable-snippet t
-          company-lsp-cache-candidates t))
+      ;; (use-package company-lsp
+      ;;   :after (lsp-mode company-mode)
+      ;;   :config
+      ;;   (push 'company-lsp company-backends)
+      ;;   (setq company-lsp-enable-snippet t
+      ;;         company-lsp-cache-candidates t))
 
-  (use-package lsp-ui :commands lsp-ui-mode)
+      ;; (use-package lsp-ui :commands lsp-ui-mode)
+
+      ;; (add-to-list 'eglot-server-programs '(c++-mode . ("cquery-language-server")))
+      ;; (add-to-list 'eglot-server-programs '(c-mode . ("cquery-language-server")))
+      ;; (add-to-list 'eglot-server-programs '(python-mode . ("~/bin/mypyls.sh")))
+      ;; (add-to-list 'eglot-server-programs '(python-mode . ("pyls-language-server")))
+      ;; (add-to-list 'eglot-server-programs '(python-mode . ("pyls")))
+      ;; (add-hook 'c++-mode-hook 'eglot-ensure)
+      ;; (add-hook 'c-mode-hook 'eglot-ensure)
+      ;; (add-hook 'python-mode-hook 'eglot-ensure)
+
+    (use-package eglot
+      :config
+      (add-to-list 'eglot-server-programs '(hack-mode . ("hh_client" "lsp" "--from" "emacs")))
+      (add-hook 'hack-mode-hook 'eglot-ensure))
 
 #+END_SRC
 
@@ -2205,6 +2230,11 @@ emacs -diff file1 file2
 (add-to-list 'auto-mode-alist '("\\/TARGETS\\'" . python-mode))
 (add-to-list 'auto-mode-alist '("\\/BUCK\\'" . python-mode))
 #+END_SRC
+*** cython
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package cython-mode)
+#+END_SRC
+
 *** Setup =python-mode=
    #+begin_src emacs-lisp :tangle yes
    ;; (add-hook 'python-mode-hook 'lsp)
@@ -2312,12 +2342,13 @@ emacs -diff file1 file2
               ("M-." . godef-jump)))
    #+END_SRC
 ** Config File Formats
-  #+begin_src emacs-lisp :tangle yes
+  #+BEGIN_SRC emacs-lisp :tangle yes
     (use-package gitignore-mode)
     (use-package gitconfig-mode)
     (use-package hgignore-mode)
     (use-package hgrc-mode)
-  #+end_src
+  #+END_SRC
+
 * Which Key was that again?
 
 #+begin_src emacs-lisp :tangle yes
