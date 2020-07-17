@@ -111,6 +111,8 @@
   ;; Auto save all buffers in agenda mode
   (add-hook 'org-agenda-mode-hook
             (lambda ()
+              (define-key org-agenda-mode-map (kbd "M-.") (lambda () (interactive) (org-agenda-schedule nil ".")))
+              (define-key org-agenda-mode-map (kbd "C-.") (lambda () (interactive) (org-agenda-schedule t)))
               (define-key org-agenda-mode-map "Y" 'org-todo-yesterday)
               (define-key org-agenda-mode-map "P" 'org-pomodoro)
               (define-key org-agenda-mode-map "N" nil)
@@ -172,48 +174,27 @@ We ensure that we load org-habit and org-protocol
                   ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
                   ("DONE" ("WAITING") ("CANCELLED") ("HOLD"))))
 
-          org-tag-alist
+          org-tag-persistent-alist
           '((:startgroup)
             ("@anywhere" . ?a)
             (:grouptags) ; mutually exclusive
+            ("@home" .?h)
+            ("@sag" . ?s)
             ("@work" . ?w)
             ("@fablab" . ?f)
-            ("@sag" . ?s)
-            ("@weekend" . ?W)
-            ("@computer" . ?c)
             ("@errands" . ?e)
-            ("@home" .?h)
-            (:endgroup)
-
-
-            ;; home subgroup
-            (:startgroup)
-            ("@home" . ?h)
-            (:grouptags) ; mutually exclusive
-            ("@basement" . ?b)
-            ("@roof" . ?r)
             (:endgroup)
 
             (:startgrouptag)
             ("@work" . ?w)
             (:grouptags) ; not mutually exclusive
             ("francis" . ?F)
+            ("jordan" . ?J)
             ("dave" . ?D)
-            ("madhura" . ?M)
             ("lenni" . ?L)
             ("saurabh" . ?S)
             ("goth" . ?G)
             ("Roadmap" . ?R)
-            (:endgrouptag)
-
-            (:startgrouptag)
-            ("Roadmap" . ?R)
-            (:grouptags) ; not mutually exclusive
-            ;; TODO make this a regex...
-            ("H12019" . ?1)
-            ("H22019" . ?2)
-            ("H12020" . ?3)
-            ("H22020" . ?4)
             (:endgrouptag)
 
             (:startgrouptag)
@@ -793,7 +774,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
                      (org-agenda-todo-ignore-deadlines nil)))
 
            jallen-oacc-next
-           '(tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!NEXT"
+           '(tags-todo "-CANCELLED-CATEGORY=\"Read Me\"-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!NEXT"
                        ((org-agenda-overriding-header (concat "Next Actions"
                                                               (if bh/hide-scheduled-and-waiting-next-tasks
                                                                   ""
@@ -871,6 +852,30 @@ I remove the bulk of the defaults because I really don't use many of these featu
 #+begin_src emacs-lisp :tangle yes
   (add-hook 'org-agenda-finalize-hook (lambda () (hl-line-mode)))
 #+end_src
+*** Refresh agendas when idle
+
+#+begin_src emacs-lisp :tangle yes
+  ;; (defun my/make-throttler ()
+  ;;   (let ((last-time (float-time))
+  ;;         (last-args 'dummy)
+  ;;         (last-res ()))
+  ;;     (lambda (&rest args)
+  ;;       (if (and (< 60 (- (float-time) last-time)))
+  ;;                (equal args last-args))
+  ;;           last-res
+  ;;         (setq last-time (float-time)
+  ;;               last-args args
+  ;;               last-res (apply args)))))
+
+  ;; (defun my/org-agenda-redo ()
+  ;;   (org-agenda-redo))
+
+  ;; (advice-add 'my/org-agenda-redo :around (my/make-throttler))
+
+  ;; (add-hook 'org-agenda-finalize-hook
+  ;;           (lambda () (run-with-idle-timer 30 t 'my/org-agenda-redo)))
+#+end_src
+
 *** Buffer setup
   #+begin_src emacs-lisp :tangle yes
     (setq org-agenda-use-time-grid t
@@ -886,8 +891,12 @@ I remove the bulk of the defaults because I really don't use many of these featu
     #+begin_src emacs-lisp :tangle yes
       (advice-add 'org-agenda-goto :after
                   (lambda (&rest args)
-                    (org-show-children)
-                    (org-narrow-to-subtree)))
+                    (beginning-of-line)
+                    (save-excursion
+                      (if (bh/is-task-p)
+                          (org-up-heading-safe))
+                      (org-show-children)
+                      (org-narrow-to-subtree))))
     #+end_src
 
 
@@ -1137,6 +1146,8 @@ I remove the bulk of the defaults because I really don't use many of these featu
                 (("C-c n i" . org-roam-insert))
                 (("C-c n I" . org-roam-insert-immediate))))
 
+  (require 'org-roam-protocol)
+
   (use-package org-roam-server
     :ensure t
     :config
@@ -1151,8 +1162,36 @@ I remove the bulk of the defaults because I really don't use many of these featu
   (use-package company-org-roam
     :config
     (push 'company-org-roam company-backends))
-
 #+END_SRC
+** color agenda
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     ;; work with org-agenda dispatcher [c] "Today Clocked Tasks" to view today's clocked tasks.
+     (defun org-agenda-log-mode-colorize-block ()
+       "Set different line spacing based on clock time duration."
+       (save-excursion
+         (let* ((colors (cl-case (alist-get 'background-mode (frame-parameters))
+                          ('light
+                           (list "#F6B1C3" "#FFFF9D" "#BEEB9F" "#ADD5F7"))
+                          ('dark
+                           (list "#aa557f" "DarkGreen" "DarkSlateGray" "DarkSlateBlue"))))
+                pos
+                duration)
+           (nconc colors colors)
+           (goto-char (point-min))
+           (while (setq pos (next-single-property-change (point) 'duration))
+             (goto-char pos)
+             (when (and (not (equal pos (point-at-eol)))
+                        (setq duration (org-get-at-bol 'duration)))
+               ;; larger duration bar height
+               (let ((line-height (if (< duration 15) 1.0 (+ 0.5 (/ duration 30))))
+                     (ov (make-overlay (point-at-bol) (1+ (point-at-eol)))))
+                 (overlay-put ov 'face `(:background ,(car colors) :foreground "black"))
+                 (setq colors (cdr colors))
+                 (overlay-put ov 'line-height line-height)
+                 (overlay-put ov 'line-spacing (1- line-height))))))))
+
+     (add-hook 'org-agenda-finalize-hook #'org-agenda-log-mode-colorize-block)
+   #+END_SRC
 * Snippets
   Snippets are are awesome. They are found in ~/emacs.d/snippets
 #+begin_src emacs-lisp :tangle yes
