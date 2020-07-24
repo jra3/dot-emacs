@@ -1816,124 +1816,16 @@ to set xterm-mode as a terminal option for this
   (global-set-key (kbd "<f6>") 'compile)
   (global-set-key (kbd "<f7>") 'next-error) ;; can make this not global
 #+END_SRC
-** BUCK
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (require 'cl)
+** Colors
 
-  (defun buck--absolute-directory-path (path)
-    "Given a file name, returns the buck path to its directory."
-    (concat "//"
-            (directory-file-name
-             (file-name-directory
-              (file-relative-name
-               path (locate-dominating-file path ".buckconfig"))))))
+#+BEGIN_SRC emacs-lisp :tangle yes
+(require 'ansi-color)
 
-  (defun buck--find-targets-in-targets-file (targets-file)
-    "Given a TARGETS file, returns all targets defined in it."
-    (split-string
-     (shell-command-to-string
-      ; We could use `buck query' here, but this is much faster, though
-      ; less precise.
-      ; We can also consider adding `...' and `all' targets.
-      (format "grep 'name = ' %s | cut -d\\\" -f2" targets-file))
-     "\n" t))
-
-  (defun buck--find-tests-in-targets-file (targets-file)
-    "Given a TARGETS file, returns all tests defined in it."
-    (split-string
-     (shell-command-to-string
-      ; Again, `buck query' would be more accurate.
-      (format "grep -A 1 '^[a-z_]*test' %s | grep 'name = ' | cut -d\\\" -f2"
-              targets-file))
-     "\n" t))
-
-  (defun buck--find-fully-qualified-targets-in-targets-file (targets-file
-                                                             finder)
-    "Given a TARGETS file, return full buck paths to all its targets.
-
-  `finder' is a function that, given a TARGETS file, determines
-  its targets, e.g. `buck--find-targets-in-targets-file'."
-    (let ((base (buck--absolute-directory-path targets-file)))
-      (mapcar
-       (lambda (target) (format "%s:%s" base target))
-       (apply finder targets-file nil))))
-
-  (defun buck--find-targets-files-under (dir)
-    "Returns the full path of all TARGETS files under `dir'."
-    (mapcar
-     (lambda (target) target)
-     (split-string
-      (shell-command-to-string (format "find %s -name TARGETS" dir))
-      "\n" t)))
-
-  (defun buck--find-all-targets-under (dir finder)
-    "Returns all buck targets at or below `dir'.
-
-  `finder' is a function that, given a TARGETS file, determines
-  its targets, e.g. `buck--find-targets-in-targets-file'."
-    (cl-mapcan
-     (lambda (targets-file)
-       (buck--find-fully-qualified-targets-in-targets-file targets-file finder))
-     (buck--find-targets-files-under dir)))
-
-  (defun buck--find-build-targets-under (dir)
-    "Returns all buildable buck targets at or below `dir'."
-    (buck--find-all-targets-under dir 'buck--find-targets-in-targets-file))
-
-  (defun buck--find-test-targets-under (dir)
-    "Returns all testable buck targets at or below `dir'."
-    (buck--find-all-targets-under dir 'buck--find-tests-in-targets-file))
-
-  (defun buck--my-target-name ()
-    "Returns a guess at the target name for the current file."
-    (concat (buck--absolute-directory-path (buffer-file-name)) ":"
-            (string-trim
-             (shell-command-to-string
-              (format "grep -Pzo '(?s)name = [^)]*\"%s\"' %sTARGETS | head -1 | cut -d\\\" -f2"
-                      (file-name-nondirectory (buffer-file-name))
-                      (file-name-directory (buffer-file-name)))))))
-
-  (defvar buck--build-target-history nil "History for buck-build.")
-  (defvar buck--test-target-history nil "History for buck-test.")
-
-  (defun buck-build ()
-    "Choose and build a target with buck."
-    (interactive)
-    (compile
-     (format
-      "buck build --report-absolute-paths %s"
-      (completing-read
-       "Build target: "
-       (buck--find-build-targets-under default-directory)
-       nil 'confirm (buck--my-target-name) 'buck--build-target-history))))
-
-  (defun buck-test ()
-    "Choose and test a target with buck."
-    (interactive)
-    (compile
-     (format
-      "buck test --report-absolute-paths %s"
-      (completing-read
-       "Test target: "
-       (buck--find-test-targets-under default-directory)
-       nil 'confirm nil 'buck--test-target-history))))
-
-  (global-set-key (kbd "<f5>") 'buck-build)
-  (global-set-key (kbd "<f8>") 'buck-test)
-
-  (defun bcp--update-modeline ()
-    (save-excursion
-      (if (re-search-backward "^BUILT \\([[:digit:]]+\\)/\\([[:digit:]]+\\) "
-                              compilation-filter-start t)
-          (progn
-            (let ((num (string-to-number (match-string 1)))
-                  (denom (string-to-number (match-string 2))))
-              (setq-local mode-line-process
-                          (format ":%d%% (%d/%d)"
-                                  (/ (* 100 num) denom)
-                                  num denom)))))))
-
-  (add-hook 'compilation-filter-hook 'bcp--update-modeline)
+(defun colorize-compilation-buffer ()
+  (toggle-read-only)
+  (ansi-color-apply-on-region compilation-filter-start (point))
+  (toggle-read-only))
+(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 #+END_SRC
 * Code Format
   :LOGBOOK:
@@ -2037,21 +1929,35 @@ to set xterm-mode as a terminal option for this
    move xref stuff to a general xref section
 #+BEGIN_SRC emacs-lisp tangle: yes
 
-  (use-package lsp-mode
-    :config
-    (setq
-     lsp-ui-sideline-show-code-actions nil
-     lsp-ui-sideline-show-hover nil
-     lsp-highlight-symbol-at-point nil))
+      ;; (use-package lsp-mode
+      ;;   :config
+      ;;   (setq
+      ;;    lsp-ui-sideline-show-code-actions nil
+      ;;    lsp-ui-sideline-show-hover nil
+      ;;    lsp-highlight-symbol-at-point nil))
 
-  (use-package company-lsp
-    :after (lsp-mode company-mode)
-    :config
-    (push 'company-lsp company-backends)
-    (setq company-lsp-enable-snippet t
-          company-lsp-cache-candidates t))
+      ;; (use-package company-lsp
+      ;;   :after (lsp-mode company-mode)
+      ;;   :config
+      ;;   (push 'company-lsp company-backends)
+      ;;   (setq company-lsp-enable-snippet t
+      ;;         company-lsp-cache-candidates t))
 
-  (use-package lsp-ui :commands lsp-ui-mode)
+      ;; (use-package lsp-ui :commands lsp-ui-mode)
+
+      ;; (add-to-list 'eglot-server-programs '(c++-mode . ("cquery-language-server")))
+      ;; (add-to-list 'eglot-server-programs '(c-mode . ("cquery-language-server")))
+      ;; (add-to-list 'eglot-server-programs '(python-mode . ("~/bin/mypyls.sh")))
+      ;; (add-to-list 'eglot-server-programs '(python-mode . ("pyls-language-server")))
+      ;; (add-to-list 'eglot-server-programs '(python-mode . ("pyls")))
+      ;; (add-hook 'c++-mode-hook 'eglot-ensure)
+      ;; (add-hook 'c-mode-hook 'eglot-ensure)
+      ;; (add-hook 'python-mode-hook 'eglot-ensure)
+
+    (use-package eglot
+      :config
+      (add-to-list 'eglot-server-programs '(hack-mode . ("hh_client" "lsp" "--from" "emacs")))
+      (add-hook 'hack-mode-hook 'eglot-ensure))
 
 #+END_SRC
 
@@ -2205,6 +2111,11 @@ emacs -diff file1 file2
 (add-to-list 'auto-mode-alist '("\\/TARGETS\\'" . python-mode))
 (add-to-list 'auto-mode-alist '("\\/BUCK\\'" . python-mode))
 #+END_SRC
+*** cython
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package cython-mode)
+#+END_SRC
+
 *** Setup =python-mode=
    #+begin_src emacs-lisp :tangle yes
    ;; (add-hook 'python-mode-hook 'lsp)
@@ -2312,12 +2223,13 @@ emacs -diff file1 file2
               ("M-." . godef-jump)))
    #+END_SRC
 ** Config File Formats
-  #+begin_src emacs-lisp :tangle yes
+  #+BEGIN_SRC emacs-lisp :tangle yes
     (use-package gitignore-mode)
     (use-package gitconfig-mode)
     (use-package hgignore-mode)
     (use-package hgrc-mode)
-  #+end_src
+  #+END_SRC
+
 * Which Key was that again?
 
 #+begin_src emacs-lisp :tangle yes
