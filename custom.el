@@ -31,6 +31,10 @@
  '(auto-package-update-delete-old-versions nil)
  '(bbdb-file-remote "/usr/share/emacs/bbdb")
  '(company-minimum-prefix-length 1)
+ '(diary-file "~/diary")
+ '(excorporate-configuration
+   (quote
+    ("jallen@fb.com" . "https://outlook.office365.com/ews/exchange.asmx")))
  '(helm-ff-lynx-style-map t)
  '(helm-flx-for-helm-locate t)
  '(helm-flx-mode t)
@@ -40,7 +44,9 @@
  '(newsticker-html-renderer (quote shr-render-region) t)
  '(newsticker-use-full-width nil t)
  '(org-agenda-current-time-string "> you are here <")
+ '(org-agenda-files (quote ("~/org/gtd.org")))
  '(org-agenda-hide-tags-regexp "TASKS\\|WAITING\\|SOMEDAY\\|HOLD\\|TICKLER")
+ '(org-agenda-include-diary t)
  '(org-agenda-sorting-strategy
    (quote
     ((agenda habit-down effort-up time-up priority-down category-keep)
@@ -57,12 +63,14 @@
  '(org-clock-task-overrun-text "Don't be such a punk")
  '(org-download-method (quote directory))
  '(org-download-screenshot-method "screencapture -i %s")
+ '(org-export-with-toc nil)
  '(org-pomodoro-format "P~%s")
  '(org-pomodoro-play-sounds nil)
  '(org-roam-directory "~/org/roam")
+ '(org-special-ctrl-a/e (quote reversed))
  '(package-selected-packages
    (quote
-    (go-mode org-download org-roam-protocol company-org-roam org-d20 org-gcal modern-cpp-font-lock gnu-elpa-keyring-update markdown-mode lsp-mode org-pomodoro wttrin arduino-mode bbdb thrift yasnippet yaml-mode win-switch which-key web-mode use-package tangotango-theme rainbow-mode rainbow-delimiters popwin package-lint multiple-cursors lsp-ui lsp-hack js-comint ibuffer-vc ibuffer-git hgrc-mode hgignore-mode helm-xref helm-flx helm-descbinds hack-mode google-c-style gitignore-mode gitconfig-mode git-gutter flycheck expand-region exec-path-from-shell elisp-slime-nav cquery company-lsp auto-package-update anzu ag)))
+    (excorporate cython-mode eglot go-mode org-download org-roam-protocol company-org-roam org-d20 org-gcal modern-cpp-font-lock gnu-elpa-keyring-update markdown-mode lsp-mode org-pomodoro wttrin arduino-mode bbdb thrift yasnippet yaml-mode win-switch which-key web-mode use-package tangotango-theme rainbow-mode rainbow-delimiters popwin package-lint multiple-cursors lsp-ui lsp-hack js-comint ibuffer-vc ibuffer-git hgrc-mode hgignore-mode helm-xref helm-flx helm-descbinds hack-mode google-c-style gitignore-mode gitconfig-mode git-gutter flycheck expand-region exec-path-from-shell elisp-slime-nav cquery company-lsp auto-package-update anzu ag)))
  '(shr-width 80)
  '(undo-outer-limit 120000000))
 

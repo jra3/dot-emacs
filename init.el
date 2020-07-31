@@ -32,3 +32,4 @@
  config-org-files)
 
 (message "Start up time %.2fs" (float-time (time-subtract (current-time) my-start-time)))
+(put 'narrow-to-region 'disabled nil)
