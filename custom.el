@@ -46,7 +46,7 @@
  '(org-agenda-current-time-string "> you are here <")
  '(org-agenda-files (quote ("~/org/gtd.org")))
  '(org-agenda-hide-tags-regexp "TASKS\\|WAITING\\|SOMEDAY\\|HOLD\\|TICKLER")
- '(org-agenda-include-diary t)
+ '(org-agenda-include-diary nil)
  '(org-agenda-sorting-strategy
    (quote
     ((agenda habit-down effort-up time-up priority-down category-keep)

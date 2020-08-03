@@ -346,6 +346,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
   #+begin_src emacs-lisp :tangle yes
     (setq jallen-org-notes-file (concat org-directory "notes.org")
           jallen-org-gtd-file (concat org-directory "gtd.org")
+          jallen-org-beorg-file (concat org-directory "beorg.org")
           jallen-org-reference-file (concat org-directory "reference.org")
           jallen-org-chores-file (concat org-directory "chores.org")
           jallen-org-habits-file (concat org-directory "habits.org")
@@ -358,7 +359,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
           jallen-org-sync-calendar (concat org-directory "cal.org")
 
           ;; TODO we have a separate habits file to allos beorg to ignore habits. this is a bit unfortunate
-          jallen-default-org-agenda-files (list jallen-org-gtd-file)
+          jallen-default-org-agenda-files (list jallen-org-gtd-file jallen-org-beorg-file)
           org-default-notes-file jallen-org-notes-file
           org-agenda-files jallen-default-org-agenda-files)
 
@@ -746,6 +747,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
                      (org-agenda-ndays 30)
                      (org-agenda-start-on-weekday nil)
                      (org-agenda-start-day "+0d")
+                     (org-agenda-include-diary t)
                      (org-agenda-show-all-dates nil)
                      (org-agenda-files (list jallen-org-gtd-file jallen-org-sync-calendar))
                      (org-agenda-todo-ignore-deadlines nil)))
@@ -1162,6 +1164,12 @@ I remove the bulk of the defaults because I really don't use many of these featu
   (use-package company-org-roam
     :config
     (push 'company-org-roam company-backends))
+#+END_SRC
+** diary integratiohn
+   See calsync.el
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (add-hook 'diary-list-entries-hook 'diary-include-other-diary-files)
+  (add-hook 'diary-mark-entries-hook 'diary-mark-included-diary-files)
 #+END_SRC
 ** color agenda
    #+BEGIN_SRC emacs-lisp :tangle yes

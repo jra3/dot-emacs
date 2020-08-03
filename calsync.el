@@ -1,3 +1,4 @@
+;; $EMACS --batch -l ~/.emacs.d/calsync.el
 (let ((ics-files (directory-files-recursively "~/Library/Calendars" "\.ics$"))
       (diary-target "/tmp/diary-sync")
       (diary-final "~/diary.cal"))
