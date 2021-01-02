@@ -26,6 +26,7 @@ config.el
 .last-package-update-day
 .lsp-session-*
 .cask
+org-roam.db
 
 # Lux packagbe
 lux/node_modules

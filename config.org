@@ -144,9 +144,6 @@ We ensure that we load org-habit and org-protocol
 
 ** GTD TODO, tags, effort
 
-  TAGS: { project(p) }
-  TAGS: { @home(h) @office(o) @travelling(t) @phone(p) @email(m) @errands(e) }
-
   #+begin_src emacs-lisp :tangle yes
     (setq org-global-properties
           '(("Effort_ALL". "0:05 0:30 1:00 2:00 4:00 8:00")))
@@ -181,6 +178,7 @@ We ensure that we load org-habit and org-protocol
             ("@home" .?h)
             ("@sag" . ?s)
             ("@work" . ?w)
+            ("@woodshop" . ?@)
             ("@fablab" . ?f)
             ("@errands" . ?e)
             (:endgroup)
@@ -193,6 +191,7 @@ We ensure that we load org-habit and org-protocol
             ("dave" . ?D)
             ("lenni" . ?L)
             ("saurabh" . ?S)
+            ("vlad" . ?V)
             ("goth" . ?G)
             ("Roadmap" . ?R)
             (:endgrouptag)
@@ -204,6 +203,13 @@ We ensure that we load org-habit and org-protocol
             ("mimi" . ?m)
             ("dinny" . ?l)
             ("kids" . ?k)
+            (:endgrouptag)
+
+            (:startgrouptag)
+            ("hobby")
+            (:grouptags) ; not mutually exclusive
+            ("@woodshop" . ?@)
+            ("@fablab" . ?f)
             (:endgrouptag)
 
             ))
@@ -1082,17 +1088,31 @@ I remove the bulk of the defaults because I really don't use many of these featu
     (defun jallen/complete-on-capture ()
       "To be run in org-capture-before-finalize-hook"
       (pcase (plist-get org-capture-current-plist :description)
+        ("Evening Entry" (jallen/habit-id-checkoff "81125689-466F-4C87-9898-FB344CDD175F"))
         ("Morning Entry" (jallen/habit-id-checkoff "FEE1A918-0FFE-446F-A954-5B7A6DE29D3F"))
-        ("Breakfast" (jallen/habit-id-checkoff "04E10333-848C-4328-B029-96AFDEEB9728"))
+        ("breakfast" (jallen/habit-id-checkoff "04E10333-848C-4328-B029-96AFDEEB9728"))
         ("Lunch" (jallen/habit-id-checkoff "88A42399-6041-4F0B-8255-17301AC69F74"))
         ("Dinner" (jallen/habit-id-checkoff "D4CFC543-13A6-40C3-A82F-880191F60CF5"))
-        ("Evening Entry" (jallen/habit-id-checkoff "81125689-466F-4C87-9898-FB344CDD175F"))
         ("Weekly Report" (jallen/habit-id-checkoff "2BFA322E-1B16-4C62-868F-92BEE62D091E"))
         (_ (message "Capture complete!"))))
+
+    (defun jallen/review-after-capture ()
+      (let ((key  (plist-get org-capture-plist :key))
+            (desc (plist-get org-capture-plist :description)))
+        (if (not org-note-abort)
+            (pcase desc
+              ("Evening Entry" (jallen/random-journal-entry))
+              ("Morning Entry" (jallen/random-journal-entry))
+              (_ (message "Template with key %s and description “%s” run successfully" key desc))))))
 
     (add-hook
      'org-capture-before-finalize-hook
      'jallen/complete-on-capture)
+
+    (add-hook
+     'org-capture-after-finalize-hook
+     'jallen/review-after-capture)
+
   #+end_src
 ** Revert/Save around captures
 #+BEGIN_SRC emacs-lisp :tangle yes
