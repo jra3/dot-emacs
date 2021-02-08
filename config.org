@@ -1,11 +1,17 @@
 #+TITLE: Emacs Configuration
 #+AUTHOR: John Allen
 #+STARTUP: overview
+
+* Secret Sauce
+#+BEGIN_SRC emacs-lisp tangle: yes
+(require 'fb-master nil t)
+#+END_SRC
+
 * Use dash
   Because dash is awesome
-  #+BEGIN_SRC emacs-lisp :tangle yes
-    (use-package dash)
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp tangle: yes
+  (use-package dash)
+#+END_SRC
 
 * Path Fix for Mac
   Mac tries to hide your $PATH from you when using a graphical mode
@@ -16,13 +22,13 @@
     (exec-path-from-shell-initialize))
 #+END_SRC
 * Customization File
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (setq custom-file (concat config-load-path "custom.el"))
   (load custom-file)
-#+end_src
+#+END_SRC
 * Toggle Magic
   https://endlessparentheses.com/the-toggle-map-and-wizardry.html
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (define-prefix-command 'endless/toggle-map)
   ;; The manual recommends C-c for user keys, but C-x t is
   ;; always free, whereas C-c t is used by some modes.
@@ -33,16 +39,15 @@
   (define-key endless/toggle-map "f" #'auto-fill-mode)
   (define-key endless/toggle-map "l" #'toggle-truncate-lines)
   (define-key endless/toggle-map "q" #'toggle-debug-on-quit)
-  (define-key endless/toggle-map "t" #'endless/toggle-theme)
   ;;; Generalized version of `read-only-mode'.
   (define-key endless/toggle-map "r" #'dired-toggle-read-only)
   (autoload 'dired-toggle-read-only "dired" nil t)
   (define-key endless/toggle-map "w" #'whitespace-mode)
-#+end_src
+#+END_SRC
 
 * Configure Helm
   Make everything fuzzy and also rebind functions.
-  #+begin_src emacs-lisp :tangle yes
+  #+BEGIN_SRC emacs-lisp tangle: yes
     (use-package flx)
 
     (use-package helm-flx)
@@ -75,10 +80,10 @@
     :config
       (setq xref-show-xrefs-function 'helm-xref-show-xrefs))
 
-  #+end_src
+  #+END_SRC
 * Configuring =org-mode=
 ** Set environment
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (setq org-enforce-todo-dependencies t)
   (setq org-agenda-sticky t)
   (setq org-cycle-separator-lines 0)
@@ -119,32 +124,32 @@
               (cd "/tmp")
               (add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
               (auto-save-mode)))
-#+end_src
+#+END_SRC
 
 ** Modules
 
 We ensure that we load org-habit and org-protocol
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (setq-default org-modules
                 '(org-bibtex
                   org-habit
                   org-id
                   org-info
                   org-protocol))
-#+end_src
+#+END_SRC
 
 ** Enable =org-mode= for org files
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (use-package org
   :mode ("\\.org\\'" . org-mode)
   :mode ("\\.org_archive\\'" . org-mode))
-#+end_src
+#+END_SRC
 
 ** GTD TODO, tags, effort
 
-  #+begin_src emacs-lisp :tangle yes
+  #+BEGIN_SRC emacs-lisp tangle: yes
     (setq org-global-properties
           '(("Effort_ALL". "0:05 0:30 1:00 2:00 4:00 8:00")))
 
@@ -214,26 +219,26 @@ We ensure that we load org-habit and org-protocol
 
             ))
 
-  #+end_src
+  #+END_SRC
 ** Pretty headlines
 *** Make headlines more compact
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (setq org-hide-leading-stars t
         org-ellipsis "⤵"
         org-tags-column 80)
-#+end_src
+#+END_SRC
 *** Start folded by default
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
     (setq org-startup-folded 'content)
-#+end_src
+#+END_SRC
 *** Make all headline levels the same size
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (set-face-attribute 'org-level-1 nil :foreground "dodger blue" :weight 'bold :height 1.0)
   (set-face-attribute 'org-level-2 nil :foreground "#edd400" :weight 'bold :height 1.0)
-#+end_src
+#+END_SRC
 ** Columns, get your columns here
 
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (setq org-columns-default-format "%50ITEM(Task) %2PRIORITY %10Effort(Effort){:} %10CLOCKSUM")
 
 #+END_SRC
@@ -241,12 +246,12 @@ We ensure that we load org-habit and org-protocol
 ** Enter follows links at point
 
    Because how the hell else should it work?
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (setq org-return-follows-link t)
-#+end_src
+#+END_SRC
 
 ** Random Elt
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (defun jallen/random-journal-entry ()
     (interactive)
     (find-file jallen-org-5-min-journal-file)
@@ -259,7 +264,7 @@ We ensure that we load org-habit and org-protocol
 #+END_SRC
 ** Src blocks
 *** Intentation and fontification
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (setq org-src-fontify-natively t)
   (setq org-src-tab-acts-natively t)
 
@@ -276,25 +281,25 @@ We ensure that we load org-habit and org-protocol
   ;;   (lambda (src-block)
   ;;     (message src-block)
   ;;     ))
-#+end_src
+#+END_SRC
 
 *** Just evaluate it, don't backtalk me
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (setq org-confirm-babel-evaluate nil)
-#+end_src
+#+END_SRC
 
 ** Set up global keys
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-cb" 'org-switchb)
-#+end_src
+#+END_SRC
 ** Speed commands
 These are speed commands. They make the ORG go faster.
 
 I remove the bulk of the defaults because I really don't use many of these features...
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (setq org-use-speed-commands t
         org-speed-commands-user '(("Outline Navigation")
                                   ("u" . ignore)
@@ -357,11 +362,11 @@ I remove the bulk of the defaults because I really don't use many of these featu
 
 
   ;;org-speed-commands-user '(("5" (lambda () (org-toggle-tag "read")))))
-#+end_src
+#+END_SRC
 
 ** Special files
 
-  #+begin_src emacs-lisp :tangle yes
+  #+BEGIN_SRC emacs-lisp tangle: yes
     (setq jallen-org-notes-file (concat org-directory "notes.org")
           jallen-org-gtd-file (concat org-directory "gtd.org")
           jallen-org-beorg-file (concat org-directory "beorg.org")
@@ -381,9 +386,9 @@ I remove the bulk of the defaults because I really don't use many of these featu
           org-default-notes-file jallen-org-notes-file
           org-agenda-files jallen-default-org-agenda-files)
 
-  #+end_src
+  #+END_SRC
 ** Refiling
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   ;; Also enable based on a project tag?
   (defun jallen/filter-refile-targets ()
     (or (member "BUCKET" (org-get-tags))
@@ -403,7 +408,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
    :ORDERED:  t
    :END:
 *** Random sorting
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (defun org-random-cmp (a b)
     "Return -1,0 or 1 randomly"
     (- (mod (random) 3) 1))
@@ -411,7 +416,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
 
 *** Agenda helpers
 
-   #+BEGIN_SRC emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp tangle: yes
      ;; (defun clocked-time-cmp (a b)
      ;;   (let((x )
      ;;        (y ))
@@ -731,7 +736,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
    #+END_SRC
 *** Custom commands
 
-   #+BEGIN_SRC emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp tangle: yes
      (setq jallen-oacc-refile
            '(tags-todo "REFILE"
                        ((org-agenda-overriding-header "Tasks to Refile")
@@ -841,7 +846,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
 
 *** Agenda faces
 
-    #+begin_src emacs-lisp :tangle yes
+    #+BEGIN_SRC emacs-lisp tangle: yes
       (defface my-org-deadline-yesterday
         '((t (:foreground "#F45B69" :weight bold)))
         "Agenda deadlines overdue")
@@ -865,14 +870,14 @@ I remove the bulk of the defaults because I really don't use many of these featu
               (0.69 . my-org-deadline-tomorrow)
               (0.49 . my-org-deadline-later)
               (0.00 . my-org-deadline-someday)))
-    #+end_src
+    #+END_SRC
 *** Highlight the line that the point is on
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (add-hook 'org-agenda-finalize-hook (lambda () (hl-line-mode)))
-#+end_src
+#+END_SRC
 *** Refresh agendas when idle
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   ;; (defun my/make-throttler ()
   ;;   (let ((last-time (float-time))
   ;;         (last-args 'dummy)
@@ -892,10 +897,10 @@ I remove the bulk of the defaults because I really don't use many of these featu
 
   ;; (add-hook 'org-agenda-finalize-hook
   ;;           (lambda () (run-with-idle-timer 30 t 'my/org-agenda-redo)))
-#+end_src
+#+END_SRC
 
 *** Buffer setup
-  #+begin_src emacs-lisp :tangle yes
+  #+BEGIN_SRC emacs-lisp tangle: yes
     (setq org-agenda-use-time-grid t
           org-agenda-dim-blocked-tasks nil ;; Do not dim blocked tasks
           org-agenda-compact-blocks nil      ;; Compact the block agenda view
@@ -903,10 +908,10 @@ I remove the bulk of the defaults because I really don't use many of these featu
           org-agenda-start-on-weekday nil
           org-agenda-span 1
           org-agenda-window-setup 'current-window)
-  #+end_src
+  #+END_SRC
 *** org-goto should use a narrowed view
     I find this much more readable
-    #+begin_src emacs-lisp :tangle yes
+    #+BEGIN_SRC emacs-lisp tangle: yes
       (advice-add 'org-agenda-goto :after
                   (lambda (&rest args)
                     (beginning-of-line)
@@ -915,7 +920,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
                           (org-up-heading-safe))
                       (org-show-children)
                       (org-narrow-to-subtree))))
-    #+end_src
+    #+END_SRC
 
 
 ** No Priorities
@@ -925,32 +930,32 @@ I remove the bulk of the defaults because I really don't use many of these featu
 
 ** Clocks
 *** Org Pomodoro
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (use-package org-pomodoro)
 #+END_SRC
 
 *** Logging time of task completion
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (setq org-log-done 'time ; log the time a task is marked done
         org-clock-out-remove-zero-time-clocks t
         org-log-into-drawer t) ; timestamps go in a drawer, not the body
-#+end_src
+#+END_SRC
 *** Editing timestamps
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (setq org-edit-timestamp-down-means-later t)
-#+end_src
+#+END_SRC
 
 *** Save the running clock and all clock history when exiting Emacs, load it on startp
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (org-clock-persistence-insinuate)
   (setq org-clock-persist 'history
         org-clock-in-resume t)
-#+end_src
+#+END_SRC
 
 *** org-clocking-luxafor
 
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   ;; Some of the usual Luxafor patterns.
   (defconst org-clocking-luxafor-patterns
     '(
@@ -1014,7 +1019,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
 #+END_SRC
 
 ** =org-capture= templates
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (setq
    org-capture-templates
    '(
@@ -1066,19 +1071,19 @@ I remove the bulk of the defaults because I really don't use many of these featu
       (file+datetree jallen-org-notes-file)
       "* %? %U\n")
      ))
- #+end_src
+ #+END_SRC
 ** Habits
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (require 'org-habit)
   (setq org-habit-preceding-days 14
         org-habit-following-days 1
         org-habit-show-habits-only-for-today t
         org-habit-graph-column 52
         org-habit-show-all-today nil)
-#+end_src
+#+END_SRC
 ** Auto habit tracking for 5-min-journal et al.
    The ids in here are hardcoded the the random ids in my habits.org
-  #+begin_src emacs-lisp :tangle yes
+  #+BEGIN_SRC emacs-lisp tangle: yes
     (defun jallen/habit-id-checkoff (id)
       "Mark the habit with id as DONE"
       (save-excursion
@@ -1113,9 +1118,9 @@ I remove the bulk of the defaults because I really don't use many of these featu
      'org-capture-after-finalize-hook
      'jallen/review-after-capture)
 
-  #+end_src
+  #+END_SRC
 ** Revert/Save around captures
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 
   ;; ;; Revert buffer before capture
   ;; (add-hook
@@ -1129,35 +1134,35 @@ I remove the bulk of the defaults because I really don't use many of these featu
 
 #+END_SRC
 ** Regenerate Dynamic Blocks on save
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (add-hook 'before-save-hook 'org-update-all-dblocks)
   (add-hook 'before-save-hook 'org-table-recalculate-buffer-tables)
 #+END_SRC
 ** Exporting
 *** Exporter Setup
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (setq
    org-export-html-style-include-scripts nil
    org-export-html-style-include-default nil
    org-export-backends '(ascii beamer html icalendar texinfo latex)
    org-publish-use-timestamps-flag nil)
-#+end_src
+#+END_SRC
 *** HTML postamble
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (setq org-html-postamble-format
         (quote
          (("en" "<p class=\"author\">Author: %a (%e)</p>
   powered by <p class=\"creator\">%c</p><p class=\"validation\">%v</p>"))))
-#+end_src
+#+END_SRC
 
 ** org-protocol
    For some reason I need to explicitly require this. I thought it
    would be pulled in as an org-module.
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (require 'org-protocol)
 #+END_SRC
 ** org-download
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (use-package org-download
   :after org
   :bind
@@ -1166,7 +1171,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
          ("s-y" . org-download-yank))))
 #+END_SRC
 ** org-roam
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (use-package org-roam
     :ensure t
     :hook
@@ -1201,12 +1206,12 @@ I remove the bulk of the defaults because I really don't use many of these featu
 #+END_SRC
 ** diary integratiohn
    See calsync.el
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (add-hook 'diary-list-entries-hook 'diary-include-other-diary-files)
   (add-hook 'diary-mark-entries-hook 'diary-mark-included-diary-files)
 #+END_SRC
 ** color agenda
-   #+BEGIN_SRC emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp tangle: yes
      ;; work with org-agenda dispatcher [c] "Today Clocked Tasks" to view today's clocked tasks.
      ;; (defun org-agenda-log-mode-colorize-block ()
      ;;   "Set different line spacing based on clock time duration."
@@ -1235,7 +1240,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
      ;; (add-hook 'org-agenda-finalize-hook #'org-agenda-log-mode-colorize-block)
    #+END_SRC
 ** FB Links
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 
   (defconst diff-task-sev-re  "[tTdDsS][0-9]\\{4,\\}"
     "Regex matching Tasks, SEVs and Diffs links")
@@ -1263,16 +1268,16 @@ I remove the bulk of the defaults because I really don't use many of these featu
 #+END_SRC
 * Snippets
   Snippets are are awesome. They are found in ~/emacs.d/snippets
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (use-package yasnippet
   :diminish yas-minor-mode
   :config (yas-global-mode 1))
-#+end_src
+#+END_SRC
 
 * Navigation
 ** Configure Windmove
    I like to use the S-<arrow> keys for moving windows
-   #+begin_src emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp tangle: yes
      (windmove-default-keybindings)
 
      ;; Make windmove work in org-mode:
@@ -1298,11 +1303,11 @@ I remove the bulk of the defaults because I really don't use many of these featu
                #'jallen-org-header-windmove-right)
      (add-hook 'org-shiftleft-hook
                #'jallen-org-header-windmove-left)
-   #+end_src
+   #+END_SRC
 
 ** Manipulate Window Sizes
    C-x <arrow>
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (global-set-key
  (kbd "C-x <right>")
  '(lambda () (interactive) (enlarge-window-horizontally 4)))
@@ -1315,13 +1320,13 @@ I remove the bulk of the defaults because I really don't use many of these featu
 (global-set-key
  (kbd "C-x <down>")
  '(lambda () (interactive) (shrink-window 4)))
-#+end_src
+#+END_SRC
 ** Popwin
   Popwin give us special temporary behavior for certain buffers. This
   lets them pop in and out in a way that I like better than the
   default behavior of taking over the other-buffer
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (use-package popwin
     :config
     (progn
@@ -1367,17 +1372,17 @@ I remove the bulk of the defaults because I really don't use many of these featu
   ;;       ("*Help*")
   ;;       ("*Completions*" :noselect t)
   ;;       ("*Occur*" :noselect t)))))
-#+end_src
+#+END_SRC
 
 ** Go to a line by number
    I'm not really sure why this isn't bound somewhere already... I use
    this all the time. Am I the weird one?
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 ; (global-set-key (kbd "C-c t")  'goto-line)
-#+end_src
+#+END_SRC
 ** Enable win-switch
 Super nice to switch between frames and buffers
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (use-package win-switch
     :bind (("C-x o" . win-switch-dispatch))
     :config
@@ -1385,9 +1390,9 @@ Super nice to switch between frames and buffers
     (setq win-switch-feedback-background-color "purple")
     (setq win-switch-feedback-foreground-color "white")
     (win-switch-setup-keys-default))
-#+end_src
+#+END_SRC
 ** Enable ibuffer
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (use-package ibuffer-vc)
 (use-package ibuffer-git)
 (define-key global-map (kbd "C-x C-b") 'ibuffer)
@@ -1397,27 +1402,27 @@ Super nice to switch between frames and buffers
 ;;   (kbd "RET")
 ;;   'ibuffer-visit-buffer-other-window)
 
-#+end_src
+#+END_SRC
 ** Enable =anzu=
 
 I keep forgetting what anzu is... but i think I like it
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (use-package anzu
   :config (global-anzu-mode +1)
   (setq anzu-mode-lighter ""))
-#+end_src
+#+END_SRC
 
 ** Save Point Positions Between Sessions
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (use-package saveplace
   :config
   (setq-default save-place t)
   (setq save-place-file (expand-file-name ".places" "~/tmp/saves")))
-#+end_src
+#+END_SRC
 ** narrow/widen
 
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (defun narrow-or-widen-dwim (p)
     "Widen if buffer is narrowed, narrow-dwim otherwise.
     Dwim means: region, org-src-block, org-subtree, or
@@ -1467,19 +1472,19 @@ I keep forgetting what anzu is... but i think I like it
 #+END_SRC
 ** expand-region
    it's awsome
-   #+begin_src emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp tangle: yes
      (use-package expand-region
        :commands er/expand-region
        :bind ("C-=" . er/expand-region))
-   #+end_src
+   #+END_SRC
 * Appearance
 ** Frame Titles
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (setq frame-title-format (concat  "%b - emacs@" system-name))
-#+end_src
+#+END_SRC
 ** Fonts
  Install fonts from my .emacs.d into system locations
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (defun jallen-install-font ()
     "copy my font files into the system-specific location"
     (let ((fonts-source "~/.emacs.d/Input_Fonts/"))
@@ -1493,21 +1498,21 @@ I keep forgetting what anzu is... but i think I like it
             (lambda ()
               (if (-any '(lambda (fonts) (string-prefix-p "-*-Input " (elt fonts 6))) (x-family-fonts))
                   (jallen-install-font))))
-#+end_src
+#+END_SRC
 
 Define some shortcuts for sizes that I use sometimes
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (defun jallen-font () (interactive)
          (set-frame-font "Input Mono Narrow-16"))
   (defun jallen-font-no-contacts () (interactive)
          (set-frame-font "Input Mono Narrow-22"))
   (defun jallen-blind () (interactive)
          (set-frame-font "Input Mono Narrow-30"))
-#+end_src
+#+END_SRC
 
 
 ** Frame Configuration
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (setq default-frame-alist
       (quote
        ((left-fringe . 1)
@@ -1516,68 +1521,68 @@ Define some shortcuts for sizes that I use sometimes
         (tool-bar-lines . 0)
         (font . "Input Mono Narrow-16")
         )))
-#+end_src
+#+END_SRC
 ** Theme
    I love tangotango
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (use-package tangotango-theme
   :config (load-theme 'tangotango t))
-#+end_src
+#+END_SRC
 ** Uniqify Buffer Names
    TODO make this lazy load maybe?
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'reverse
       uniquify-separator "|"
       uniquify-after-kill-buffer-p t
       uniquify-ignore-buffers-re "^\\*")
-#+end_src
+#+END_SRC
 ** isearch faces
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (set-face-foreground 'lazy-highlight "black")
   (set-face-background 'lazy-highlight "yellow")
   (set-face-foreground 'isearch "white")
   (set-face-background 'isearch "blue")
-#+end_src
+#+END_SRC
 ** Turn off nux and noisy UI
    No scroll, tool, menu bars
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
   (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
   (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-#+end_src
+#+END_SRC
 
    Scratch buffer can just be empty, thanks
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (setq initial-scratch-message nil)
-#+end_src
+#+END_SRC
 
    No NUX
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (setq inhibit-splash-screen t
         inhibit-startup-message t
         inhibit-startup-echo-area-message t)
-#+end_src
+#+END_SRC
 
 ** Show lines and columns
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (setq line-number-mode t
       column-number-mode t)
-#+end_src
+#+END_SRC
 ** Highlight the selected region
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (setq transient-mark-mode t)
-#+end_src
+#+END_SRC
 * Terminal Configuration
 ** Fix my shell prompt regex
    I use fancy unicode characters in my shell prompt
 
 ** Terminals in emacs should use ansi colors
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (use-package ansi-color)
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 (setq comint-prompt-read-only t)
-#+end_src
+#+END_SRC
 
 ** Deal with running emacs in terminal
    Here is some scar tissue of me trying to make all keys work in the
@@ -1587,7 +1592,7 @@ and I'm no longer sure if this does anything for me.
 we are expecting an xterm compatible terminal here. tmux requires you
 to set xterm-mode as a terminal option for this
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (defadvice terminal-init-xterm (after map-S-up-escape-sequence activate)
   (define-key input-decode-map "\e[1;9A" [M-up])
   (define-key input-decode-map "\e[1;9B" [M-down])
@@ -1603,11 +1608,11 @@ to set xterm-mode as a terminal option for this
   (global-set-key [select] [S-up])
 )
 
-#+end_src
+#+END_SRC
 
 * Weather
   Because weather
-  #+BEGIN_SRC emacs-lisp :tangle yes
+  #+BEGIN_SRC emacs-lisp tangle: yes
     (use-package wttrin
       :ensure t
       :commands (wttrin)
@@ -1618,41 +1623,41 @@ to set xterm-mode as a terminal option for this
   #+END_SRC
 * Dired
 ** Enable =dired-x=
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (require 'dired-x)
-#+end_src
+#+END_SRC
 
 ** Simple =dired= display
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 ; (use-package dired-details
 ;   :config
 ;   (setq-default dired-details-hidden-string "--- ")
 ;   (dired-details-install))
-#+end_src
+#+END_SRC
 * Disable warnings about large files
   I'm not afraid of large files, yo
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (setq large-file-warning-threshold nil)
-#+end_src
+#+END_SRC
 * Search/Match should be case insensitive
   The documentation is actually a little misleading. The search will
   be case sensitive if the search string has any capital characters in
   it.
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (setq case-fold-search t)
-#+end_src
+#+END_SRC
 * Revert Files When They Change On Disk
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (global-auto-revert-mode t)
-#+end_src
+#+END_SRC
 * Simple Behavior Customizations
 ** Set fill-column to sensible default for me
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (setq fill-column 78)
-#+end_src
+#+END_SRC
 ** Backups
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (defvar user-temporary-file-directory "~/tmp/saves/"
   (concat temporary-file-directory user-login-name "/"))
 (make-directory user-temporary-file-directory t)
@@ -1678,71 +1683,71 @@ to set xterm-mode as a terminal option for this
 (setq auto-save-list-file-prefix
       (concat user-temporary-file-directory ".auto-saves-"))
 
-#+end_src
+#+END_SRC
 
 ** Text-mode is a better default than fundamental for me
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (setq-default major-mode 'text-mode)
-#+end_src
+#+END_SRC
 ** Replace 'yes/no' by just 'y/n'
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (fset 'yes-or-no-p 'y-or-n-p)
-#+end_src
+#+END_SRC
 
 ** Tags operations should be case sensitive
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (setq tags-case-fold-search nil)
-#+end_src
+#+END_SRC
 
 ** Smooth Scrolling
    https://www.emacswiki.org/emacs/SmoothScrolling
-   #+begin_src emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp tangle: yes
    (setq scroll-step 1
          scroll-conservatively 10000
          mouse-wheel-scroll-amount '(1 ((shift) . 1))
          mouse-wheel-progressive-speed nil ;; don't accelerate scrolling
          mouse-wheel-follow-mouse t) ;; scroll window under mouse
-   #+end_src
+   #+END_SRC
 ** Screen Splitting
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (setq split-height-threshold 10000
       split-width-threshold 10000)
-#+end_src
+#+END_SRC
 ** Subword movement in prog-mode
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (add-hook 'prog-mode-hook 'subword-mode)
-#+end_src
+#+END_SRC
 ** No bell, thanks
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (setq ring-bell-function 'ignore)
-#+end_src
+#+END_SRC
 * Spellcheck in Comments & Strings
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-#+end_src
+#+END_SRC
 * Editing
 ** Multiple Cursors                                                             :today:
    Multi-cursor editing is so cool when you can do it. Useful when
    editing many similar lines. More interactive than macros.
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (use-package multiple-cursors
   :bind (("M-c" . mc/edit-lines)
          ("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
          ("C-c C-<" . mc/mark-all-like-this)
          ("C-S-<mouse-1>" . mc/add-cursor-on-click)))
-#+end_src
+#+END_SRC
 
 ** Align lines on ' = '
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (global-set-key (kbd "C-c =") 'align-eq)
-#+end_src
+#+END_SRC
 ** Revert a buffer
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (global-set-key (kbd "C-c r") 'revert-buffer)
-#+end_src
+#+END_SRC
 ** Unfill paragraphs
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (defun unfill-paragraph ()
     "Takes a multi-line paragraph and makes it into a single line of text."
     (interactive)
@@ -1802,7 +1807,7 @@ to set xterm-mode as a terminal option for this
 
 * Flycheck
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (use-package flycheck
     :diminish
     :config
@@ -1811,30 +1816,30 @@ to set xterm-mode as a terminal option for this
                   '(emacs-lisp-checkdoc
                     python-flake8
                     json-jsonlist)))
-#+end_src
+#+END_SRC
 
 * Awesome Key Bindings
 ** Multiple Cursors
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (use-package multiple-cursors
   :bind
   (("M-c" . mc/edit-lines)
    ("C->" . mc/mark-next-like-this)
    ("C-<" . mc/mark-previous-like-this)
    ("C-c C-<" . mc/mark-all-like-this)))
-#+end_src
+#+END_SRC
 
 * Utility Functions
 ** Read lines of file into a list
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (defun jallen-read-lines (fpath)
   "Return a list of lines of a file at at FPATH."
   (with-temp-buffer
     (insert-file-contents fpath)
     (split-string (buffer-string) "\n" t)))
-#+end_src
+#+END_SRC
 ** Edit Current Buffer As root
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (defun sudo ()
   "Use TRAMP to `sudo' the current buffer"
   (interactive)
@@ -1842,9 +1847,9 @@ to set xterm-mode as a terminal option for this
     (find-alternate-file
      (concat "/sudo:root@localhost:"
              buffer-file-name))))
-#+end_src
+#+END_SRC
 ** Sort Lines In Paragraph
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (defun jallen-sort-para ()
   "Sorts the paragraph in which the point is located"
   (interactive)
@@ -1857,10 +1862,10 @@ to set xterm-mode as a terminal option for this
       (sort-lines nil bpoint epoint)
       )
     ))
-#+end_src
+#+END_SRC
 ** Increment/Decrement number at point
    Because why not?
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (defun increment-number-at-point ()
   (interactive)
   (skip-chars-backward "0-9")
@@ -1874,12 +1879,12 @@ to set xterm-mode as a terminal option for this
   (or (looking-at "[0-9]+")
       (error "No number at point"))
   (replace-match (number-to-string (- (string-to-number (match-string 0)) 1))))
-#+end_src
+#+END_SRC
 * Compilation
   If I'm compiling, just save all the buffers automatically for me
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (setq compilation-ask-about-save nil)
-#+end_src
+#+END_SRC
   And make some nice hotkeys
 #+BEGIN_SRC emacs-lisp tangle: yes
   (global-set-key (kbd "<f6>") 'compile)
@@ -1887,7 +1892,7 @@ to set xterm-mode as a terminal option for this
 #+END_SRC
 ** Colors
 
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (require 'ansi-color)
 
 (defun colorize-compilation-buffer ()
@@ -1903,51 +1908,51 @@ to set xterm-mode as a terminal option for this
 ** Default Indentation
    c-basic-offset is used by most major modes I use as the basis for
    how deeply to indent any code.
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (setq c-basic-offset 2)
-#+end_src
+#+END_SRC
 ** Whitespace
   I don't highlight trailing whitespace, because I auto-kill it anyway
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (setq-default show-trailing-whitespace nil)
-#+end_src
+#+END_SRC
   And here we do the killing
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (add-hook 'before-save-hook 'whitespace-cleanup)
-#+end_src
+#+END_SRC
 ** Tabs
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 2)
 (setq tab-width 2)
-#+end_src
+#+END_SRC
 ** Add newline to the end of files
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (setq require-final-newline t)
-#+end_src
+#+END_SRC
 ** Set Unix file coding system
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (setq-default buffer-file-coding-system 'utf-8-unix)
 (setq-default default-buffer-file-coding-system 'utf-8-unix)
 (set-default-coding-systems 'utf-8-unix)
 (prefer-coding-system 'utf-8-unix)
-#+end_src
+#+END_SRC
 * Better regex-builder
   'string' does not require the crazy double escape thing from emacs
   regexes
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (use-package re-builder
   :config
   (setq reb-re-syntax 'string))
-#+end_src
+#+END_SRC
 * Make scripts executable on save
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (add-hook 'after-save-hook
           'executable-make-buffer-file-executable-if-script-p)
-#+end_src
+#+END_SRC
 * echo-keys
   This is useful for screen capture videos
-  #+begin_src emacs-lisp :tangle yes
+  #+BEGIN_SRC emacs-lisp tangle: yes
     (defvar *echo-keys-last* nil "Last command processed by `echo-keys'.")
 
     (defun echo-keys ()
@@ -1992,7 +1997,7 @@ to set xterm-mode as a terminal option for this
           (switch-to-buffer (get-buffer-create "*echo-key*"))
           (set-window-dedicated-p (selected-window) t)
           (other-window 1))))
-  #+end_src
+  #+END_SRC
 * LSP
 ** TODO Basic
    move xref stuff to a general xref section
@@ -2060,7 +2065,7 @@ to set xterm-mode as a terminal option for this
 #+END_SRC
 * Hideshow
 
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (require 'hideshow)
   (define-key hs-minor-mode-map "\C-\M-i" 'hs-toggle-hiding) ;; C-tab
   (define-key hs-minor-mode-map "\C-\M-y" 'hs-show-all)      ;; C-S-tab
@@ -2068,26 +2073,26 @@ to set xterm-mode as a terminal option for this
 * Modes
 ** elisp
 *** Turn on eldoc-mode
-   #+begin_src emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp tangle: yes
    (use-package eldoc
      :diminish eldoc-mode
      :config (add-hook 'emacs-lisp-mode-hook 'eldoc-mode))
-   #+end_src
+   #+END_SRC
 
 *** Enable slime-nav
-   #+begin_src emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp tangle: yes
      (use-package elisp-slime-nav
        :diminish elisp-slime-nav-mode
        :config
        (add-hook 'emacs-lisp-mode-hook (lambda () (elisp-slime-nav-mode t))))
-   #+end_src
+   #+END_SRC
 *** Enable =rainbow-delimiters=
     But only for emacs-lisp
-    #+begin_src emacs-lisp :tangle yes
+    #+BEGIN_SRC emacs-lisp tangle: yes
     (use-package rainbow-delimiters
       :config
       (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode))
-    #+end_src
+    #+END_SRC
 
 *** package-lint for authoring packages
 #+BEGIN_SRC emacs-lisp tangle: yes
@@ -2095,7 +2100,7 @@ to set xterm-mode as a terminal option for this
 #+END_SRC
 
 ** CSS
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (use-package rainbow-mode :delight)
 (use-package css-mode
   :mode "\\.css$"
@@ -2104,10 +2109,10 @@ to set xterm-mode as a terminal option for this
         css-indent-offset 2)
   (add-hook 'css-mode-hook 'rainbow-mode)
 )
-#+end_src
+#+END_SRC
 ** C++
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (use-package modern-cpp-font-lock
     :ensure t)
 
@@ -2115,9 +2120,9 @@ to set xterm-mode as a terminal option for this
     :config
     (add-hook 'c-mode-common-hook 'google-set-c-style)
     (add-hook 'c-mode-common-hook 'google-make-newline-indent))
-#+end_src
+#+END_SRC
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
   (define-key org-mode-map (kbd "C-c o") 'ff-get-other-file)
   (add-hook 'c++-mode-hook
@@ -2126,7 +2131,7 @@ to set xterm-mode as a terminal option for this
               (modern-c++-font-lock-mode)
               (setq-local require-final-newline t)
               (setq-local compilation-auto-jump-to-first-error t)))
-#+end_src
+#+END_SRC
 
 ** ediff
 
@@ -2137,7 +2142,7 @@ emacs as our diff tool.
 emacs -diff file1 file2
 #+END_SRC
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (defun command-line-diff (switch)
   (let ((file1 (pop command-line-args-left))
         (file2 (pop command-line-args-left)))
@@ -2162,16 +2167,16 @@ emacs -diff file1 file2
              ediff-current-diff-face-B)
             (make-face-italic
              ediff-current-diff-face-C)))
-#+end_src
+#+END_SRC
 ** YAML
    Enable =yaml-mode=
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 (use-package yaml-mode
   :mode ("\\.yml$" "\\.yaml$" "\\.lock$")
   :config
   (add-hook 'yaml-mode-hook 'flycheck-mode)
   (add-hook 'yaml-mode-hook 'flyspell-mode))
-#+end_src
+#+END_SRC
 ** Python
    In the past I've used elpy to great effect, but I haven't messed
    with that in a while
@@ -2181,37 +2186,37 @@ emacs -diff file1 file2
 (add-to-list 'auto-mode-alist '("\\/BUCK\\'" . python-mode))
 #+END_SRC
 *** cython
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (use-package cython-mode)
 #+END_SRC
 
 *** Setup =python-mode=
-   #+begin_src emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp tangle: yes
    ;; (add-hook 'python-mode-hook 'lsp)
    (setq python-shell-interpreter "/usr/bin/ipython")
    (setq py-basic-offset 4)
-   #+end_src
+   #+END_SRC
 *** Enable company-jedi
-   #+begin_src emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp tangle: yes
                                              ; (use-package company-jedi
                                              ;   :config (add-to-list 'company-backends 'company-jedi))
-   #+end_src
+   #+END_SRC
 ** Thrift
- #+begin_src emacs-lisp :tangle yes
+ #+BEGIN_SRC emacs-lisp tangle: yes
    (use-package thrift)
-#+end_src
+#+END_SRC
 ** JSON
-  #+begin_src emacs-lisp :tangle yes
+  #+BEGIN_SRC emacs-lisp tangle: yes
     (use-package json)
-  #+end_src
+  #+END_SRC
 
 ** Markdown
-  #+begin_src emacs-lisp :tangle yes
+  #+BEGIN_SRC emacs-lisp tangle: yes
     (use-package markdown-mode
        :mode (("\\.text\\'" . markdown-mode)
               ("\\.markdown\\'" . markdown-mode)
               ("README\\.md\\'" . gfm-mode)))
-  #+end_src
+  #+END_SRC
 
 ** Hack
 
@@ -2229,7 +2234,7 @@ emacs -diff file1 file2
 
 ** JS + Web
    Web mode is a very, very, very fine mode
-   #+begin_src emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp tangle: yes
      (use-package js-comint)
      (use-package web-mode
        :mode "\\.phtml\\'"
@@ -2277,9 +2282,9 @@ emacs -diff file1 file2
        (add-to-list 'web-mode-indentation-params '("lineup-calls" . nil))
        (add-to-list 'web-mode-indentation-params '("lineup-concats" . nil))
        (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil)))
-   #+end_src
+   #+END_SRC
 ** Go
-   #+BEGIN_SRC emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp tangle: yes
      (use-package go-mode
        :defer t
        :ensure t
@@ -2292,7 +2297,7 @@ emacs -diff file1 file2
               ("M-." . godef-jump)))
    #+END_SRC
 ** Config File Formats
-  #+BEGIN_SRC emacs-lisp :tangle yes
+  #+BEGIN_SRC emacs-lisp tangle: yes
     (use-package gitignore-mode)
     (use-package gitconfig-mode)
     (use-package hgignore-mode)
@@ -2301,33 +2306,33 @@ emacs -diff file1 file2
 
 * Which Key was that again?
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (use-package which-key
     :pin gnu
     :diminish which-key-mode
     :config (which-key-mode 1))
-#+end_src
+#+END_SRC
 * Log major-mode
-  #+begin_src emacs-lisp :tangle yes
+  #+BEGIN_SRC emacs-lisp tangle: yes
     (add-hook 'prog-mode-hook (lambda () (message "%s" major-mode)) 'append)
-  #+end_src
+  #+END_SRC
 
 * RSS Reader
 ** Basic setup
-   #+begin_src emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp tangle: yes
      (setq newsticker-date-format "(%A %D %H:%M)"
            newsticker-html-renderer 'shr-render-region
            newsticker-use-full-width nil)
-   #+end_src
+   #+END_SRC
 ** Set up HTML rendering
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   ;; (use-package w3m
   ;;   :if (executable-find "w3m")
   ;;   :config
   ;;   (setq newsticker-html-renderer 'w3m-region))
  #+END_SRC
 ** List of blogs
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
     (global-set-key (kbd "C-c C-n") 'newsticker-show-news)
     (setq-default
      newsticker-url-list
@@ -2337,11 +2342,11 @@ emacs -diff file1 file2
        ("Arabesque" "https://sanctum.geek.nz/arabesque/feed/" nil nil nil)
        ("XKCD" "https://xkcd.com/rss.xml" nil nil nil)
        ("Sacha Chua" "http://sachachua.com/blog/feed/" nil nil nil)))
-#+end_src
+#+END_SRC
 * Scratch
 ** lsp-thrift
 
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp tangle: yes
 
     (require 'lsp-mode)
 
