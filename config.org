@@ -754,13 +754,6 @@ I remove the bulk of the defaults because I really don't use many of these featu
                         (org-tags-match-list-sublevels 'indented)
                         ))
 
-           jallen-oacc-stuck
-           '(tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
-                       ((org-agenda-overriding-header "Stuck Projects")
-                        (org-agenda-skip-function 'bh/skip-non-stuck-projects)
-                        (org-agenda-sorting-strategy '(todo-state-up))
-                        ))
-
            jallen-oacc-today
            '(agenda ""
                     ((org-agenda-overriding-header "Agenda:")
@@ -772,6 +765,13 @@ I remove the bulk of the defaults because I really don't use many of these featu
                      (org-agenda-show-all-dates nil)
                      (org-agenda-files (list jallen-org-gtd-file jallen-org-sync-calendar))
                      (org-agenda-todo-ignore-deadlines nil)))
+
+           jallen-oacc-stuck
+           '(tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
+                       ((org-agenda-overriding-header "Stuck Projects")
+                        (org-agenda-skip-function 'bh/skip-non-stuck-projects)
+                        (org-agenda-sorting-strategy '(todo-state-up))
+                        ))
 
            jallen-oacc-habits
            '(agenda ""
@@ -812,6 +812,23 @@ I remove the bulk of the defaults because I really don't use many of these featu
                         (org-agenda-sorting-strategy '(effort-up))
                         ))
 
+           jallen-oacc-next-no-location
+           '(tags-todo "-@anywhere-@woodshop-@fablab-@work-@home-@sag-CANCELLED-CATEGORY=\"Read Me\"-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!NEXT"
+                       ((org-agenda-overriding-header (concat "No location"
+                                                              (if bh/hide-scheduled-and-waiting-next-tasks
+                                                                  ""
+                                                                " (including WAITING and SCHEDULED tasks)")))
+                        (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+                        (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
+                        (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
+                        (org-agenda-skip-function 'bh/skip-projects-and-habits)
+                        (org-tags-match-list-sublevels t)
+                        ;; random sorting so I don't stare at the meaningless order
+                        ;; (org-agenda-cmp-user-defined 'org-random-cmp)
+                        (org-agenda-sorting-strategy '(effort-up))
+                        ))
+
+
            jallen-oacc-waiting
            '(tags-todo "-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"-CANCELLED+WAITING|HOLD/!"
                        ((org-agenda-overriding-header (concat "Waiting and Postponed Tasks"
@@ -832,7 +849,11 @@ I remove the bulk of the defaults because I really don't use many of these featu
             (list "C" "Clarify"
                   (list jallen-oacc-refile
                         jallen-oacc-stuck
+                        jallen-oacc-next-no-location
                         ))
+
+            (list "i" "inspire"
+                  (list jallen-oacc-next))
 
             (list "j" "GTD"
                   (list jallen-oacc-today
@@ -2002,37 +2023,35 @@ to set xterm-mode as a terminal option for this
 ** TODO Basic
    move xref stuff to a general xref section
 #+BEGIN_SRC emacs-lisp tangle: yes
+  (use-package lsp-mode
+    :config
+    (setq
+     lsp-ui-sideline-show-code-actions nil
+     lsp-ui-sideline-show-hover nil
+     lsp-highlight-symbol-at-point nil))
 
-      ;; (use-package lsp-mode
-      ;;   :config
-      ;;   (setq
-      ;;    lsp-ui-sideline-show-code-actions nil
-      ;;    lsp-ui-sideline-show-hover nil
-      ;;    lsp-highlight-symbol-at-point nil))
+  (use-package company-lsp
+    :after (lsp-mode company-mode)
+    :config
+    (push 'company-lsp company-backends)
+    (setq company-lsp-enable-snippet t
+          company-lsp-cache-candidates t))
 
-      ;; (use-package company-lsp
-      ;;   :after (lsp-mode company-mode)
-      ;;   :config
-      ;;   (push 'company-lsp company-backends)
-      ;;   (setq company-lsp-enable-snippet t
-      ;;         company-lsp-cache-candidates t))
+  (use-package lsp-ui :commands lsp-ui-mode)
 
-      ;; (use-package lsp-ui :commands lsp-ui-mode)
+  ;; (add-to-list 'eglot-server-programs '(c++-mode . ("cquery-language-server")))
+  ;; (add-to-list 'eglot-server-programs '(c-mode . ("cquery-language-server")))
+  ;; (add-to-list 'eglot-server-programs '(python-mode . ("~/bin/mypyls.sh")))
+  ;; (add-to-list 'eglot-server-programs '(python-mode . ("pyls-language-server")))
+  ;; (add-to-list 'eglot-server-programs '(python-mode . ("pyls")))
+  ;; (add-hook 'c++-mode-hook 'eglot-ensure)
+  ;; (add-hook 'c-mode-hook 'eglot-ensure)
+  ;; (add-hook 'python-mode-hook 'eglot-ensure)
 
-      ;; (add-to-list 'eglot-server-programs '(c++-mode . ("cquery-language-server")))
-      ;; (add-to-list 'eglot-server-programs '(c-mode . ("cquery-language-server")))
-      ;; (add-to-list 'eglot-server-programs '(python-mode . ("~/bin/mypyls.sh")))
-      ;; (add-to-list 'eglot-server-programs '(python-mode . ("pyls-language-server")))
-      ;; (add-to-list 'eglot-server-programs '(python-mode . ("pyls")))
-      ;; (add-hook 'c++-mode-hook 'eglot-ensure)
-      ;; (add-hook 'c-mode-hook 'eglot-ensure)
-      ;; (add-hook 'python-mode-hook 'eglot-ensure)
-
-    (use-package eglot
-      :config
-      (add-to-list 'eglot-server-programs '(hack-mode . ("hh_client" "lsp" "--from" "emacs")))
-      (add-hook 'hack-mode-hook 'eglot-ensure))
-
+  (use-package eglot
+    :config
+    (add-to-list 'eglot-server-programs '(hack-mode . ("hh_client" "lsp" "--from" "emacs")))
+    (add-hook 'hack-mode-hook 'eglot-ensure))
 #+END_SRC
 
 ** cquery
