@@ -6,13 +6,6 @@
 
 ;;; Code:
 
-;(package-initialize) We'll do this in config.org
-
-(setq url-proxy-services
-   '(("no_proxy" . "^\\(localhost\\|10.*\\)")
-     ("http" . "fwdproxy:8080")
-     ("https" . "fwdproxy:8080")))
-
 (defvar my-start-time (current-time) "Time when Emacs was started")
 
 (defvar config-load-path (file-name-directory (or load-file-name buffer-file-name)))
@@ -26,7 +19,6 @@
     ))
 
 (require 'package)
-(package-initialize)
 (require 'org)
 
 (mapc

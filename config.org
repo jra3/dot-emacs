@@ -1221,9 +1221,6 @@ I remove the bulk of the defaults because I really don't use many of these featu
           org-roam-server-label-truncate-length 60
           org-roam-server-label-wrap-length 20))
 
-  (use-package company-org-roam
-    :config
-    (push 'company-org-roam company-backends))
 #+END_SRC
 ** diary integratiohn
    See calsync.el
@@ -2029,13 +2026,6 @@ to set xterm-mode as a terminal option for this
      lsp-ui-sideline-show-code-actions nil
      lsp-ui-sideline-show-hover nil
      lsp-highlight-symbol-at-point nil))
-
-  (use-package company-lsp
-    :after (lsp-mode company-mode)
-    :config
-    (push 'company-lsp company-backends)
-    (setq company-lsp-enable-snippet t
-          company-lsp-cache-candidates t))
 
   (use-package lsp-ui :commands lsp-ui-mode)
 
