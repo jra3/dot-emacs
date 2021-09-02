@@ -1386,7 +1386,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
               :dedicated t :position bottom :stick t :noselect nil :height 0.33)
             popwin:special-display-config)
       (push '("*compilation*"
-              :dedicated t :position bottom :stick t :noselect t   :height 0.2)
+              :dedicated t :position bottom :stick t :noselect t   :height 0.5)
             popwin:special-display-config)
       (push '("*Compile-Log*"
               :dedicated t :position bottom :stick t :noselect t   :height 0.33)
@@ -1769,10 +1769,6 @@ to set xterm-mode as a terminal option for this
 #+BEGIN_SRC emacs-lisp tangle: yes
 (setq ring-bell-function 'ignore)
 #+END_SRC
-* Spellcheck in Comments & Strings
-#+BEGIN_SRC emacs-lisp tangle: yes
-(add-hook 'prog-mode-hook 'flyspell-prog-mode)
-#+END_SRC
 * Editing
 ** Multiple Cursors                                                             :today:
    Multi-cursor editing is so cool when you can do it. Useful when
@@ -1931,12 +1927,16 @@ to set xterm-mode as a terminal option for this
 * Compilation
   If I'm compiling, just save all the buffers automatically for me
 #+BEGIN_SRC emacs-lisp tangle: yes
-(setq compilation-ask-about-save nil)
+  (setq compilation-ask-about-save nil)
 #+END_SRC
   And make some nice hotkeys
 #+BEGIN_SRC emacs-lisp tangle: yes
   (global-set-key (kbd "<f6>") 'compile)
   (global-set-key (kbd "<f7>") 'next-error) ;; can make this not global
+#+END_SRC
+And follow the output!!!
+#+BEGIN_SRC emacs-lisp tangle: yes
+  (setq compilation-scroll-output 'first-error)
 #+END_SRC
 ** Colors
 
