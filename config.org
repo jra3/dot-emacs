@@ -2323,10 +2323,10 @@ emacs -diff file1 file2
    #+END_SRC
 ** Config File Formats
   #+BEGIN_SRC emacs-lisp tangle: yes
-    (use-package gitignore-mode)
-    (use-package gitconfig-mode)
-    (use-package hgignore-mode)
-    (use-package hgrc-mode)
+    ;; (use-package gitignore-mode)
+    ;; (use-package gitconfig-mode)
+    ;; (use-package hgignore-mode)
+    ;; (use-package hgrc-mode)
   #+END_SRC
 
 * Which Key was that again?
