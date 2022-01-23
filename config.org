@@ -1442,7 +1442,6 @@ Super nice to switch between frames and buffers
 ** Enable ibuffer
 #+BEGIN_SRC emacs-lisp tangle: yes
 (use-package ibuffer-vc)
-(use-package ibuffer-git)
 (define-key global-map (kbd "C-x C-b") 'ibuffer)
 (setq ibuffer-default-sorting-mode 'major-mode)
 ;; (define-key
