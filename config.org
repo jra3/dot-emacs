@@ -2,10 +2,6 @@
 #+AUTHOR: John Allen
 #+STARTUP: overview
 
-* Secret Sauce
-#+BEGIN_SRC emacs-lisp tangle: yes
-(require 'fb-master nil t)
-#+END_SRC
 * mac magic
   #+BEGIN_SRC emacs-lisp tangle: yes
     ;; Keybonds
@@ -38,12 +34,6 @@
       )
   #+END_SRC
 
-* Use dash
-  Because dash is awesome
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (use-package dash)
-#+END_SRC
-
 * Path Fix for Mac
   Mac tries to hide your $PATH from you when using a graphical mode
 #+BEGIN_SRC emacs-lisp tangle: yes
@@ -52,6 +42,12 @@
     :config
     (exec-path-from-shell-initialize))
 #+END_SRC
+* Use dash
+  Because dash is awesome
+#+BEGIN_SRC emacs-lisp tangle: yes
+  (use-package dash)
+#+END_SRC
+
 * Customization File
 #+BEGIN_SRC emacs-lisp tangle: yes
   (setq custom-file (concat config-load-path "custom.el"))
@@ -80,7 +76,6 @@
   Make everything fuzzy and also rebind functions.
   #+BEGIN_SRC emacs-lisp tangle: yes
     (use-package flx)
-
     (use-package helm-flx)
     (use-package helm-descbinds)
     (use-package helm
@@ -1422,12 +1417,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
   ;;       ("*Occur*" :noselect t)))))
 #+END_SRC
 
-** Go to a line by number
-   I'm not really sure why this isn't bound somewhere already... I use
-   this all the time. Am I the weird one?
-#+BEGIN_SRC emacs-lisp tangle: yes
-; (global-set-key (kbd "C-c t")  'goto-line)
-#+END_SRC
+
 ** Enable win-switch
 Super nice to switch between frames and buffers
 #+BEGIN_SRC emacs-lisp tangle: yes
@@ -1452,7 +1442,7 @@ Super nice to switch between frames and buffers
 #+END_SRC
 ** Enable =anzu=
 
-I keep forgetting what anzu is... but i think I like it
+Show number and ordinality of matching
 
 #+BEGIN_SRC emacs-lisp tangle: yes
 (use-package anzu
@@ -1621,9 +1611,6 @@ Define some shortcuts for sizes that I use sometimes
 (setq transient-mark-mode t)
 #+END_SRC
 * Terminal Configuration
-** Fix my shell prompt regex
-   I use fancy unicode characters in my shell prompt
-
 ** Terminals in emacs should use ansi colors
 #+BEGIN_SRC emacs-lisp tangle: yes
 (use-package ansi-color)
@@ -1657,30 +1644,6 @@ to set xterm-mode as a terminal option for this
 
 #+END_SRC
 
-* Weather
-  Because weather
-  #+BEGIN_SRC emacs-lisp tangle: yes
-    (use-package wttrin
-      :ensure t
-      :commands (wttrin)
-      :init
-      (setq wttrin-default-cities '("New York" "Sag Harbor, NY")
-            wttrin-default-accept-language '("Accept-Language" . "en-US")))
-    (define-key ctl-x-map "w" 'wttrin)
-  #+END_SRC
-* Dired
-** Enable =dired-x=
-#+BEGIN_SRC emacs-lisp tangle: yes
-(require 'dired-x)
-#+END_SRC
-
-** Simple =dired= display
-#+BEGIN_SRC emacs-lisp tangle: yes
-; (use-package dired-details
-;   :config
-;   (setq-default dired-details-hidden-string "--- ")
-;   (dired-details-install))
-#+END_SRC
 * Disable warnings about large files
   I'm not afraid of large files, yo
 
@@ -1800,7 +1763,6 @@ to set xterm-mode as a terminal option for this
   (global-set-key (kbd "M-Q") 'unfill-paragraph)
 #+END_SRC
 * VC
-
 ** git-gutter-mode
 #+BEGIN_SRC emacs-lisp tangle: yes
   (use-package git-gutter
@@ -1848,18 +1810,6 @@ to set xterm-mode as a terminal option for this
                      (if revision (list (concat "-r" revision)))))))
 #+END_SRC
 
-* Flycheck
-
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (use-package flycheck
-    :diminish
-    :config
-    (setq-default flycheck-temp-prefix ".flycheck")
-    (setq-default flycheck-disabled-checkers
-                  '(emacs-lisp-checkdoc
-                    python-flake8
-                    json-jsonlist)))
-#+END_SRC
 
 * Awesome Key Bindings
 ** Multiple Cursors
@@ -1969,7 +1919,7 @@ And follow the output!!!
 #+END_SRC
 ** Tabs
 #+BEGIN_SRC emacs-lisp tangle: yes
-(setq-default indent-tabs-mode nil)
+(setq-default indent-tabs-mode t)
 (setq-default tab-width 2)
 (setq tab-width 2)
 #+END_SRC
@@ -1999,6 +1949,7 @@ And follow the output!!!
 #+END_SRC
 * echo-keys
   This is useful for screen capture videos
+
   #+BEGIN_SRC emacs-lisp tangle: yes
     (defvar *echo-keys-last* nil "Last command processed by `echo-keys'.")
 
@@ -2047,67 +1998,18 @@ And follow the output!!!
   #+END_SRC
 * LSP
 ** TODO Basic
-   move xref stuff to a general xref section
 #+BEGIN_SRC emacs-lisp tangle: yes
+  (use-package eglot)
   (use-package lsp-mode
     :config
     (setq
      lsp-ui-sideline-show-code-actions nil
      lsp-ui-sideline-show-hover nil
      lsp-highlight-symbol-at-point nil))
-
   (use-package lsp-ui :commands lsp-ui-mode)
-
-  ;; (add-to-list 'eglot-server-programs '(c++-mode . ("cquery-language-server")))
-  ;; (add-to-list 'eglot-server-programs '(c-mode . ("cquery-language-server")))
-  ;; (add-to-list 'eglot-server-programs '(python-mode . ("~/bin/mypyls.sh")))
-  ;; (add-to-list 'eglot-server-programs '(python-mode . ("pyls-language-server")))
-  ;; (add-to-list 'eglot-server-programs '(python-mode . ("pyls")))
-  ;; (add-hook 'c++-mode-hook 'eglot-ensure)
-  ;; (add-hook 'c-mode-hook 'eglot-ensure)
-  ;; (add-hook 'python-mode-hook 'eglot-ensure)
-
-  (use-package eglot
-    :config
-    (add-to-list 'eglot-server-programs '(hack-mode . ("hh_client" "lsp" "--from" "emacs")))
-    (add-hook 'hack-mode-hook 'eglot-ensure))
 #+END_SRC
 
-** cquery
-#+BEGIN_SRC emacs-lisp tangle: yes
-  ;; (use-package cquery
-  ;;   :if
-  ;;   (file-exists-p "/bin/cquery")
-  ;;   :bind
-  ;;   (:map c-mode-base-map
-  ;;     ("M-." . xref-find-definitions)
-  ;;     ("C-t h c" . cquery-call-hierarchy)
-  ;;     ("C-t h i" . cquery-inheritance-hierarchy)
-  ;;     ("C-t i" . lsp-ui-sideline-toggle-symbols-info)
-  ;;     ("C-t I". helm-imenu)
-  ;;     ("C-t h m" . cquery-member-hierarchy)
-  ;;     ("C-t ." . lsp-ui-peek-find-definitions)
-  ;;     ("C-t ?" . lsp-ui-peek-find-references))
-  ;;   :preface
-  ;;   (defun cquery//enable ()
-  ;;     (condition-case nil
-  ;;       (lsp-cquery-enable)
-  ;;       (user-error nil)))
-  ;;   :init
-  ;;   (add-hook 'c-mode-common-hook #'cquery//enable)
-  ;;   :config
-  ;;   (setq cquery-executable "/bin/cquery"
-  ;;         cquery-extra-args '("--log-file=/tmp/cq.log")
-  ;;         cquery-extra-init-params '(:completion (:detailedLabel t))
-  ;;         cquery-sem-highlight-method 'font-lock))
-#+END_SRC
-* Hideshow
 
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (require 'hideshow)
-  (define-key hs-minor-mode-map "\C-\M-i" 'hs-toggle-hiding) ;; C-tab
-  (define-key hs-minor-mode-map "\C-\M-y" 'hs-show-all)      ;; C-S-tab
-#+END_SRC
 * Modes
 ** elisp
 *** Turn on eldoc-mode
@@ -2190,7 +2092,6 @@ emacs -diff file1 file2
 (add-hook 'ediff-load-hook
           (lambda ()
             (message "getting my diff onnnnn")
-            (flycheck-mode nil)
             (setq ediff-highlight-all-diffs nil)
             (set-face-background
              ediff-current-diff-face-A "#1e2424")
@@ -2208,11 +2109,11 @@ emacs -diff file1 file2
 ** YAML
    Enable =yaml-mode=
 #+BEGIN_SRC emacs-lisp tangle: yes
-(use-package yaml-mode
-  :mode ("\\.yml$" "\\.yaml$" "\\.lock$")
-  :config
-  (add-hook 'yaml-mode-hook 'flycheck-mode)
-  (add-hook 'yaml-mode-hook 'flyspell-mode))
+   (use-package yaml-mode
+    :mode (("\\.lock$" . yaml-ts-mode)
+           ("\\.yml$" . yaml-ts-mode)
+           ("\\.yaml$" . yaml-ts-mode)))
+
 #+END_SRC
 ** Python
    In the past I've used elpy to great effect, but I haven't messed
@@ -2238,10 +2139,6 @@ emacs -diff file1 file2
                                              ; (use-package company-jedi
                                              ;   :config (add-to-list 'company-backends 'company-jedi))
    #+END_SRC
-** Thrift
- #+BEGIN_SRC emacs-lisp tangle: yes
-   (use-package thrift)
-#+END_SRC
 ** JSON
   #+BEGIN_SRC emacs-lisp tangle: yes
     (use-package json)
@@ -2254,20 +2151,6 @@ emacs -diff file1 file2
               ("\\.markdown\\'" . markdown-mode)
               ("README\\.md\\'" . gfm-mode)))
   #+END_SRC
-
-** Hack
-
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (use-package hack-mode
-    :init
-    (add-hook 'hack-mode-hook
-              (lambda ()
-                (lsp)
-                (flycheck-mode t)
-                (subword-mode t)
-                (company-mode t)
-                )))
-#+END_SRC
 
 ** JS + Web
    Web mode is a very, very, very fine mode
@@ -2307,10 +2190,6 @@ emacs -diff file1 file2
         'web-mode `(("\\(function *\\)("
                      (0 (progn (compose-region (match-beginning 1) (match-end 1) "ƒ")
                                nil)))))
-       (setq-default flycheck-disabled-checkers
-                     (append flycheck-disabled-checkers
-                             '(javascript-jshint)))
-       (flycheck-add-mode 'javascript-eslint 'web-mode)
        (defadvice web-mode-highlight-part (around tweak-jsx activate)
          (if (equal web-mode-content-type "jsx")
              (let ((web-mode-enable-part-face nil))
@@ -2368,39 +2247,3 @@ emacs -diff file1 file2
        ("Sacha Chua" "http://sachachua.com/blog/feed/" nil nil nil)))
 #+END_SRC
 * Scratch
-** lsp-thrift
-
-#+BEGIN_SRC emacs-lisp tangle: yes
-
-    (require 'lsp-mode)
-
-    (defgroup lsp-thrift nil
-      "Thrift."
-      :group 'lsp-mode
-      :tag "Thrift")
-
-    (defcustom lsp-thrift-command '("/usr/local/bin/thrift-lsp")
-      "thrift-lsp command."
-      :group 'lsp-thrift
-      :risky t
-      :type 'list)
-
-    (lsp-register-client
-     (make-lsp-client :new-connection (lsp-stdio-connection (lambda () lsp-thrift-command))
-                      :major-modes '(thrift-mode)
-                      :priority -1
-                      :server-id 'thrift))
-
-    (setq lsp-language-id-configuration
-          (append lsp-language-id-configuration  '((thrift-mode . "thrift"))))
-
-  (locate-dominating-file "/data/users/jallen/fbsource/fbcode/strobelight/if/service.thrift" "fbcode")
-
-         ;; 'fbcode',
-         ;; 'fbandroid',
-         ;; 'fbobjc',
-         ;; 'configerator-hg/source',
-         ;; 'opsfiles-hg',
-         ;; 'configerator-eden/source',
-         ;; 'opsfiles-eden
-#+END_SRC
