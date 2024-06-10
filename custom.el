@@ -46,7 +46,6 @@
  '(newsticker-html-renderer 'shr-render-region t)
  '(newsticker-use-full-width nil t)
  '(org-agenda-current-time-string "> you are here <")
- '(org-agenda-files '("~/org/gtd.org"))
  '(org-agenda-hide-tags-regexp "TASKS\\|WAITING\\|SOMEDAY\\|HOLD\\|TICKLER")
  '(org-agenda-include-diary nil)
  '(org-agenda-sorting-strategy

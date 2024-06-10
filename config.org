@@ -210,22 +210,9 @@ We ensure that we load org-habit and org-protocol
             ("@sag" . ?s)
             ("@work" . ?w)
             ("@woodshop" . ?@)
-            ("@fablab" . ?f)
+            ("@fish" . ?f)
             ("@errands" . ?e)
             (:endgroup)
-
-            (:startgrouptag)
-            ("@work" . ?w)
-            (:grouptags) ; not mutually exclusive
-            ("francis" . ?F)
-            ("jordan" . ?J)
-            ("dave" . ?D)
-            ("lenni" . ?L)
-            ("saurabh" . ?S)
-            ("vlad" . ?V)
-            ("goth" . ?G)
-            ("Roadmap" . ?R)
-            (:endgrouptag)
 
             (:startgrouptag)
             ("Family" . ?A)
@@ -240,7 +227,7 @@ We ensure that we load org-habit and org-protocol
             ("hobby")
             (:grouptags) ; not mutually exclusive
             ("@woodshop" . ?@)
-            ("@fablab" . ?f)
+            ("@fish" . ?f)
             (:endgrouptag)
 
             ))
@@ -395,20 +382,18 @@ I remove the bulk of the defaults because I really don't use many of these featu
   #+BEGIN_SRC emacs-lisp tangle: yes
     (setq jallen-org-notes-file (concat org-directory "notes.org")
           jallen-org-gtd-file (concat org-directory "gtd.org")
-          jallen-org-beorg-file (concat org-directory "beorg.org")
           jallen-org-reference-file (concat org-directory "reference.org")
           jallen-org-chores-file (concat org-directory "chores.org")
           jallen-org-habits-file (concat org-directory "habits.org")
+          jallen-org-mobile-capture-file (concat org-directory "inbox.org")
 
           jallen-org-journal-file (concat org-directory "journal.org")
           jallen-org-5-min-journal-file (concat org-directory "5-min-journal.org")
           jallen-org-weekly-report-file (concat org-directory "weekly.org")
           jallen-org-cbt-journal-file (concat org-directory "cbt-journal.org")
           jallen-org-diet-journal-file (concat org-directory "diet-journal.org")
-          jallen-org-sync-calendar (concat org-directory "cal.org")
 
-          ;; TODO we have a separate habits file to allos beorg to ignore habits. this is a bit unfortunate
-          jallen-default-org-agenda-files (list jallen-org-gtd-file jallen-org-beorg-file jallen-org-habits-file)
+          jallen-default-org-agenda-files (list jallen-org-gtd-file jallen-org-mobile-capture-file)
           org-default-notes-file jallen-org-notes-file
           org-agenda-files jallen-default-org-agenda-files)
 
@@ -429,7 +414,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
                              (jallen-org-reference-file :maxlevel . 4)))
 #+END_SRC
 
-** Agendas configurations
+** =Agendas= configurations
    :PROPERTIES:
    :ORDERED:  t
    :END:
@@ -789,7 +774,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
                      (org-agenda-start-day "+0d")
                      (org-agenda-include-diary t)
                      (org-agenda-show-all-dates nil)
-                     (org-agenda-files (list jallen-org-gtd-file jallen-org-sync-calendar))
+                     (org-agenda-files (list jallen-org-gtd-file jallen-org-mobile-capture-file))
                      (org-agenda-todo-ignore-deadlines nil)))
 
            jallen-oacc-stuck
@@ -1522,6 +1507,7 @@ Show number and ordinality of matching
 ** Fonts
  Install fonts from my .emacs.d into system locations
 #+BEGIN_SRC emacs-lisp tangle: yes
+
   (defun jallen-install-font ()
     "copy my font files into the system-specific location"
     (let ((fonts-source "~/.emacs.d/Input_Fonts/"))
@@ -1535,6 +1521,7 @@ Show number and ordinality of matching
             (lambda ()
               (if (-any '(lambda (fonts) (string-prefix-p "-*-Input " (elt fonts 6))) (x-family-fonts))
                   (jallen-install-font))))
+
 #+END_SRC
 
 Define some shortcuts for sizes that I use sometimes
