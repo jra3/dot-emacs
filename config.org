@@ -1870,87 +1870,103 @@ And follow the output!!!
 
 * Simple Behavior Customizations
 ** Set fill-column to sensible default for me
-#+BEGIN_SRC emacs-lisp tangle: yes
-(setq fill-column 78)
-#+END_SRC
+
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(setq fill-column 78)
+	#+END_SRC
+
 ** Backups
-#+BEGIN_SRC emacs-lisp tangle: yes
-(defvar user-temporary-file-directory "~/tmp/saves/"
-	(concat temporary-file-directory user-login-name "/"))
-(make-directory user-temporary-file-directory t)
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(defvar user-temporary-file-directory "~/tmp/saves/"
+			(concat temporary-file-directory user-login-name "/"))
 
-(setq
- make-backup-files t
- backup-by-copying t      ; don't clobber symlinks
- backup-directory-alist
- '(("." . user-temporary-file-directory))    ; don't litter my fs tree
- delete-old-versions t
- kept-new-versions 6
- kept-old-versions 2
- version-control t)       ; use versioned backups
+		(make-directory user-temporary-file-directory t)
 
-; disable vc integration, the repos can just be too big
-(setq vc-handled-backends nil)
-(setq vc-make-backup-files t)
+		(setq
+		 make-backup-files t
 
-(setq backup-directory-alist
-			`((".*" . ,user-temporary-file-directory)))
-(setq auto-save-file-name-transforms
-			`((".*" ,user-temporary-file-directory t)))
-(setq auto-save-list-file-prefix
-			(concat user-temporary-file-directory ".auto-saves-"))
+		 backup-by-copying t      ; don't clobber symlinks
+		 backup-directory-alist
+		 '(("." . user-temporary-file-directory))    ; don't litter my fs tree
+		 delete-old-versions t
+		 kept-new-versions 6
+		 kept-old-versions 2
+		 version-control t)       ; use versioned backups
 
+		(setq vc-make-backup-files t)
+
+		(setq backup-directory-alist
+					`((".*" . ,user-temporary-file-directory)))
+		(setq auto-save-file-name-transforms
+					`((".*" ,user-temporary-file-directory t)))
+		(setq auto-save-list-file-prefix
+					(concat user-temporary-file-directory ".auto-saves-"))
 #+END_SRC
 
 ** Text-mode is a better default than fundamental for me
-#+BEGIN_SRC emacs-lisp tangle: yes
-(setq-default major-mode 'text-mode)
-#+END_SRC
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(setq-default major-mode 'text-mode)
+	#+END_SRC
 ** Replace 'yes/no' by just 'y/n'
-#+BEGIN_SRC emacs-lisp tangle: yes
-(fset 'yes-or-no-p 'y-or-n-p)
-#+END_SRC
+
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(fset 'yes-or-no-p 'y-or-n-p)
+	#+END_SRC
 
 ** Tags operations should be case sensitive
-#+BEGIN_SRC emacs-lisp tangle: yes
-(setq tags-case-fold-search nil)
-#+END_SRC
+
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(setq tags-case-fold-search nil)
+	#+END_SRC
 
 ** Smooth Scrolling
+
 	 https://www.emacswiki.org/emacs/SmoothScrolling
-	 #+BEGIN_SRC emacs-lisp tangle: yes
-	 (setq scroll-step 1
-				 scroll-conservatively 10000
-				 mouse-wheel-scroll-amount '(1 ((shift) . 1))
-				 mouse-wheel-progressive-speed nil ;; don't accelerate scrolling
-				 mouse-wheel-follow-mouse t) ;; scroll window under mouse
+
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(setq scroll-step 1
+					scroll-conservatively 10000
+					mouse-wheel-scroll-amount '(1 ((shift) . 1))
+					mouse-wheel-progressive-speed nil ;; don't accelerate scrolling
+					mouse-wheel-follow-mouse t) ;; scroll window under mouse
 	 #+END_SRC
+
 ** Screen Splitting
-#+BEGIN_SRC emacs-lisp tangle: yes
-(setq split-height-threshold 10000
-			split-width-threshold 10000)
-#+END_SRC
+
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(setq split-height-threshold 10000
+					split-width-threshold 10000)
+	#+END_SRC
+
 ** Subword movement in prog-mode
-#+BEGIN_SRC emacs-lisp tangle: yes
-(add-hook 'prog-mode-hook 'subword-mode)
-#+END_SRC
+
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(add-hook 'prog-mode-hook 'subword-mode)
+	#+END_SRC
+
 ** No bell, thanks
-#+BEGIN_SRC emacs-lisp tangle: yes
-(setq ring-bell-function 'ignore)
-#+END_SRC
+
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(setq ring-bell-function 'ignore)
+	#+END_SRC
+
 ** Disable warnings about large files
 	I'm not afraid of large files, yo
 
-#+BEGIN_SRC emacs-lisp tangle: yes
-(setq large-file-warning-threshold nil)
-#+END_SRC
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(setq large-file-warning-threshold nil)
+	#+END_SRC
+
 ** Search/Match should be case insensitive
+
 	The documentation is actually a little misleading. The search will
 	be case sensitive if the search string has any capital characters in
 	it.
-#+BEGIN_SRC emacs-lisp tangle: yes
-(setq case-fold-search t)
-#+END_SRC
+
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(setq case-fold-search t)
+	#+END_SRC
+
 ** Revert Files When They Change On Disk
 #+BEGIN_SRC emacs-lisp tangle: yes
 	(global-auto-revert-mode t)
