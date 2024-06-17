@@ -1789,9 +1789,10 @@ to set xterm-mode as a terminal option for this
 *** Default Indentation
 	 c-basic-offset is used by most major modes I use as the basis for
 	 how deeply to indent any code.
-#+BEGIN_SRC emacs-lisp tangle: yes
-(setq c-basic-offset 2)
-#+END_SRC
+
+	 #+BEGIN_SRC emacs-lisp tangle: yes
+		 (setq c-basic-offset 1)
+	 #+END_SRC
 *** Whitespace
 	I don't highlight trailing whitespace, because I auto-kill it anyway
 #+BEGIN_SRC emacs-lisp tangle: yes
@@ -1803,31 +1804,22 @@ to set xterm-mode as a terminal option for this
 #+END_SRC
 *** Tabs
 #+BEGIN_SRC emacs-lisp tangle: yes
-(setq-default indent-tabs-mode t)
-(setq-default tab-width 2)
-(setq tab-width 2)
+	(setq-default indent-tabs-mode t)
+	(setq-default tab-width 2)
+	(setq tab-width 2)
 #+END_SRC
 *** Add newline to the end of files
 #+BEGIN_SRC emacs-lisp tangle: yes
-(setq require-final-newline t)
+	(setq require-final-newline t)
 #+END_SRC
 *** Set Unix file coding system
 #+BEGIN_SRC emacs-lisp tangle: yes
-(setq-default buffer-file-coding-system 'utf-8-unix)
-(setq-default default-buffer-file-coding-system 'utf-8-unix)
-(set-default-coding-systems 'utf-8-unix)
-(prefer-coding-system 'utf-8-unix)
+	(setq-default buffer-file-coding-system 'utf-8-unix)
+	(setq-default default-buffer-file-coding-system 'utf-8-unix)
+	(set-default-coding-systems 'utf-8-unix)
+	(prefer-coding-system 'utf-8-unix)
 #+END_SRC
-*** Smart stuff
 
-#+BEGIN_SRC emacs-list tangle: yes
-;; auto-format different source code files extremely intelligently
-;; https://github.com/radian-software/apheleia
-(use-package apheleia
-	:ensure t
-	:config
-	(apheleia-global-mode +1))
-#+END_SRC
 ** LSP
 *** TODO Basic
 #+BEGIN_SRC emacs-lisp tangle: yes
@@ -2166,71 +2158,12 @@ emacs -diff file1 file2
 
 ** Typescript
 
-#+BEGIN_SRC emacs-lisp tangle: yes
-	(use-package typescript-mode
-		:after tree-sitter
-		:config
-		;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
-		;; see https://github.com/joaotavora/eglot/issues/624 and https://github.com/joaotavora/eglot#handling-quirky-servers
-		(define-derived-mode typescriptreact-mode typescript-mode
-			"TypeScript TSX")
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(use-package typescript-ts-mode
+			:mode (("\\.ts\\'" . typescript-ts-mode)
+						 ("\\.tsx\\'" . tsx-ts-mode)))
 
-		;; use our derived mode for tsx files
-		(add-to-list 'auto-mode-alist '("\\.tsx?\\'" . typescriptreact-mode))
-		;; by default, typescript-mode is mapped to the treesitter typescript parser
-		;; use our derived mode to map both .tsx AND .ts -> typescriptreact-mode -> treesitter tsx
-		(add-to-list 'tree-sitter-major-mode-language-alist
-								 '(typescriptreact-mode . tsx)))
-
-#+END_SRC
-
-** JS + Web
-	 Web mode is a very, very, very fine mode
-	 #+BEGIN_SRC emacs-lisp tangle: yes
-		 (use-package js-comint)
-		 (use-package web-mode
-			 :mode "\\.phtml\\'"
-			 :mode "\\.[agj]sp\\'"
-			 :mode "\\.as[cp]x\\'"
-			 :mode "\\.erb\\'"
-			 :mode "\\.mustache\\'"
-			 :mode "\\.djhtml\\'"
-			 :mode "\\.html?\\'"
-			 :mode "\\.jsx?\\'"
-			 :bind
-			 (:map web-mode-map
-						 ("C-x C-e" . js-send-last-sexp)
-						 ("C-M-x" . js-send-last-sexp-and-go)
-						 ("C-c b" . js-send-buffer)
-						 ("C-c C-b" . js-send-buffer-and-go)
-						 ("C-c l" . js-load-file-and-go)
-						 )
-			 :config
-			 (setq web-mode-code-indent-offset 2
-						 web-mode-css-indent-offset 2
-						 web-mode-attr-indent-offset 2
-						 web-mode-enable-auto-closing t
-						 web-mode-enable-auto-indentation t
-						 web-mode-enable-auto-opening t
-						 web-mode-enable-auto-pairing t
-						 web-mode-enable-auto-quoting t
-						 web-mode-markup-indent-offset 2
-						 web-mode-script-padding 2
-						 web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'"))
-						 web-mode-style-padding 2)
-			 (font-lock-add-keywords
-				'web-mode `(("\\(function *\\)("
-										 (0 (progn (compose-region (match-beginning 1) (match-end 1) "ƒ")
-															 nil)))))
-			 (defadvice web-mode-highlight-part (around tweak-jsx activate)
-				 (if (equal web-mode-content-type "jsx")
-						 (let ((web-mode-enable-part-face nil))
-							 ad-do-it)
-					 ad-do-it))
-			 (add-to-list 'web-mode-indentation-params '("lineup-calls" . nil))
-			 (add-to-list 'web-mode-indentation-params '("lineup-concats" . nil))
-			 (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil)))
-	 #+END_SRC
+	#+END_SRC
 
 ** YAML
 	 Enable =yaml-mode=
