@@ -50,6 +50,7 @@
 * Configuring =org-mode=
 ** Set environment
 #+BEGIN_SRC emacs-lisp tangle: yes
+
 	(setq org-enforce-todo-dependencies t)
 	(setq org-agenda-sticky t)
 	(setq org-cycle-separator-lines 0)
@@ -67,7 +68,6 @@
 		(find-file (concat org-directory
 											 (helm-comp-read "Select your org file: "
 																			 (directory-files org-directory nil "\.org$")))))
-
 
 	(eval-after-load "org"
 		'(defun org-save-all-org-buffers ()
@@ -108,9 +108,10 @@ We ensure that we load org-habit and org-protocol
 ** Enable =org-mode= for org files
 
 #+BEGIN_SRC emacs-lisp tangle: yes
-(use-package org
-	:mode ("\\.org\\'" . org-mode)
-	:mode ("\\.org_archive\\'" . org-mode))
+	(use-package org
+		:mode ("\\.org\\'" . org-mode)
+		:mode ("\\.org_archive\\'" . org-mode)
+		:config (windmove-mode nil))
 #+END_SRC
 
 ** GTD TODO, tags, effort
