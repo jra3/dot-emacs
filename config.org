@@ -48,19 +48,35 @@
 		(load custom-file)
 	#+END_SRC
 * Configuring =org-mode=
+** Enable =org-mode= for org files
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(use-package org
+			:mode ("\\.org\\'" . org-mode)
+			:mode ("\\.org_archive\\'" . org-mode))
+	#+END_SRC
+
 ** Set environment
+	Blocked tasks are tasks that have subtasks which are not in a done
+	todo state. Blocked tasks show up in a grayed font by default in the
+	agenda.
+
+	To enable task blocking set the following variable:
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(setq org-enforce-todo-dependencies t)
+	#+END_SRC
+
 	#+BEGIN_SRC emacs-lisp tangle: yes
 
-		(setq org-enforce-todo-dependencies t)
-		(setq org-agenda-sticky t)
-		(setq org-cycle-separator-lines 0)
+			(setq org-agenda-sticky t)
+			(setq org-cycle-separator-lines 0)
 
-		(setq org-directory "~/org/"
-					org-tags-exclude-from-inheritance '("BUCKET" "PROJECTS"))
+			(setq org-directory "~/org/"
+						org-tags-exclude-from-inheritance '("BUCKET" "PROJECTS"))
 
-		(defun org-file-path (filename)
-			"Return the absolute address of an org file, given its relative name."
-			(concat (file-name-as-directory org-directory) filename))
+			(defun org-file-path (filename)
+				"Return the absolute address of an org file, given its relative name."
+				(concat (file-name-as-directory org-directory) filename))
+
 
 		(defun org-find-file ()
 			"Leverage Helm to quickly open any org files."
@@ -69,28 +85,28 @@
 												 (helm-comp-read "Select your org file: "
 																				 (directory-files org-directory nil "\.org$")))))
 
-		(eval-after-load "org"
-			'(defun org-save-all-org-buffers ()
-				 (interactive)
-				 "org-save-all-org-buffers saves agenda buffers annoyingly..."
-				 (save-some-buffers t (lambda () (and (derived-mode-p 'org-mode)
-																							(not (derived-mode-p 'org-agenda-mode))
-																							)))
-				 (when (featurep 'org-id) (org-id-locations-save))
-				 (message "Saving all org buffers... done")))
+			(eval-after-load "org"
+				'(defun org-save-all-org-buffers ()
+					 (interactive)
+					 "org-save-all-org-buffers saves agenda buffers annoyingly..."
+					 (save-some-buffers t (lambda () (and (derived-mode-p 'org-mode)
+																								(not (derived-mode-p 'org-agenda-mode))
+																								)))
+					 (when (featurep 'org-id) (org-id-locations-save))
+					 (message "Saving all org buffers... done")))
 
-		;; Auto save all buffers in agenda mode
-		(add-hook 'org-agenda-mode-hook
-							(lambda ()
-								(define-key org-agenda-mode-map (kbd "M-.") (lambda () (interactive) (org-agenda-schedule nil ".")))
-								(define-key org-agenda-mode-map (kbd "C-.") (lambda () (interactive) (org-agenda-schedule t)))
-								(define-key org-agenda-mode-map "Y" 'org-todo-yesterday)
-								(define-key org-agenda-mode-map "P" 'org-pomodoro)
-								(define-key org-agenda-mode-map "N" nil)
-								(cd "/tmp")
-								(add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
-								(auto-save-mode)))
-		#+END_SRC
+			;; Auto save all buffers in agenda mode
+			(add-hook 'org-agenda-mode-hook
+								(lambda ()
+									(define-key org-agenda-mode-map (kbd "M-.") (lambda () (interactive) (org-agenda-schedule nil ".")))
+									(define-key org-agenda-mode-map (kbd "C-.") (lambda () (interactive) (org-agenda-schedule t)))
+									(define-key org-agenda-mode-map "Y" 'org-todo-yesterday)
+									(define-key org-agenda-mode-map "P" 'org-pomodoro)
+									(define-key org-agenda-mode-map "N" nil)
+									(cd "/tmp")
+									(add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
+									(auto-save-mode)))
+	#+END_SRC
 
 ** Modules
 
