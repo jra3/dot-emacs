@@ -340,7 +340,7 @@
 	#+BEGIN_SRC emacs-lisp tangle: yes
 		(setq jallen-org-notes-file (concat org-directory "notes.org")
 					jallen-org-gtd-file (concat org-directory "gtd.org")
-					jallen-org-beorg-calendar-file (concat org-directory "beorg/calendar-beorg.org")
+					jallen-org-beorg-calendar-file (concat org-directory "mobile/calendar-beorg.org")
 					jallen-org-reference-file (concat org-directory "reference.org")
 					jallen-org-chores-file (concat org-directory "chores.org")
 					jallen-org-habits-file (concat org-directory "habits.org")
