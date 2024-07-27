@@ -154,7 +154,7 @@
 									("HOLD" ("WAITING") ("HOLD" . t))
 									(done ("WAITING") ("HOLD"))
 									("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
-									("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
+									("NEXT" ("WAITING") ("CANCELLED") ("HOLD") ("TASK" . t))
 									("DONE" ("WAITING") ("CANCELLED") ("HOLD"))))
 
 					org-tag-persistent-alist
@@ -162,6 +162,7 @@
 							("^measure" . ?m)
 							("^reachout" . ?r)
 							("^tools" . ?t)
+							("^review" . ?v)
 						(:endgroup)
 
 						(:startgroup . "location")
@@ -330,8 +331,6 @@
 																		("?" . org-speed-command-help)
 																		("<" org-agenda-set-restriction-lock 'subtree)
 																		(">" org-agenda-remove-restriction-lock)))
-
-		;;org-speed-commands-user '(("5" (lambda () (org-toggle-tag "read")))))
 
 	#+END_SRC
 
@@ -769,8 +768,8 @@
 												 (org-tags-match-list-sublevels nil)))
 
 						jallen-oacc-read
-						'(tags-todo "read"
-												((org-agenda-overriding-header "Reading List")
+						'(tags-todo "^review"
+												((org-agenda-overriding-header "Read/Review")
 												 (org-tags-match-list-sublevels nil)))
 
 						jallen-oacc-projects
@@ -796,7 +795,6 @@
 						'(tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
 												((org-agenda-overriding-header "Stuck Projects")
 												 (org-agenda-skip-function 'bh/skip-non-stuck-projects)
-												 (org-agenda-sorting-strategy '(todo-state-up))
 												 ))
 
 						jallen-oacc-habits
@@ -868,9 +866,6 @@
 
 						org-agenda-custom-commands
 						(list
-						 (list "r" "Read"
-									 (list jallen-oacc-read
-												 ))
 
 						 (list "C" "Clarify"
 									 (list jallen-oacc-refile
@@ -879,16 +874,18 @@
 												 ))
 
 						 (list "i" "inspire"
-									 (list jallen-oacc-next))
+									 (list jallen-oacc-read
+												 jallen-oacc-next))
 
 						 (list "j" "GTD"
 									 (list jallen-oacc-today
-												 jallen-oacc-habits
 												 jallen-oacc-next
-												 jallen-oacc-stuck
 												 jallen-oacc-projects
+												 jallen-oacc-waiting
+												 jallen-oacc-stuck
+												 jallen-oacc-habits
 												 jallen-oacc-chores
-												 jallen-oacc-waiting))))
+												 ))))
 		#+END_SRC
 
 ** No Priorities
