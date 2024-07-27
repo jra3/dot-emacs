@@ -1,0 +1,2 @@
+#!/bin/zsh
+emacsclient --eval "(jallen/habit-id-checkoff \"E6442695-4F24-4DB0-8F35-879C39B6FA54\")"
