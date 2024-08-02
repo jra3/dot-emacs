@@ -159,10 +159,10 @@
 
 					org-tag-persistent-alist
 					'((:startgroup . "types")
-							("^measure" . ?m)
-							("^reachout" . ?r)
-							("^tools" . ?t)
-							("^review" . ?v)
+							("#measure" . ?m)
+							("#reachout" . ?r)
+							("#tools" . ?t)
+							("#review" . ?v)
 						(:endgroup)
 
 						(:startgroup . "location")
@@ -377,10 +377,7 @@
 	 :PROPERTIES:
 	 :ORDERED:  t
 	 :END:
-
-
 *** Agenda helpers
-
 **** Sorting
 #+BEGIN_SRC emacs-lisp tangle: yes
 	(defun org-random-cmp (a b)
@@ -566,6 +563,32 @@
 				 ((org-is-habit-p) subtree-end)
 				 (t	nil)))))
 
+	(defun bh/skip-projects-and-habits ()
+		"Skip trees that are projects and tasks that are habits"
+		(save-restriction
+			(widen)
+			(let ((subtree-end (save-excursion (org-end-of-subtree t))))
+				(cond
+				 ((bh/is-project-p)	subtree-end)
+				 ((org-is-habit-p) subtree-end)
+				 (t	nil)))))
+
+	(defun jra3/skip-habits-on-hold ()
+		"Skip habit tasks that are hold TODO status"
+		(save-restriction
+			(widen)
+			(let ((subtree-end (save-excursion (org-end-of-subtree t))))
+				(cond
+				 ((and (org-is-habit-p)
+							 (member (org-get-todo-state) (list "HOLD"))) subtree-end)
+				 (t nil)))))
+
+
+		#+END_SRC
+**** Unused
+
+#+BEGIN_SRC emacs-lisp tangle: yes
+
 	(defun bh/skip-projects-and-habits-and-single-tasks ()
 		"Skip trees that are projects, tasks that are habits, single non-project tasks"
 		(save-restriction
@@ -579,24 +602,6 @@
 				 ((and (bh/is-task-p) (not (bh/is-project-subtree-p))) next-headline)
 				 (t	nil)))))
 
-	(defun bh/skip-project-tasks-maybe ()
-		"Show tasks related to the current restriction.
-				When restricted to a project, skip project and sub project tasks, habits, NEXT tasks, and loose tasks.
-				When not restricted, skip project and sub-project tasks, habits, and project related tasks."
-		(save-restriction
-			(widen)
-			(let* ((subtree-end (save-excursion (org-end-of-subtree t)))
-						 (next-headline (save-excursion (or (outline-next-heading) (point-max))))
-						 (limit-to-project (marker-buffer org-agenda-restrict-begin)))
-				(cond
-				 ((bh/is-project-p) next-headline)
-				 ((org-is-habit-p) subtree-end)
-				 ((and (not limit-to-project)
-							 (bh/is-project-subtree-p)) subtree-end)
-				 ((and limit-to-project
-							 (bh/is-project-subtree-p)
-							 (member (org-get-todo-state) (list "NEXT"))) subtree-end)
-				 (t	nil)))))
 
 	(defun bh/skip-project-tasks ()
 		"Show non-project tasks.
@@ -625,33 +630,24 @@
 				 ((not (bh/is-project-subtree-p))	subtree-end)
 				 (t	nil)))))
 
-	(defun bh/skip-projects-and-habits ()
-		"Skip trees that are projects and tasks that are habits"
+	(defun bh/skip-project-tasks-maybe ()
+		"Show tasks related to the current restriction.
+				When restricted to a project, skip project and sub project tasks, habits, NEXT tasks, and loose tasks.
+				When not restricted, skip project and sub-project tasks, habits, and project related tasks."
 		(save-restriction
 			(widen)
-			(let ((subtree-end (save-excursion (org-end-of-subtree t))))
+			(let* ((subtree-end (save-excursion (org-end-of-subtree t)))
+						 (next-headline (save-excursion (or (outline-next-heading) (point-max))))
+						 (limit-to-project (marker-buffer org-agenda-restrict-begin)))
 				(cond
-				 ((bh/is-project-p)	subtree-end)
+				 ((bh/is-project-p) next-headline)
 				 ((org-is-habit-p) subtree-end)
+				 ((and (not limit-to-project)
+							 (bh/is-project-subtree-p)) subtree-end)
+				 ((and limit-to-project
+							 (bh/is-project-subtree-p)
+							 (member (org-get-todo-state) (list "NEXT"))) subtree-end)
 				 (t	nil)))))
-
-	(defun jra3/skip-habits-on-hold ()
-		"Skip habit tasks that are hold TODO status"
-		(save-restriction
-			(widen)
-			(let ((subtree-end (save-excursion (org-end-of-subtree t))))
-				(cond
-				 ((and (org-is-habit-p)
-							 (member (org-get-todo-state) (list "HOLD")))
-					subtree-end)
-				 (t
-					nil)))))
-
-
-		#+END_SRC
-**** Unused
-
-#+BEGIN_SRC emacs-lisp tangle: yes
 
 	(defun bh/skip-non-subprojects ()
 		"Skip trees that are not projects"
@@ -902,59 +898,71 @@
 	#+END_SRC
 
 ** =org-capture= templates
+
 #+BEGIN_SRC emacs-lisp tangle: yes
-	(setq
-	 org-capture-templates
-	 '(
-		 ("t" "Todo [inbox]" entry ; New inbox item to be processed
-			(file+headline jallen-org-gtd-file "Inbox")
-			"* TODO %?\n %i\n\n")
-		 ("T" "Tickler" entry
-			(file+headline jallen-org-gtd-file "Tickler")
-			"* TODO %i%? \n SCHEDULED: <%(org-read-date nil nil \"+1d\")>")
-		 ("." "Do Task Now [inbox]" entry ; New inbox item to be processed
-			(file+headline jallen-org-gtd-file "Tasks")
-			"** NEXT %? \n  SCHEDULED: <%<%Y-%m-%d %H:%M>>\n %i\n\n")
+	(defun my/org-capture-target-at-heading ()
+		"Return a point marker at the current heading."
+		(save-excursion
+			(org-back-to-heading)
+			(point-marker)))
 
-		 ("w" "Weekly Report Item"
-			entry (file+olp+datetree jallen-org-weekly-report-file)
-			"* %?\n" :tree-type week)
-		 ("g" "GLOWUPS"
-			entry (file+olp+datetree jallen-org-weekly-report-file)
-			"* %? :glowup: \n" :tree-type week)
+		(setq
+		 org-capture-templates
+		 '(
+			 ("t" "Todo [inbox]" entry ; New inbox item to be processed
+				(file+headline jallen-org-gtd-file "Inbox")
+				"* TODO %?\n %i\n\n")
+			 ("T" "Tickler" entry
+				(file+headline jallen-org-gtd-file "Tickler")
+				"* TODO %i%? \n SCHEDULED: <%(org-read-date nil nil \"+1d\")>")
 
-		 ("j" "Journal Entries")
-		 ("jm" "Precious Memory" entry ; Freeform journal entry
-			(file+datetree jallen-org-journal-file)
-			"* %? :memory:\n  %i\n  %a")
-		 ("jl" "Today I Learned" entry ; Breif TIL journal entry
-			(file+datetree jallen-org-journal-file "TIL")
-			"* %?\nLearned on %U :til:\n  %i\n  %a")
-		 ("j." "Journal" entry ; Freeform journal entry
-			(file+datetree jallen-org-journal-file)
-			"* %?\nEntered on %U\n  %i\n  %a")
+			 ("w" "Weekly Report Item"
+				entry (file+olp+datetree jallen-org-weekly-report-file)
+				"* %?\n" :tree-type week)
+			 ("g" "GLOWUPS"
+				entry (file+olp+datetree jallen-org-weekly-report-file)
+				"* %? :glowup: \n" :tree-type week)
 
-		 ("5" "5 Minute Journal")
-		 ("5m" "Morning Entry" entry (file+datetree jallen-org-5-min-journal-file)
-			"* Morning\n  I am grateful for...\n  - %?\n  - \n  - \n\n  What will I do to make today great?\n  - \n  - \n  - \n\n  I am ...")
-		 ("5e" "Evening Entry" entry (file+datetree jallen-org-5-min-journal-file)
-			"* Evening\n  3 amazing things that happened today...\n  - %?\n  - \n  - \n\n  How could I have made today even better?\n  - \n")
+			 ("j" "Journal Entries")
+			 ("jm" "Precious Memory" entry ; Freeform journal entry
+				(file+datetree jallen-org-journal-file)
+				"* %? :memory:\n  %i\n  %a")
+			 ("jl" "Today I Learned" entry ; Breif TIL journal entry
+				(file+datetree jallen-org-journal-file "TIL")
+				"* %?\nLearned on %U :til:\n  %i\n  %a")
+			 ("j." "Journal" entry ; Freeform journal entry
+				(file+datetree jallen-org-journal-file)
+				"* %?\nEntered on %U\n  %i\n  %a")
 
-		 ("f" "Food")
-		 ("fb" "Breakfast" entry (file+datetree jallen-org-diet-journal-file)
-			"* Breakfast\n %U %?")
-		 ("fl" "Lunch" entry (file+datetree jallen-org-diet-journal-file)
-			"* Lunch\n %U %?")
-		 ("fd" "Dinner" entry (file+datetree jallen-org-diet-journal-file)
-			"* Dinner\n %U %?")
-		 ("fs" "Snack" entry (file+datetree jallen-org-diet-journal-file)
-			"* Snack\n %U %?")
+			 ("5" "5 Minute Journal")
+			 ("5m" "Morning Entry" entry (file+datetree jallen-org-5-min-journal-file)
+				"* Morning\n  I am grateful for...\n  - %?\n  - \n  - \n\n  What will I do to make today great?\n  - \n  - \n  - \n\n  I am ...")
+			 ("5e" "Evening Entry" entry (file+datetree jallen-org-5-min-journal-file)
+				"* Evening\n  3 amazing things that happened today...\n  - %?\n  - \n  - \n\n  How could I have made today even better?\n  - \n")
 
-		 ("n" "notes" entry ; Generic notebook entry
-			(file+datetree jallen-org-notes-file)
-			"* %? %U\n")
-		 ))
+			 ("f" "Food")
+			 ("fb" "Breakfast" entry (file+datetree jallen-org-diet-journal-file)
+				"* Breakfast\n %U %?")
+			 ("fl" "Lunch" entry (file+datetree jallen-org-diet-journal-file)
+				"* Lunch\n %U %?")
+			 ("fd" "Dinner" entry (file+datetree jallen-org-diet-journal-file)
+				"* Dinner\n %U %?")
+			 ("fs" "Snack" entry (file+datetree jallen-org-diet-journal-file)
+				"* Snack\n %U %?")
+
+			 ("."
+				"note at point"
+				item
+				(function my/org-capture-target-at-heading) "%? %U"
+				:prepend t
+				)
+
+			 ("n" "notes" entry ; Generic notebook entry
+				(file+datetree jallen-org-notes-file)
+				"* %? %U\n")
+			 ))
  #+END_SRC
+
 ** Habits
 #+BEGIN_SRC emacs-lisp tangle: yes
 		(require 'org-habit)
