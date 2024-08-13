@@ -756,6 +756,7 @@
 						'(tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
 												((org-agenda-overriding-header "Projects")
 												 (org-agenda-skip-function 'bh/skip-non-projects)
+												 (org-agenda-sorting-strategy '(timestamp-up))
 												 (org-tags-match-list-sublevels 'indented)
 												 ))
 
@@ -772,9 +773,16 @@
 											(org-agenda-todo-ignore-deadlines nil)))
 
 						jallen-oacc-stuck
-						'(tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
+						'(tags-todo "-CANCELLED-DELEGATED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
 												((org-agenda-overriding-header "Stuck Projects")
 												 (org-agenda-skip-function 'bh/skip-non-stuck-projects)
+												 (org-agenda-sorting-strategy '(todo-state-up))
+												 ))
+
+						jallen-oacc-delegated
+						'(tags-todo "-CANCELLED+DELEGATED!"
+												((org-agenda-overriding-header "Delegated Projects")
+												 (org-agenda-skip-function 'bh/skip-non-projects)
 												 ))
 
 						jallen-oacc-habits
@@ -813,7 +821,7 @@
 												 (org-tags-match-list-sublevels t)
 												 ;; random sorting so I don't stare at the meaningless order
 												 ;; (org-agenda-cmp-user-defined 'org-random-cmp)
-												 (org-agenda-sorting-strategy '(effort-up))
+												 (org-agenda-sorting-strategy '(effort-up timestamp-up))
 												 ))
 
 						jallen-oacc-next-no-location
@@ -840,6 +848,7 @@
 																																	 ""
 																																 " (including WAITING and SCHEDULED tasks)")))
 												 (org-agenda-skip-function 'bh/skip-non-tasks)
+												 (org-agenda-sorting-strategy '(todo-state-up))
 												 (org-tags-match-list-sublevels nil)
 												 (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
 												 (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)))
@@ -863,6 +872,7 @@
 												 jallen-oacc-projects
 												 jallen-oacc-waiting
 												 jallen-oacc-stuck
+												 jallen-oacc-delegated
 												 jallen-oacc-habits
 												 jallen-oacc-chores
 												 ))))
