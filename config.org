@@ -741,142 +741,150 @@
 
 *** Custom commands
 
-		#+BEGIN_SRC emacs-lisp tangle: yes
-			(setq jallen-oacc-refile
-						'(tags-todo "REFILE"
-												((org-agenda-overriding-header "Tasks to Refile")
-												 (org-tags-match-list-sublevels nil)))
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(defun jra3/next-with-context (tag)
+		"Return a configuration for next actions matching a context tag"
+		(let ((tag-filter (format "+%s" tag)))
+			`(tags-todo ,tag)))
 
-						jallen-oacc-read
-						'(tags-todo "^review"
-												((org-agenda-overriding-header "Read/Review")
-												 (org-tags-match-list-sublevels nil)))
+	(setq jallen-oacc-refile
+				'(tags-todo "REFILE"
+										((org-agenda-overriding-header "Tasks to Refile")
+										 (org-tags-match-list-sublevels nil)))
 
-						jallen-oacc-projects
-						'(tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
-												((org-agenda-overriding-header "Projects")
-												 (org-agenda-skip-function 'bh/skip-non-projects)
-												 (org-agenda-sorting-strategy '(timestamp-up))
-												 (org-tags-match-list-sublevels 'indented)
-												 ))
+				jallen-oacc-read
+				'(tags-todo "^review"
+										((org-agenda-overriding-header "Read/Review")
+										 (org-tags-match-list-sublevels nil)))
 
-						jallen-oacc-today
-						'(agenda ""
-										 ((org-agenda-overriding-header "Agenda:")
-											(org-agenda-span 'day)
-											(org-agenda-ndays 30)
-											(org-agenda-start-on-weekday nil)
-											(org-agenda-start-day "+0d")
-											(org-agenda-include-diary t)
-											(org-agenda-show-all-dates nil)
-											(org-agenda-files (list jallen-org-gtd-file jallen-org-beorg-calendar-file))
-											(org-agenda-todo-ignore-deadlines nil)))
+				jallen-oacc-projects
+				'(tags-todo "-CANCELLED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
+										((org-agenda-overriding-header "Projects")
+										 (org-agenda-skip-function 'bh/skip-non-projects)
+										 (org-agenda-sorting-strategy '(timestamp-up))
+										 (org-tags-match-list-sublevels 'indented)
+										 ))
 
-						jallen-oacc-stuck
-						'(tags-todo "-CANCELLED-DELEGATED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
-												((org-agenda-overriding-header "Stuck Projects")
-												 (org-agenda-skip-function 'bh/skip-non-stuck-projects)
-												 (org-agenda-sorting-strategy '(todo-state-up))
-												 ))
+				jallen-oacc-today
+				'(agenda ""
+								 ((org-agenda-overriding-header "Agenda:")
+									(org-agenda-span 'day)
+									(org-agenda-ndays 30)
+									(org-agenda-start-on-weekday nil)
+									(org-agenda-start-day "+0d")
+									(org-agenda-include-diary t)
+									(org-agenda-show-all-dates nil)
+									(org-agenda-files (list jallen-org-gtd-file jallen-org-beorg-calendar-file))
+									(org-agenda-todo-ignore-deadlines nil)))
 
-						jallen-oacc-delegated
-						'(tags-todo "-CANCELLED+DELEGATED!"
-												((org-agenda-overriding-header "Delegated Projects")
-												 (org-agenda-skip-function 'bh/skip-non-projects)
-												 ))
+				jallen-oacc-stuck
+				'(tags-todo "-CANCELLED-DELEGATED-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!"
+										((org-agenda-overriding-header "Stuck Projects")
+										 (org-agenda-skip-function 'bh/skip-non-stuck-projects)
+										 (org-agenda-sorting-strategy '(todo-state-up))
+										 ))
 
-						jallen-oacc-habits
-						'(agenda ""
-										 ((org-agenda-overriding-header "Habits:")
-											(org-agenda-remove-tags t)
-											(org-agenda-use-time-grid nil)
-											(org-agenda-files (list jallen-org-habits-file))
-											(org-agenda-skip-function 'jra3/skip-habits-on-hold)
-											(org-agenda-span 'day)
-											(org-agenda-ndays 30)
-											(org-agenda-start-on-weekday nil)
-											(org-agenda-start-day "+0d")
-											(org-agenda-todo-ignore-deadlines nil)))
+				jallen-oacc-delegated
+				'(tags-todo "-CANCELLED+DELEGATED!"
+										((org-agenda-overriding-header "Delegated Projects")
+										 (org-agenda-skip-function 'bh/skip-non-projects)
+										 ))
 
-						jallen-oacc-chores
-						'(agenda ""
-										 ((org-agenda-overriding-header "Chores:")
-											(org-agenda-remove-tags t)
-											(org-agenda-files (list jallen-org-chores-file))
-											(org-agenda-span 7)
-											(org-agenda-ndays 60)
-											(org-agenda-show-all-dates nil)
-											(org-agenda-todo-ignore-deadlines nil)))
+				jallen-oacc-habits
+				'(agenda ""
+								 ((org-agenda-overriding-header "Habits:")
+									(org-agenda-remove-tags t)
+									(org-agenda-use-time-grid nil)
+									(org-agenda-files (list jallen-org-habits-file))
+									(org-agenda-skip-function 'jra3/skip-habits-on-hold)
+									(org-agenda-span 'day)
+									(org-agenda-ndays 30)
+									(org-agenda-start-on-weekday nil)
+									(org-agenda-start-day "+0d")
+									(org-agenda-todo-ignore-deadlines nil)))
 
-						jallen-oacc-next
-						'(tags-todo "-CANCELLED-CATEGORY=\"Read Me\"-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!NEXT"
-												((org-agenda-overriding-header (concat "Next Actions"
-																															 (if bh/hide-scheduled-and-waiting-next-tasks
-																																	 ""
-																																 " (including WAITING and SCHEDULED tasks)")))
-												 (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
-												 (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
-												 (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
-												 (org-agenda-skip-function 'bh/skip-projects-and-habits)
-												 (org-tags-match-list-sublevels t)
-												 ;; random sorting so I don't stare at the meaningless order
-												 ;; (org-agenda-cmp-user-defined 'org-random-cmp)
-												 (org-agenda-sorting-strategy '(effort-up timestamp-up))
-												 ))
-
-						jallen-oacc-next-no-location
-						'(tags-todo "-@anywhere-CANCELLED-CATEGORY=\"Read Me\"-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!NEXT"
-												((org-agenda-overriding-header (concat "No location"
-																															 (if bh/hide-scheduled-and-waiting-next-tasks
-																																	 ""
-																																 " (including WAITING and SCHEDULED tasks)")))
-												 (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
-												 (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
-												 (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
-												 (org-agenda-skip-function 'bh/skip-projects-and-habits)
-												 (org-tags-match-list-sublevels t)
-												 ;; random sorting so I don't stare at the meaningless order
-												 ;; (org-agenda-cmp-user-defined 'org-random-cmp)
-												 (org-agenda-sorting-strategy '(effort-up))
-												 ))
+				jallen-oacc-chores
+				'(agenda ""
+								 ((org-agenda-overriding-header "Chores:")
+									(org-agenda-remove-tags t)
+									(org-agenda-files (list jallen-org-chores-file))
+									(org-agenda-span 7)
+									(org-agenda-ndays 60)
+									(org-agenda-show-all-dates nil)
+									(org-agenda-todo-ignore-deadlines nil)))
 
 
-						jallen-oacc-waiting
-						'(tags-todo "-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"-CANCELLED+WAITING|HOLD/!"
-												((org-agenda-overriding-header (concat "Waiting and Postponed Tasks"
-																															 (if bh/hide-scheduled-and-waiting-next-tasks
-																																	 ""
-																																 " (including WAITING and SCHEDULED tasks)")))
-												 (org-agenda-skip-function 'bh/skip-non-tasks)
-												 (org-agenda-sorting-strategy '(todo-state-up))
-												 (org-tags-match-list-sublevels nil)
-												 (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
-												 (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)))
+				jallen-oacc-next
+				'(tags-todo "-CANCELLED-CATEGORY=\"Read Me\"-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!NEXT"
+										((org-agenda-overriding-header (concat "Next Actions"
+																													 (if bh/hide-scheduled-and-waiting-next-tasks
+																															 ""
+																														 " (including WAITING and SCHEDULED tasks)")))
+										 (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+										 (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
+										 (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
+										 (org-agenda-skip-function 'bh/skip-projects-and-habits)
+										 (org-tags-match-list-sublevels t)
+										 ;; random sorting so I don't stare at the meaningless order
+										 ;; (org-agenda-cmp-user-defined 'org-random-cmp)
+										 (org-agenda-sorting-strategy '(effort-up timestamp-up))
+										 ))
 
-						org-agenda-custom-commands
-						(list
 
-						 (list "C" "Clarify"
-									 (list jallen-oacc-refile
-												 jallen-oacc-stuck
-												 jallen-oacc-next-no-location
-												 ))
 
-						 (list "i" "inspire"
-									 (list jallen-oacc-read
-												 jallen-oacc-next))
+				jallen-oacc-next-no-location
+				'(tags-todo "-@anywhere-CANCELLED-CATEGORY=\"Read Me\"-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!NEXT"
+										((org-agenda-overriding-header (concat "No location"
+																													 (if bh/hide-scheduled-and-waiting-next-tasks
+																															 ""
+																														 " (including WAITING and SCHEDULED tasks)")))
+										 (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+										 (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
+										 (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
+										 (org-agenda-skip-function 'bh/skip-projects-and-habits)
+										 (org-tags-match-list-sublevels t)
+										 ;; random sorting so I don't stare at the meaningless order
+										 ;; (org-agenda-cmp-user-defined 'org-random-cmp)
+										 (org-agenda-sorting-strategy '(effort-up))
+										 ))
 
-						 (list "j" "GTD"
-									 (list jallen-oacc-today
-												 jallen-oacc-next
-												 jallen-oacc-projects
-												 jallen-oacc-waiting
-												 jallen-oacc-stuck
-												 jallen-oacc-delegated
-												 jallen-oacc-habits
-												 jallen-oacc-chores
-												 ))))
-		#+END_SRC
+
+				jallen-oacc-waiting
+				'(tags-todo "-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"-CANCELLED+WAITING|HOLD/!"
+										((org-agenda-overriding-header (concat "Waiting and Postponed Tasks"
+																													 (if bh/hide-scheduled-and-waiting-next-tasks
+																															 ""
+																														 " (including WAITING and SCHEDULED tasks)")))
+										 (org-agenda-skip-function 'bh/skip-non-tasks)
+										 (org-agenda-sorting-strategy '(todo-state-up))
+										 (org-tags-match-list-sublevels nil)
+										 (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+										 (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)))
+
+				org-agenda-custom-commands
+				(list
+
+				 (list "C" "Clarify"
+							 (list jallen-oacc-refile
+										 jallen-oacc-stuck
+										 jallen-oacc-next-no-location
+										 ))
+
+				 (list "a" "Act"
+							 `(,(jra3/next-with-context "@home")))
+
+
+				 (list "j" "GTD"
+							 (list jallen-oacc-today
+										 jallen-oacc-next
+										 jallen-oacc-projects
+										 jallen-oacc-waiting
+										 jallen-oacc-stuck
+										 jallen-oacc-delegated
+										 jallen-oacc-habits
+										 jallen-oacc-chores
+										 ))))
+#+END_SRC
 
 ** No Priorities
 		#+BEGIN_SRC emacs-lisp tangle: yes
