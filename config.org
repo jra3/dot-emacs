@@ -171,20 +171,10 @@
 								("@work" . ?w)
 								("@computer" . ?c)
 								("@errands" . ?e)
-
-								(:startgrouptag)
-									("@home". ?h)
-									(:grouptags) ; not mutually exclusive
-										("@fish" . ?f)
-								(:endgrouptag)
-
-								(:startgrouptag)
-									("@sag")
-									(:grouptags) ; not mutually exclusive
-										("@woodshop" . ?@)
-								(:endgrouptag)
-
-							(:endgrouptag)
+								("@home". ?h)
+								("@fish" . ?f)
+								("@sag" .?s)
+								("@woodshop" . ?@)
 						(:endgroup)
 
 						))
@@ -744,8 +734,10 @@
 #+BEGIN_SRC emacs-lisp tangle: yes
 	(defun jra3/next-with-context (tag)
 		"Return a configuration for next actions matching a context tag"
-		(let ((tag-filter (format "+%s" tag)))
-			`(tags-todo ,tag)))
+		(let ((tag-filter (format "+%s-CATEGORY=\"Someday\"-CATEGORY=\"Tickler\"/!NEXT" tag)))
+			`(tags-todo ,tag-filter	((org-agenda-overriding-header (concat "Next " ,tag))))))
+
+
 
 	(setq jallen-oacc-refile
 				'(tags-todo "REFILE"
@@ -820,6 +812,7 @@
 																													 (if bh/hide-scheduled-and-waiting-next-tasks
 																															 ""
 																														 " (including WAITING and SCHEDULED tasks)")))
+										 (org-agenda-tags-todo-honor-ignore-options 't)
 										 (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
 										 (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
 										 (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
@@ -838,6 +831,7 @@
 																													 (if bh/hide-scheduled-and-waiting-next-tasks
 																															 ""
 																														 " (including WAITING and SCHEDULED tasks)")))
+										 (org-agenda-tags-todo-honor-ignore-options 't)
 										 (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
 										 (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
 										 (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
@@ -871,7 +865,22 @@
 										 ))
 
 				 (list "a" "Act"
-							 `(,(jra3/next-with-context "@home")))
+							 `(
+
+								 ,(jra3/next-with-context "@errands")
+								 ,(jra3/next-with-context "@work")
+								 ,(jra3/next-with-context "@computer")
+								 ,(jra3/next-with-context "@home")
+								 ,(jra3/next-with-context "@fish")
+								 ,(jra3/next-with-context "@sag")
+								 ,(jra3/next-with-context "@woodshop")
+								 ,(jra3/next-with-context "@anywhere")
+								 )
+							 '(
+								 (org-agenda-tags-todo-honor-ignore-options 't)
+								 (org-agenda-todo-ignore-scheduled 'all)
+								 (org-agenda-todo-ignore-deadlines 'all)
+								 (org-agenda-todo-ignore-with-date 'all)))
 
 
 				 (list "j" "GTD"
