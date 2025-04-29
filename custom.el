@@ -31,7 +31,8 @@
  '(auto-package-update-delete-old-versions nil)
  '(bbdb-file-remote "/usr/share/emacs/bbdb")
  '(company-backends
-	 '(company-tasks company-reviewers company-bbdb company-nxml company-css company-capf
+	 '(company-tasks company-reviewers company-bbdb company-nxml
+									 company-css company-capf
 									 (company-dabbrev-code company-keywords)))
  '(company-minimum-prefix-length 1)
  '(diary-file "~/diary")
@@ -51,12 +52,11 @@
  '(org-agenda-sorting-strategy
 	 '((agenda habit-down effort-up time-up priority-down category-keep)
 		 (todo priority-down category-keep)
-		 (tags priority-down category-keep)
-		 (search category-keep)))
+		 (tags priority-down category-keep) (search category-keep)))
  '(org-agenda-time-grid
 	 '((daily today require-timed remove-match)
-		 (900 1000 1100 1200 1300 1400 1500 1600 1700 1800)
-		 "......" "----------------"))
+		 (900 1000 1100 1200 1300 1400 1500 1600 1700 1800) "......"
+		 "----------------"))
  '(org-agenda-timegrid-use-ampm nil)
  '(org-archive-location "~/org/archive/archive.org::* From %s")
  '(org-clock-task-overrun-text "Don't be such a punk")
@@ -68,7 +68,12 @@
  '(org-roam-directory "~/org/roam" nil nil "Customized with use-package org-roam")
  '(org-special-ctrl-a/e 'reversed)
  '(package-selected-packages
-	 '(tree-sitter typescript-mode apheleia yaml-pro tree-sitter-langs counsel button-lock excorporate cython-mode eglot go-mode org-download org-roam-protocol company-org-roam org-d20 org-gcal modern-cpp-font-lock gnu-elpa-keyring-update markdown-mode lsp-mode org-pomodoro wttrin arduino-mode bbdb thrift yasnippet yaml-mode win-switch which-key web-mode use-package tangotango-theme rainbow-mode rainbow-delimiters popwin package-lint multiple-cursors lsp-ui lsp-hack js-comint ibuffer-vc ibuffer-git hgrc-mode hgignore-mode helm-xref helm-flx helm-descbinds hack-mode google-c-style gitignore-mode gitconfig-mode git-gutter flycheck expand-region exec-path-from-shell elisp-slime-nav cquery company-lsp auto-package-update anzu ag))
+	 '(anzu apheleia auto-package-update corfu cython-mode elisp-slime-nav
+					exec-path-from-shell expand-region flycheck git-gutter
+					google-c-style helm-descbinds helm-flx helm-xref ibuffer-vc
+					lsp-ui modern-cpp-font-lock multiple-cursors org-pomodoro
+					package-lint popwin rainbow-delimiters tangotango-theme
+					win-switch yaml-mode yasnippet))
  '(shr-width 80)
  '(undo-outer-limit 120000000))
 
