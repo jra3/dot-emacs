@@ -1,9 +1,9 @@
 * Packaging system setup
 #+BEGIN_SRC emacs-lisp :tangle yes
   (require 'package)
-  (setq package-archives nil)
-  (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+  (setq package-archives
+	'(("melpa" . "https://melpa.org/packages/")
+	  ("gnu"   . "https://elpa.gnu.org/packages/")))
   (package-initialize)
 
   (unless (package-installed-p 'use-package)
@@ -17,8 +17,8 @@
     (setq use-package-always-ensure t))
 
   (use-package auto-package-update
-         :config
-         (setq auto-package-update-delete-old-versions t)
-         (setq auto-package-update-hide-results t)
-         (auto-package-update-at-time "03:00"))
+    :config
+    (setq auto-package-update-delete-old-versions t)
+    (setq auto-package-update-hide-results t)
+    (auto-package-update-at-time "03:00"))
 #+END_SRC

@@ -29,12 +29,10 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(auto-package-update-delete-old-versions nil)
- '(bbdb-file-remote "/usr/share/emacs/bbdb")
- '(company-backends
-	 '(company-tasks company-reviewers company-bbdb company-nxml
-									 company-css company-capf
-									 (company-dabbrev-code company-keywords)))
- '(company-minimum-prefix-length 1)
+ '(custom-enabled-themes '(tangotango))
+ '(custom-safe-themes
+	 '("cd69d46df6559baf9e26b47e93c0bf69b7c8d32db079c3c105d66e38e17c8cdf"
+		 default))
  '(diary-file "~/diary")
  '(excorporate-configuration
 	 '("jallen@fb.com" . "https://outlook.office365.com/ews/exchange.asmx"))
@@ -42,10 +40,12 @@
  '(helm-flx-for-helm-locate t)
  '(helm-flx-mode t)
  '(helm-mode-reverse-history nil)
+ '(lsp-javascript-display-return-type-hints t)
+ '(lsp-javascript-display-variable-type-hints t)
  '(lsp-restart 'auto-restart)
- '(newsticker-date-format "(%A %D %H:%M)" t)
- '(newsticker-html-renderer 'shr-render-region t)
- '(newsticker-use-full-width nil t)
+ '(lsp-typescript-implementations-code-lens-enabled t)
+ '(lsp-typescript-references-code-lens-enabled t)
+ '(lsp-typescript-suggest-complete-function-calls t)
  '(org-agenda-current-time-string "> you are here <")
  '(org-agenda-hide-tags-regexp "TASKS\\|WAITING\\|SOMEDAY\\|HOLD\\|TICKLER")
  '(org-agenda-include-diary nil)
@@ -60,21 +60,13 @@
  '(org-agenda-timegrid-use-ampm nil)
  '(org-archive-location "~/org/archive/archive.org::* From %s")
  '(org-clock-task-overrun-text "Don't be such a punk")
- '(org-download-method 'directory)
- '(org-download-screenshot-method "screencapture -i %s")
  '(org-export-with-toc nil)
  '(org-pomodoro-format "P~%s")
  '(org-pomodoro-play-sounds nil)
- '(org-roam-directory "~/org/roam" nil nil "Customized with use-package org-roam")
  '(org-special-ctrl-a/e 'reversed)
- '(package-selected-packages
-	 '(anzu apheleia auto-package-update corfu cython-mode elisp-slime-nav
-					exec-path-from-shell expand-region flycheck git-gutter
-					google-c-style helm-descbinds helm-flx helm-xref ibuffer-vc
-					lsp-ui modern-cpp-font-lock multiple-cursors org-pomodoro
-					package-lint popwin rainbow-delimiters tangotango-theme
-					win-switch yaml-mode yasnippet))
+ '(package-selected-packages nil)
  '(shr-width 80)
+ '(tab-width 2)
  '(undo-outer-limit 120000000))
 
 (custom-set-faces
