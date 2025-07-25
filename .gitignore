@@ -30,3 +30,7 @@ org-roam.db
 
 # Lux packagbe
 lux/node_modules
+
+projects
+transient/
+tree-sitter/

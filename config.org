@@ -798,9 +798,9 @@ Because why not?
     :config
     (projectile-mode +1)
     (setq projectile-project-search-path '("~/am/")
-          projectile-completion-system 'consult)
+	  projectile-completion-system 'consult)
     :bind (:map projectile-mode-map
-                ("C-c p" . projectile-command-map)))
+		("C-c p" . projectile-command-map)))
 
   (defun compile-go-project ()
     "Compile current Go project using make build"
@@ -845,6 +845,652 @@ Because why not?
   (global-set-key (kbd "C-c m T") 'test-ts-project)
   (global-set-key (kbd "C-c m d") 'dev-ts-project)
 #+END_SRC
+
+* Navigation
+** Configure Windmove
+
+	 #+BEGIN_SRC emacs-lisp tangle: yes
+		 (windmove-default-keybindings 'hyper)
+	 #+END_SRC
+
+** Manipulate Window Sizes
+	 C-x <arrow>
+#+BEGIN_SRC emacs-lisp tangle: yes
+(global-set-key
+ (kbd "C-x <right>")
+ '(lambda () (interactive) (enlarge-window-horizontally 4)))
+(global-set-key
+ (kbd "C-x <left>")
+ '(lambda () (interactive) (shrink-window-horizontally 4)))
+(global-set-key
+ (kbd "C-x <up>")
+ '(lambda () (interactive) (enlarge-window 4)))
+(global-set-key
+ (kbd "C-x <down>")
+ '(lambda () (interactive) (shrink-window 4)))
+#+END_SRC
+** Popwin
+	Popwin give us special temporary behavior for certain buffers. This
+	lets them pop in and out in a way that I like better than the
+	default behavior of taking over the other-buffer
+
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(use-package popwin
+		:config
+		(progn
+			(setq popwin:special-display-config nil)
+			(push '("*Ibuffer*"
+							:dedicated t :position top    :stick t :noselect t   :height 30)
+						popwin:special-display-config)
+			(push '("*Backtrace*"
+							:dedicated t :position bottom :stick t :noselect nil :height 0.33)
+						popwin:special-display-config)
+			(push '("*compilation*"
+							:dedicated t :position bottom :stick t :noselect t   :height 0.5)
+						popwin:special-display-config)
+			(push '("*Compile-Log*"
+							:dedicated t :position bottom :stick t :noselect t   :height 0.33)
+						popwin:special-display-config)
+			(push '("*Help*"
+							:dedicated t :position bottom :stick t :noselect nil :height 0.33)
+						popwin:special-display-config)
+			(push '("*Shell Command Output*"
+							:dedicated t :position bottom :stick t :noselect nil :height 0.33)
+						popwin:special-display-config)
+			(push '(" *undo-tree*"
+							:dedicated t :position bottom :stick t :noselect nil :height 0.33)
+						popwin:special-display-config)
+			(push '("*Warnings*"
+							:dedicated t :position bottom :stick t :noselect nil :height 0.33)
+						popwin:special-display-config)
+			(push '("^\\*Man .*\\*$"
+							:regexp t    :position bottom :stick t :noselect nil :height 0.33)
+						popwin:special-display-config)
+			(popwin-mode 1)))
+
+
+	;; (setq popwin:special-display-config
+	;;     (quote
+	;;      (("*Ibuffer*" :position top :noselect t :height 30)
+	;;       ("*Python Check*" :position top :noselect t :height 30)
+	;;       ("*compilation*")
+	;;       ("*Python Doc*")
+	;;       ("*xref*")
+	;;       ("*grep*")
+	;;       ("*Help*")
+	;;       ("*Completions*" :noselect t)
+	;;       ("*Occur*" :noselect t)))))
+#+END_SRC
+
+
+** Enable win-switch
+Super nice to switch between frames and buffers
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(use-package win-switch
+		:bind (("C-x o" . win-switch-dispatch))
+		:config
+		(setq win-switch-provide-visual-feedback t)
+		(setq win-switch-feedback-background-color "purple")
+		(setq win-switch-feedback-foreground-color "white")
+		(win-switch-setup-keys-default))
+#+END_SRC
+** Enable ibuffer
+#+BEGIN_SRC emacs-lisp tangle: yes
+(use-package ibuffer-vc)
+(define-key global-map (kbd "C-x C-b") 'ibuffer)
+(setq ibuffer-default-sorting-mode 'major-mode)
+;; (define-key
+;;   ibuffer-mode-map
+;;   (kbd "RET")
+;;   'ibuffer-visit-buffer-other-window)
+
+#+END_SRC
+** Enable =anzu=
+
+Show number and ordinality of matching
+
+#+BEGIN_SRC emacs-lisp tangle: yes
+(use-package anzu
+	:config (global-anzu-mode +1)
+	(setq anzu-mode-lighter ""))
+#+END_SRC
+
+** Save Point Positions Between Sessions
+#+BEGIN_SRC emacs-lisp tangle: yes
+(use-package saveplace
+	:config
+	(setq-default save-place t)
+	(setq save-place-file (expand-file-name ".places" "~/tmp/saves")))
+#+END_SRC
+** narrow/widen
+
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(defun narrow-or-widen-dwim (p)
+		"Widen if buffer is narrowed, narrow-dwim otherwise.
+		Dwim means: region, org-src-block, org-subtree, or
+		defun, whichever applies first. Narrowing to
+		org-src-block actually calls `org-edit-src-code'.
+
+		With prefix P, don't widen, just narrow even if buffer
+		is already narrowed."
+		(interactive "P")
+		(declare (interactive-only))
+		(cond ((and (buffer-narrowed-p) (not p)) (widen))
+					((region-active-p)
+					 (narrow-to-region (region-beginning)
+														 (region-end)))
+					((derived-mode-p 'org-mode)
+					 ;; `org-edit-src-code' is not a real narrowing
+					 ;; command. Remove this first conditional if
+					 ;; you don't want it.
+					 (cond ((ignore-errors (org-edit-src-code) t)
+									(delete-other-windows))
+								 ((ignore-errors (org-narrow-to-block) t))
+								 (t (org-narrow-to-subtree))))
+					((derived-mode-p 'latex-mode)
+					 (LaTeX-narrow-to-environment))
+					(t (narrow-to-defun))))
+
+	(define-key endless/toggle-map "n"
+		#'narrow-or-widen-dwim)
+	;; This line actually replaces Emacs' entire narrowing
+	;; keymap, that's how much I like this command. Only
+	;; copy it if that's what you want.
+	(define-key ctl-x-map "n" #'narrow-or-widen-dwim)
+	(add-hook 'LaTeX-mode-hook
+						(lambda ()
+							(define-key LaTeX-mode-map "\C-xn"
+								nil)))
+
+	(defun jallen-org-src-save-or-close () (interactive)
+				 (indent-region (point-min) (point-max))
+				 (if (buffer-modified-p)
+						 (save-buffer)
+					 (org-edit-src-exit)))
+
+	(eval-after-load 'org-src
+		'(define-key org-src-mode-map
+			 "\C-x\C-s" #'jallen-org-src-save-or-close))
+#+END_SRC
+** expand-region
+	 it's awsome
+	 #+BEGIN_SRC emacs-lisp tangle: yes
+		 (use-package expand-region
+			 :commands er/expand-region
+			 :bind ("C-=" . er/expand-region))
+	 #+END_SRC
+* Appearance
+** Frame Titles
+#+BEGIN_SRC emacs-lisp tangle: yes
+(setq frame-title-format (concat  "%b - emacs@" system-name))
+#+END_SRC
+** Fonts
+ Install fonts from my .emacs.d into system locations
+#+BEGIN_SRC emacs-lisp tangle: yes
+
+	(defun jallen-install-font ()
+		"copy my font files into the system-specific location"
+		(let ((fonts-source "~/.emacs.d/Input_Fonts/"))
+			(if (string-equal system-type "darwin")
+					(copy-directory fonts-source "~/Library/Fonts/") ; Mac
+				(copy-directory fonts-source "~/.fonts/") ; Linux
+				)
+			))
+
+	(add-hook 'before-make-frame-hook
+						(lambda ()
+							(if (-any '(lambda (fonts) (string-prefix-p "-*-Input " (elt fonts 6))) (x-family-fonts))
+									(jallen-install-font))))
+
+#+END_SRC
+
+Define some shortcuts for sizes that I use sometimes
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(defun jallen-font () (interactive)
+				 (set-frame-font "Input Mono Narrow-16"))
+	(defun jallen-font-no-contacts () (interactive)
+				 (set-frame-font "Input Mono Narrow-22"))
+	(defun jallen-blind () (interactive)
+				 (set-frame-font "Input Mono Narrow-30"))
+#+END_SRC
+
+
+** Frame Configuration
+#+BEGIN_SRC emacs-lisp tangle: yes
+(setq default-frame-alist
+			(quote
+			 ((left-fringe . 1)
+				(right-fringe . 1)
+				(menu-bar-lines . 0)
+				(tool-bar-lines . 0)
+				(font . "Input Mono Narrow-16")
+				)))
+#+END_SRC
+** Theme
+	 I love tangotango
+#+BEGIN_SRC emacs-lisp tangle: yes
+(use-package tangotango-theme
+	:config (load-theme 'tangotango t))
+#+END_SRC
+** Uniqify Buffer Names
+	 TODO make this lazy load maybe?
+#+BEGIN_SRC emacs-lisp tangle: yes
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'reverse
+			uniquify-separator "|"
+			uniquify-after-kill-buffer-p t
+			uniquify-ignore-buffers-re "^\\*")
+#+END_SRC
+** isearch faces
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(set-face-foreground 'lazy-highlight "black")
+	(set-face-background 'lazy-highlight "yellow")
+	(set-face-foreground 'isearch "white")
+	(set-face-background 'isearch "blue")
+#+END_SRC
+** Turn off nux and noisy UI
+	 No scroll, tool, menu bars
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+	(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+	(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+#+END_SRC
+
+	 Scratch buffer can just be empty, thanks
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(setq initial-scratch-message nil)
+#+END_SRC
+
+	 No NUX
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(setq inhibit-splash-screen t
+				inhibit-startup-message t
+				inhibit-startup-echo-area-message t)
+#+END_SRC
+
+** Show lines and columns
+#+BEGIN_SRC emacs-lisp tangle: yes
+(setq line-number-mode t
+			column-number-mode t)
+#+END_SRC
+** Highlight the selected region
+#+BEGIN_SRC emacs-lisp tangle: yes
+(setq transient-mark-mode t)
+#+END_SRC
+* Terminal Configuration
+** Terminals in emacs should use ansi colors
+#+BEGIN_SRC emacs-lisp tangle: yes
+(use-package ansi-color)
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+(setq comint-prompt-read-only t)
+#+END_SRC
+
+** Deal with running emacs in terminal
+	 Here is some scar tissue of me trying to make all keys work in the
+terminal as they do in X11. This isn't possible as far as I can tell,
+and I'm no longer sure if this does anything for me.
+
+we are expecting an xterm compatible terminal here. tmux requires you
+to set xterm-mode as a terminal option for this
+
+#+BEGIN_SRC emacs-lisp tangle: yes
+(defadvice terminal-init-xterm (after map-S-up-escape-sequence activate)
+	(define-key input-decode-map "\e[1;9A" [M-up])
+	(define-key input-decode-map "\e[1;9B" [M-down])
+	(define-key input-decode-map "\e[1;9C" [M-right])
+	(define-key input-decode-map "\e[1;9D" [M-left])
+
+	(define-key input-decode-map "\e[1;10A" [M-S-up])
+	(define-key input-decode-map "\e[1;10B" [M-S-down])
+	(define-key input-decode-map "\e[1;10C" [M-S-right])
+	(define-key input-decode-map "\e[1;10D" [M-S-left])
+
+	;; weird
+	(global-set-key [select] [S-up])
+)
+
+#+END_SRC
+
+
+* Editing
+** Treesitter
+
+#+BEGIN_SRC emacs-lisp tangle: yes
+(use-package tree-sitter
+	:ensure t
+	:config
+	;; activate tree-sitter on any buffer containing code for which it has a parser available
+	(global-tree-sitter-mode)
+	;; you can easily see the difference tree-sitter-hl-mode makes for python, ts or tsx
+	;; by switching on and off
+	(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+
+(use-package tree-sitter-langs
+	:ensure t
+	:after tree-sitter)
+#+END_SRC
+
+** Multiple Cursors                                                             :today:
+	 Multi-cursor editing is so cool when you can do it. Useful when
+	 editing many similar lines. More interactive than macros.
+#+BEGIN_SRC emacs-lisp tangle: yes
+(use-package multiple-cursors
+	:bind (("M-c" . mc/edit-lines)
+				 ("C->" . mc/mark-next-like-this)
+				 ("C-<" . mc/mark-previous-like-this)
+				 ("C-c C-<" . mc/mark-all-like-this)
+				 ("C-S-<mouse-1>" . mc/add-cursor-on-click)))
+#+END_SRC
+
+** Align lines on ' = '
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(global-set-key (kbd "C-c =") 'align-eq)
+#+END_SRC
+** Revert a buffer
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(global-set-key (kbd "C-c r") 'revert-buffer)
+#+END_SRC
+** Unfill paragraphs
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(defun unfill-paragraph ()
+		"Takes a multi-line paragraph and makes it into a single line of text."
+		(interactive)
+		(let ((fill-column (point-max)))
+			(fill-paragraph nil)))
+
+	(global-set-key (kbd "M-Q") 'unfill-paragraph)
+#+END_SRC
+** Code Formatting
+	:LOGBOOK:
+	- State "MAYBE"      from "TODO"       [2019-02-13 Wed 10:37]
+	:END:
+*** Default Indentation
+	 c-basic-offset is used by most major modes I use as the basis for
+	 how deeply to indent any code.
+
+	 #+BEGIN_SRC emacs-lisp tangle: yes
+		 (setq c-basic-offset 1)
+	 #+END_SRC
+*** Whitespace
+	I don't highlight trailing whitespace, because I auto-kill it anyway
+#+BEGIN_SRC emacs-lisp tangle: yes
+(setq-default show-trailing-whitespace nil)
+#+END_SRC
+	And here we do the killing
+#+BEGIN_SRC emacs-lisp tangle: yes
+(add-hook 'before-save-hook 'whitespace-cleanup)
+#+END_SRC
+*** Tabs
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(setq-default indent-tabs-mode t)
+	(setq-default tab-width 2)
+	(setq tab-width 2)
+#+END_SRC
+*** Add newline to the end of files
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(setq require-final-newline t)
+#+END_SRC
+*** Set Unix file coding system
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(setq-default buffer-file-coding-system 'utf-8-unix)
+	(setq-default default-buffer-file-coding-system 'utf-8-unix)
+	(set-default-coding-systems 'utf-8-unix)
+	(prefer-coding-system 'utf-8-unix)
+#+END_SRC
+
+** LSP
+*** TODO Basic
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(use-package eglot :ensure t)
+	;(use-package lsp-mode
+	;  :config
+	;  (setq
+	;   lsp-ui-sideline-show-code-actions nil
+	;   lsp-ui-sideline-show-hover nil
+	;   lsp-highlight-symbol-at-point nil))
+	;(use-package lsp-ui :commands lsp-ui-mode)
+#+END_SRC
+
+*** Claude Code
+#+BEGIN_SRC emacs-lisp tangle: yes
+  ;; for eat terminal backend:
+  (use-package eat :ensure t)
+
+  ;; install claude-code.el
+  (use-package claude-code :ensure t
+    :vc (:url "https://github.com/stevemolitor/claude-code.el" :rev :newest)
+    :config (claude-code-mode)
+    :bind-keymap ("C-c d" . claude-code-command-map))
+#+END_SRC
+
+*** Go Development
+#+BEGIN_SRC emacs-lisp tangle: yes
+  ;; Go mode with LSP and formatting
+  (use-package go-mode
+    :ensure t
+    :mode "\\.go\\'"
+    :hook ((go-mode . eglot-ensure)
+	   (go-mode . (lambda ()
+			(add-hook 'before-save-hook #'gofmt-before-save nil t))))
+    :config
+    ;; Use goimports for formatting (handles imports too)
+    (setq gofmt-command "goimports"))
+
+  ;; Configure Eglot for gopls
+  (with-eval-after-load 'eglot
+    (add-to-list 'eglot-server-programs '(go-mode . ("gopls")))
+    ;; Organize imports on save
+    (add-hook 'go-mode-hook
+	      (lambda ()
+		(add-hook 'before-save-hook
+			  (lambda ()
+			    (call-interactively 'eglot-code-action-organize-imports))
+			  nil t))))
+
+  ;; Flycheck for additional linting
+  (use-package flycheck
+    :ensure t
+    :init (global-flycheck-mode)
+    :config
+    ;; Only enable for programming modes
+    (setq flycheck-global-modes '(not text-mode org-mode)))
+
+  ;; Optional: Additional Go tools integration
+  (use-package flycheck-golangci-lint
+    :ensure t
+    :after (flycheck go-mode)
+    :hook (go-mode . flycheck-golangci-lint-setup)
+    :config
+    ;; Use golangci-lint for comprehensive linting
+    (setq flycheck-golangci-lint-enable-all t))
+#+END_SRC
+What o
+
+* Compilation
+	If I'm compiling, just save all the buffers automatically for me
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(setq compilation-ask-about-save nil)
+#+END_SRC
+	And make some nice hotkeys
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(global-set-key (kbd "<f6>") 'compile)
+	(global-set-key (kbd "<f7>") 'next-error) ;; can make this not global
+#+END_SRC
+And follow the output!!!
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(setq compilation-scroll-output 'first-error)
+#+END_SRC
+** Colors
+
+#+BEGIN_SRC emacs-lisp tangle: yes
+(require 'ansi-color)
+
+(defun colorize-compilation-buffer ()
+	(toggle-read-only)
+	(ansi-color-apply-on-region compilation-filter-start (point))
+	(toggle-read-only))
+(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+#+END_SRC
+
+* Simple Behavior Customizations
+** Set fill-column to sensible default for me
+
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(setq fill-column 78)
+	#+END_SRC
+
+** Backups
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(defvar user-temporary-file-directory "~/tmp/saves/"
+			(concat temporary-file-directory user-login-name "/"))
+
+		(make-directory user-temporary-file-directory t)
+
+		(setq
+		 make-backup-files t
+
+		 backup-by-copying t      ; don't clobber symlinks
+		 backup-directory-alist
+		 '(("." . user-temporary-file-directory))    ; don't litter my fs tree
+		 delete-old-versions t
+		 kept-new-versions 6
+		 kept-old-versions 2
+		 version-control t)       ; use versioned backups
+
+		(setq vc-make-backup-files t)
+
+		(setq backup-directory-alist
+					`((".*" . ,user-temporary-file-directory)))
+		(setq auto-save-file-name-transforms
+					`((".*" ,user-temporary-file-directory t)))
+		(setq auto-save-list-file-prefix
+					(concat user-temporary-file-directory ".auto-saves-"))
+#+END_SRC
+
+** Text-mode is a better default than fundamental for me
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(setq-default major-mode 'text-mode)
+	#+END_SRC
+** Replace 'yes/no' by just 'y/n'
+
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(fset 'yes-or-no-p 'y-or-n-p)
+	#+END_SRC
+
+** Tags operations should be case sensitive
+
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(setq tags-case-fold-search nil)
+	#+END_SRC
+
+** Smooth Scrolling
+
+	 https://www.emacswiki.org/emacs/SmoothScrolling
+
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(setq scroll-step 1
+					scroll-conservatively 10000
+					mouse-wheel-scroll-amount '(1 ((shift) . 1))
+					mouse-wheel-progressive-speed nil ;; don't accelerate scrolling
+					mouse-wheel-follow-mouse t) ;; scroll window under mouse
+	 #+END_SRC
+
+** Screen Splitting
+
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(setq split-height-threshold 10000
+					split-width-threshold 10000)
+	#+END_SRC
+
+** Subword movement in prog-mode
+
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(add-hook 'prog-mode-hook 'subword-mode)
+	#+END_SRC
+
+** No bell, thanks
+
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(setq ring-bell-function 'ignore)
+	#+END_SRC
+
+** Disable warnings about large files
+	I'm not afraid of large files, yo
+
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(setq large-file-warning-threshold nil)
+	#+END_SRC
+
+** Search/Match should be case insensitive
+
+	The documentation is actually a little misleading. The search will
+	be case sensitive if the search string has any capital characters in
+	it.
+
+	#+BEGIN_SRC emacs-lisp tangle: yes
+		(setq case-fold-search t)
+	#+END_SRC
+
+** Revert Files When They Change On Disk
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(global-auto-revert-mode t)
+#+END_SRC
+
+** Make scripts executable on save
+#+BEGIN_SRC emacs-lisp tangle: yes
+(add-hook 'after-save-hook
+					'executable-make-buffer-file-executable-if-script-p)
+#+END_SRC
+* VC
+** git-gutter-mode
+#+BEGIN_SRC emacs-lisp tangle: yes
+	(use-package git-gutter
+		 :diminish git-gutter-mode
+		 :commands (git-gutter-mode)
+		 :bind (:map vc-prefix-map
+								 ("[" . git-gutter:previous-hunk)
+								 ("]" . git-gutter:next-hunk)
+								 ("n" . git-gutter:revert-hunk)
+								 ("SPC" . git-gutter:mark-hunk))
+		 :init
+		 (global-git-gutter-mode)
+		 :config
+		 (setq git-gutter:handled-backends '(git hg)))
+
+	;; vc-hg comes with emacs, but we can still use use-package to group related
+	;; config
+
+	(use-package vc-hg
+		:ensure nil
+		:bind
+		(:map vc-prefix-map
+					("a" . vc-annotate)
+					;; 'g' is the original binding for vc-annotate
+					("g" . nil))
+		:config
+		(setq
+		 vc-hg-annotate-re
+		 (concat
+			"^\\(?: *[^ ]+ +\\)?\\(D?[0-9]+\\) +" ;; user and revision
+			"\\([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\\)" ;; date
+			"\\(?: +\\([^:]+\\)\\)?:") ;; filename
+		 vc-annotate-hg-switches "-u"
+		 )
+		;; redefine vc-hg-annotate-command to use -p (phabricator diff) instead of -n
+		;; (revision number)
+		;; TODO select -p or -n base on whether or not the hg repo is a phabricator
+		;; project. Is there a better way to do this other than replacing the
+		;; function, e.g. with advice?
+		(defun vc-hg-annotate-command (file buffer &optional revision)
+			"Execute \"hg annotate\" on FILE, inserting the contents in BUFFER.
+	 Optional arg REVISION is a revision to annotate from."
+			(apply #'vc-hg-command buffer 0 file "annotate" "-dq" "-p"
+						 (append (vc-switches 'hg 'annotate)
+										 (if revision (list (concat "-r" revision)))))))
+#+END_SRC
+
+
+
 
 * Modes
 ** Treesitter Grammars / Languages
@@ -1001,36 +1647,36 @@ Meat and potatoes
     :ensure t
     :after (typescript-ts-mode company flycheck)
     :hook ((typescript-ts-mode . tide-setup)
-           (typescript-ts-mode . tide-hl-identifier-mode)
-           (tsx-ts-mode . tide-setup)
-           (tsx-ts-mode . tide-hl-identifier-mode))
+	   (typescript-ts-mode . tide-hl-identifier-mode)
+	   (tsx-ts-mode . tide-setup)
+	   (tsx-ts-mode . tide-hl-identifier-mode))
     :config
     (setq tide-completion-detailed t
-          tide-always-show-documentation t))
+	  tide-always-show-documentation t))
 
   (use-package jest
     :ensure t
     :bind (:map typescript-ts-mode-map
-                ("C-c t j" . jest-popup))
+		("C-c t j" . jest-popup))
     :config
     (setq jest-executable "pnpm test"))
 
   (use-package npm-mode
     :ensure t
     :hook ((typescript-ts-mode . npm-mode)
-           (tsx-ts-mode . npm-mode))
+	   (tsx-ts-mode . npm-mode))
     :config
     (setq npm-mode-command-prefix "C-c n"))
 
   (use-package nodejs-repl
     :ensure t
     :bind (:map typescript-ts-mode-map
-                ("C-c r" . nodejs-repl)))
+		("C-c r" . nodejs-repl)))
 
   (use-package add-node-modules-path
     :ensure t
     :hook ((typescript-ts-mode . add-node-modules-path)
-           (tsx-ts-mode . add-node-modules-path)))
+	   (tsx-ts-mode . add-node-modules-path)))
 
 #+END_SRC
 
@@ -1103,9 +1749,9 @@ Prettier Formatting
     :ensure t
     :mode "\\.go\\'"
     :hook ((go-mode . lsp-deferred)
-           (go-mode . (lambda ()
-                        (setq indent-tabs-mode t)
-                        (setq tab-width 4))))
+	   (go-mode . (lambda ()
+			(setq indent-tabs-mode t)
+			(setq tab-width 4))))
     :config
     (setq gofmt-command "gofumpt")
     (add-hook 'before-save-hook 'gofmt-before-save))
@@ -1113,16 +1759,16 @@ Prettier Formatting
   (use-package go-tag
     :ensure t
     :bind (:map go-mode-map
-                ("C-c t a" . go-tag-add)
-                ("C-c t r" . go-tag-remove)))
+		("C-c t a" . go-tag-add)
+		("C-c t r" . go-tag-remove)))
 
   (use-package gotest
     :ensure t
     :bind (:map go-mode-map
-                ("C-c t f" . go-test-current-file)
-                ("C-c t t" . go-test-current-test)
-                ("C-c t p" . go-test-current-project)
-                ("C-c t b" . go-test-current-benchmark)))
+		("C-c t f" . go-test-current-file)
+		("C-c t t" . go-test-current-test)
+		("C-c t p" . go-test-current-project)
+		("C-c t b" . go-test-current-benchmark)))
 
   (use-package go-eldoc
     :ensure t
