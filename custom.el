@@ -34,10 +34,6 @@
     '("cd69d46df6559baf9e26b47e93c0bf69b7c8d32db079c3c105d66e38e17c8cdf"
        default))
  '(diary-file "~/diary")
- '(helm-ff-lynx-style-map t)
- '(helm-flx-for-helm-locate t)
- '(helm-flx-mode t)
- '(helm-mode-reverse-history nil)
  '(lsp-javascript-display-return-type-hints t)
  '(lsp-javascript-display-variable-type-hints t)
  '(lsp-restart 'auto-restart)

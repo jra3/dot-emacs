@@ -28,43 +28,6 @@ Mac tries to hide your $PATH from you when using a graphical mode
     (exec-path-from-shell-initialize))
 #+END_SRC
 
-* Configure Helm
-
-Make everything fuzzy and also rebind functions.
-
-#+BEGIN_SRC python :tangle no
-  (use-package flx)
-  (use-package helm-flx)
-  (use-package helm-descbinds)
-  (use-package helm
-    :demand
-    :diminish helm-mode
-    :bind (("M-x" . helm-M-x)
-           ("M-y" . helm-show-kill-ring)
-           ("C-x b" . helm-mini)
-           ("C-x C-f" . helm-find-files)
-           ("C-x r l" . helm-bookmarks)
-           ("C-c C-i" . helm-semantic-or-imenu)
-           :map helm-find-files-map ;; I like these from Ido
-           ("<tab>" . helm-execute-persistent-action)
-           ("C-i" . helm-execute-persistent-action)
-           ("C-<backspace>" . helm-find-files-up-one-level))
-    :config
-    (helm-mode 1)
-    (helm-descbinds-mode)
-    (helm-flx-mode +1)
-    (setq helm-M-x-fuzzy-match t
-          helm-buffers-fuzzy-matching t
-          helm-recentf-fuzzy-match t
-          helm-locate-fuzzy-match t
-          helm-lisp-fuzzy-completion t
-          helm-bookmark-show-location t))
-
-  (use-package helm-xref
-    :config
-    (setq xref-show-xrefs-function 'helm-xref-show-xrefs))
-#+END_SRC
-
 * Configure Completions
 
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -75,7 +38,18 @@ Make everything fuzzy and also rebind functions.
     (savehist-mode 1)
     :config
     (vertico-mode 1)
-    (setq vertico-cycle t))
+    (setq vertico-cycle t
+          vertico-count 15))  ; Show more candidates
+
+  ;; Enable vertico directory navigation
+  (use-package vertico-directory
+    :after vertico
+    :ensure nil  ; Part of vertico
+    :bind (:map vertico-map
+                ("RET" . vertico-directory-enter)
+                ("DEL" . vertico-directory-delete-char)
+                ("M-DEL" . vertico-directory-delete-word))
+    :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
   (use-package marginalia
     :ensure t
@@ -88,17 +62,24 @@ Make everything fuzzy and also rebind functions.
     :ensure t
     :bind (("C-x b" . consult-buffer)
            ("C-s" . consult-line)
+           ("M-y" . consult-yank-pop)     ; Better kill-ring browsing
            ("M-o" . consult-find)
            ("M-l" . consult-goto-line)
            ("M-s l" . consult-locate)
            ("M-s g" . consult-git-grep)
            ("M-s s" . consult-ripgrep)
+           ("M-s o" . consult-outline)     ; Navigate code structure
            ("C-x r l" . consult-bookmark)
+           ("C-x r f" . consult-recent-file) ; Recent files
            ("C-c C-i" . consult-imenu))
     :init
     (setq consult-locate-args "mdfind -name %s 2>/dev/null"
           xref-show-xrefs-function #'consult-xref
-          xref-show-definitions-function #'consult-xref))
+          xref-show-definitions-function #'consult-xref
+          consult-narrow-key "<")         ; Use < to narrow in consult commands
+    :config
+    ;; Preview customization for consult commands
+    (setq consult-preview-key 'any))
 
   (use-package orderless
     :ensure t
