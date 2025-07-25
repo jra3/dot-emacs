@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2017  John Allen
 
-;; Author: John Allen <jallen@devvm327.frc2.facebook.com>
+;; Author: John Allen
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -34,8 +34,6 @@
     '("cd69d46df6559baf9e26b47e93c0bf69b7c8d32db079c3c105d66e38e17c8cdf"
        default))
  '(diary-file "~/diary")
- '(excorporate-configuration
-    '("jallen@fb.com" . "https://outlook.office365.com/ews/exchange.asmx"))
  '(helm-ff-lynx-style-map t)
  '(helm-flx-for-helm-locate t)
  '(helm-flx-mode t)
