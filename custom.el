@@ -31,11 +31,11 @@
  '(auto-package-update-delete-old-versions nil)
  '(custom-enabled-themes '(tangotango))
  '(custom-safe-themes
-	 '("cd69d46df6559baf9e26b47e93c0bf69b7c8d32db079c3c105d66e38e17c8cdf"
-		 default))
+    '("cd69d46df6559baf9e26b47e93c0bf69b7c8d32db079c3c105d66e38e17c8cdf"
+       default))
  '(diary-file "~/diary")
  '(excorporate-configuration
-	 '("jallen@fb.com" . "https://outlook.office365.com/ews/exchange.asmx"))
+    '("jallen@fb.com" . "https://outlook.office365.com/ews/exchange.asmx"))
  '(helm-ff-lynx-style-map t)
  '(helm-flx-for-helm-locate t)
  '(helm-flx-mode t)
@@ -50,13 +50,13 @@
  '(org-agenda-hide-tags-regexp "TASKS\\|WAITING\\|SOMEDAY\\|HOLD\\|TICKLER")
  '(org-agenda-include-diary nil)
  '(org-agenda-sorting-strategy
-	 '((agenda habit-down effort-up time-up priority-down category-keep)
-		 (todo priority-down category-keep)
-		 (tags priority-down category-keep) (search category-keep)))
+    '((agenda habit-down effort-up time-up priority-down category-keep)
+       (todo priority-down category-keep)
+       (tags priority-down category-keep) (search category-keep)))
  '(org-agenda-time-grid
-	 '((daily today require-timed remove-match)
-		 (900 1000 1100 1200 1300 1400 1500 1600 1700 1800) "......"
-		 "----------------"))
+    '((daily today require-timed remove-match)
+       (900 1000 1100 1200 1300 1400 1500 1600 1700 1800) "......"
+       "----------------"))
  '(org-agenda-timegrid-use-ampm nil)
  '(org-archive-location "~/org/archive/archive.org::* From %s")
  '(org-clock-task-overrun-text "Don't be such a punk")
