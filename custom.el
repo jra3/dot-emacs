@@ -64,12 +64,7 @@
  '(org-pomodoro-format "P~%s")
  '(org-pomodoro-play-sounds nil)
  '(org-special-ctrl-a/e 'reversed)
- '(package-selected-packages
-	 '(anzu auto-package-update corfu elisp-slime-nav embark-consult
-					exec-path-from-shell expand-region git-gutter ibuffer-vc
-					lsp-mode lsp-ui marginalia markdown-mode multiple-cursors
-					orderless package-lint popwin rainbow-delimiters rust-mode
-					tangotango-theme vertico win-switch yaml-mode))
+ '(package-selected-packages nil)
  '(shr-width 80)
  '(tab-width 2)
  '(undo-outer-limit 120000000))

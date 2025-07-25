@@ -404,6 +404,13 @@ I'm not afraid of large files, yo
   (setq large-file-warning-threshold nil)
 #+END_SRC
 
+** Snippets
+Snippets are are awesome. They are found in ~/emacs.d/snippets
+#+BEGIN_SRC emacs-lisp tangle: yes
+(use-package yasnippet
+  :diminish yas-minor-mode
+  :config (yas-global-mode 1))
+
 ** Completions
 #+BEGIN_SRC emacs-lisp tangle: yes
   (use-package corfu
@@ -445,12 +452,12 @@ I'm not afraid of large files, yo
 ** Flycheck
 
 Flycheck for use with LSPs
-#+BEGIN_SRC python tangle: yes
+#+BEGIN_SRC emacs-lisp tangle: yes
   (use-package flycheck
-	  :ensure t
-	  :hook
-	  (lsp-mode . flycheck-mode)
-	  :bind (
+    :ensure t
+    :hook
+    (lsp-mode . flycheck-mode)
+    :bind (
 	   :map flycheck-mode-map
 	   ("M-n" . flycheck-next-error)
 	   ("M-p" . flycheck-previous-error)))
@@ -559,7 +566,111 @@ And here we do the killing
 #+END_SRC
 
 ** LSP
-  Nothing...
+
+#+BEGIN_SRC emacs-lisp tangle: yes
+  (use-package company
+    :hook (prog-mode . company-mode)
+    :config
+    (setq company-minimum-prefix-length 1
+    company-idle-delay 0.2))
+
+  (use-package lsp-mode
+    :commands (lsp lsp-deferred)
+    :hook ((lsp-mode           . lsp-enable-which-key-integration)
+     (lsp-mode           . lsp-diagnostics-mode)
+     (rust-ts-mode       . lsp-deferred)
+     (c-ts-mode          . lsp-deferred)
+     (c++-ts-mode        . lsp-deferred)
+     (typescript-ts-mode . lsp-deferred))
+
+    :custom
+    (lsp-log-io nil)                      ; IMPORTANT! Use only for debugging! Drastically affects performance
+
+  	(lsp-keymap-prefix "C-c l")           ; Prefix for LSP actions
+  	;;(lsp-completion-provider :none)     ; Using Corfu as the provider
+  	(lsp-diagnostics-provider :flycheck)
+  	(lsp-session-file (locate-user-emacs-file ".lsp-session"))
+
+  	(lsp-keep-workspace-alive nil)        ; Close LSP server if all project buffers are closed
+  	(lsp-idle-delay 0.5)                  ; Debounce timer for `after-change-function'
+  	;; core
+  	(lsp-enable-xref t)                   ; Use xref to find references
+  	(lsp-auto-configure t)                ; Used to decide between current active servers
+  	(lsp-eldoc-enable-hover t)            ; Display signature information in the echo area
+  	(lsp-enable-dap-auto-configure t)     ; Debug support
+  	(lsp-enable-file-watchers nil)
+  	(lsp-enable-folding nil)              ; I disable folding since I use origami
+  	(lsp-enable-imenu t)
+  	(lsp-enable-indentation nil)          ; I use prettier
+  	(lsp-enable-links nil)                ; No need since we have `browse-url'
+  	(lsp-enable-on-type-formatting nil)   ; Prettier handles this
+  	(lsp-enable-suggest-server-download t) ; Useful prompt to download LSP providers
+  	(lsp-enable-symbol-highlighting t)     ; Shows usages of symbol at point in the current buffer
+  	(lsp-enable-text-document-color nil)   ; This is Treesitter's job
+
+  	(lsp-ui-sideline-show-hover nil)      ; Sideline used only for diagnostics
+  	(lsp-ui-sideline-diagnostic-max-lines 20) ; 20 lines since typescript errors can be quite big
+  	;; completion
+  	(lsp-completion-enable t)
+  	(lsp-completion-enable-additional-text-edit t) ; Ex: auto-insert an import for a completion candidate
+  	(lsp-enable-snippet t)
+  	(lsp-completion-show-kind t)                   ; Optional
+  	;; headerline
+  	(lsp-headerline-breadcrumb-enable t)  ; Optional, I like the breadcrumbs
+  	(lsp-headerline-breadcrumb-enable-diagnostics nil) ; Don't make them red, too noisy
+  	(lsp-headerline-breadcrumb-enable-symbol-numbers nil)
+  	(lsp-headerline-breadcrumb-icons-enable nil)
+  	;; modeline
+  	(lsp-modeline-code-actions-enable t) ; Modeline should be relatively clean
+  	(lsp-modeline-diagnostics-enable nil)  ; Already supported through `flycheck'
+  	(lsp-modeline-workspace-status-enable nil) ; Modeline displays "LSP" when lsp-mode is enabled
+  	(lsp-signature-doc-lines 1)           ; Don't raise the echo area. It's distracting
+  	(lsp-ui-doc-use-childframe t)         ; Show docs for symbol at point
+  	(lsp-eldoc-render-all nil)            ; This would be very useful if it would respect `lsp-signature-doc-lines', currently it's distracting
+  	;; lens
+  	(lsp-lens-enable nil)                 ; Optional, I don't need it
+  	;; semantic
+  	(lsp-semantic-tokens-enable nil)      ; Related to highlighting, and we defer to treesitter
+
+  	;; C/C++
+  	(lsp-clients-clangd-args  '("--header-insertion=never"))
+
+  	;; rust
+  	(lsp-rust-server 'rust-analyzer)
+  	(lsp-rust-analyzer-server-display-inlay-hints t)
+  	(lsp-rust-analyzer-proc-macro-enable t)
+  	(lsp-rust-analyzer-cargo-watch-command "clippy"))
+
+
+  (use-package lsp-ui
+    :after lsp-mode
+    :commands (lsp-ui-mode lsp-ui-peek-find-definitions lsp-ui-peek-find-references)
+    :init
+    (setq lsp-ui-sideline-enable nil)
+
+    (setq lsp-ui-doc-enable t
+    lsp-ui-doc-delay 0.5        ;; delay before showing doc
+    lsp-ui-doc-show-with-cursor nil
+    lsp-ui-doc-show-with-mouse t)
+
+    (setq lsp-ui-peek-enable t
+    lsp-ui-peek-peek-height 20
+    lsp-ui-peek-list-width 50)
+
+    (setq lsp-ui-imenu-enable t
+    lsp-ui-imenu-kind-position 'left)
+
+    (setq lsp-ui-flycheck-enable t)
+
+    :hook
+    (lsp-mode . lsp-ui-mode)
+
+    :config
+    (define-key lsp-mode-map (kbd "C-c l d") #'lsp-ui-peek-find-definitions)
+    (define-key lsp-mode-map (kbd "C-c l r") #'lsp-ui-peek-find-references)
+    (setq lsp-ui-doc-use-webkit t
+    lsp-ui-doc-position 'at-point))
+#+END_SRC
 
 * Utilities
 ** Edit Current Buffer As root
@@ -679,28 +790,104 @@ Because why not?
 	(define-key endless/toggle-map "w" #'whitespace-mode)
 #+END_SRC
 
-* Snippets
-Snippets are are awesome. They are found in ~/emacs.d/snippets
+** Project Management
 #+BEGIN_SRC emacs-lisp tangle: yes
-(use-package yasnippet
-  :diminish yas-minor-mode
-  :config (yas-global-mode 1))
+  (use-package projectile
+    :ensure t
+    :diminish projectile-mode
+    :config
+    (projectile-mode +1)
+    (setq projectile-project-search-path '("~/am/")
+          projectile-completion-system 'consult)
+    :bind (:map projectile-mode-map
+                ("C-c p" . projectile-command-map)))
+
+  (defun compile-go-project ()
+    "Compile current Go project using make build"
+    (interactive)
+    (compile "make build"))
+
+  (defun test-go-project ()
+    "Test current Go project using make test"
+    (interactive)
+    (compile "make test"))
+
+  (defun lint-go-project ()
+    "Lint current Go project using make lint"
+    (interactive)
+    (compile "make lint"))
+
+  (defun format-go-project ()
+    "Format current Go project using make fmt"
+    (interactive)
+    (compile "make fmt"))
+
+  (defun compile-ts-project ()
+    "Compile current TypeScript project using turbo build"
+    (interactive)
+    (compile "turbo build"))
+
+  (defun test-ts-project ()
+    "Test current TypeScript project using turbo test"
+    (interactive)
+    (compile "turbo test"))
+
+  (defun dev-ts-project ()
+    "Start dev server for TypeScript project using turbo dev"
+    (interactive)
+    (compile "turbo dev"))
+
+  (global-set-key (kbd "C-c m b") 'compile-go-project)
+  (global-set-key (kbd "C-c m t") 'test-go-project)
+  (global-set-key (kbd "C-c m l") 'lint-go-project)
+  (global-set-key (kbd "C-c m f") 'format-go-project)
+  (global-set-key (kbd "C-c m B") 'compile-ts-project)
+  (global-set-key (kbd "C-c m T") 'test-ts-project)
+  (global-set-key (kbd "C-c m d") 'dev-ts-project)
+#+END_SRC
+
 * Modes
 ** Treesitter Grammars / Languages
 Stolen from https://www.ovistoica.com/blog/2024-7-05-modern-emacs-typescript-web-tsx-config#orgb6fd011
 #+BEGIN_SRC emacs-lisp tangle: yes
   (use-package tree-sitter
-    :ensure t
-    :hook ((python-mode . tree-sitter-mode)
-	   (tree-sitter-after-on . tree-sitter-hl-mode))
-    :config
-    ;; enable Tree-sitter everywhere it’s supported
-    (global-tree-sitter-mode))
+  	:mode (("\\.tsx\\'" . tsx-ts-mode)
+	   ("\\.js\\'"  . typescript-ts-mode)
+	   ("\\.mjs\\'" . typescript-ts-mode)
+	   ("\\.mts\\'" . typescript-ts-mode)
+	   ("\\.cjs\\'" . typescript-ts-mode)
+	   ("\\.ts\\'"  . typescript-ts-mode)
+	   ("\\.jsx\\'" . tsx-ts-mode)
+	   ("\\.json\\'" .  json-ts-mode)
+	   ("\\.Dockerfile\\'" . dockerfile-ts-mode)
+	   ("\\.prisma\\'" . prisma-ts-mode))
+    :hook
+    (prog-mode . global-tree-sitter-mode)
+    (tree-sitter-after-on . tree-sitter-hl-mode))
 
   (use-package tree-sitter-langs
-    :ensure t
     :after tree-sitter)
- #+END_SRC
+
+  (setq major-mode-remap-alist
+  '((c-mode          . c-ts-mode)
+    (c++-mode        . c++-ts-mode)
+    (python-mode     . python-ts-mode)
+
+    (typescript-mode . typescript-ts-mode)
+    (js-mode         . typescript-ts-mode)
+    (js2-mode        . typescript-ts-mode)
+
+  	(tsx-mode        . tsx-ts-mode)
+    (rust-mode       . rust-ts-mode)
+    (go-mode         . go-ts-mode)
+    (ruby-mode       . ruby-ts-mode)
+    (java-mode       . java-ts-mode)
+    (html-mode       . html-ts-mode)
+    (css-mode        . css-ts-mode)
+    (json-mode       . json-ts-mode)
+    (yaml-mode       . yaml-ts-mode)
+    (markdown-mode   . markdown-ts-mode)))
+#+END_SRC
 
 ** ediff
 
@@ -713,9 +900,9 @@ emacs -diff file1 file2
 
 #+BEGIN_SRC emacs-lisp tangle: yes
   (defun command-line-diff (switch)
-  	(let ((file1 (pop command-line-args-left))
+	(let ((file1 (pop command-line-args-left))
 	  (file2 (pop command-line-args-left)))
-  		(ediff file1 file2)))
+		(ediff file1 file2)))
 
   (add-to-list 'command-switch-alist '("diff" . command-line-diff))
 
@@ -784,71 +971,109 @@ Enable =yaml-mode=
 
 #+END_SRC
 
+** Protobuf
+#+BEGIN_SRC emacs-lisp tangle: yes
+  (use-package protobuf-mode
+    :ensure t
+    :mode "\\.proto\\'"
+    :config
+    (setq protobuf-mode-indent-level 2))
+#+END_SRC
+
+** Web Dev
+
+Meat and potatoes
+#+BEGIN_SRC emacs-lisp tangle: yes
+  (use-package typescript-ts-mode
+  	:mode (("\\.tsx\\'" . tsx-ts-mode)
+	   ("\\.js\\'"  . typescript-ts-mode)
+	   ("\\.mjs\\'" . typescript-ts-mode)
+	   ("\\.mts\\'" . typescript-ts-mode)
+	   ("\\.cjs\\'" . typescript-ts-mode)
+	   ("\\.ts\\'"  . typescript-ts-mode)
+	   ("\\.jsx\\'" . tsx-ts-mode))
+
+  	:hook ((typescript-ts-mode . lsp-deferred)
+	   (tsx-ts-mode . lsp-deferred))
+  	)
+
+  (use-package tide
+    :ensure t
+    :after (typescript-ts-mode company flycheck)
+    :hook ((typescript-ts-mode . tide-setup)
+           (typescript-ts-mode . tide-hl-identifier-mode)
+           (tsx-ts-mode . tide-setup)
+           (tsx-ts-mode . tide-hl-identifier-mode))
+    :config
+    (setq tide-completion-detailed t
+          tide-always-show-documentation t))
+
+  (use-package jest
+    :ensure t
+    :bind (:map typescript-ts-mode-map
+                ("C-c t j" . jest-popup))
+    :config
+    (setq jest-executable "pnpm test"))
+
+  (use-package npm-mode
+    :ensure t
+    :hook ((typescript-ts-mode . npm-mode)
+           (tsx-ts-mode . npm-mode))
+    :config
+    (setq npm-mode-command-prefix "C-c n"))
+
+  (use-package nodejs-repl
+    :ensure t
+    :bind (:map typescript-ts-mode-map
+                ("C-c r" . nodejs-repl)))
+
+  (use-package add-node-modules-path
+    :ensure t
+    :hook ((typescript-ts-mode . add-node-modules-path)
+           (tsx-ts-mode . add-node-modules-path)))
+
+#+END_SRC
+
+Pug Templates for my JS misadventures
+#+BEGIN_SRC emacs-lisp tangle: yes
+  (use-package jade-mode
+    :mode (("\\.pug\\'" . jade-mode))
+    :config (add-hook 'jade-mode-hook 'indent-tabs-mode))
+#+END_SRC
+
+Prettier Formatting
+#+BEGIN_SRC emacs-lisp tangle: yes
+  (use-package apheleia
+  	:ensure apheleia
+  	:diminish ""
+  	:defines
+  	apheleia-formatters
+  	apheleia-mode-alist
+  	:functions
+  	apheleia-global-mode
+  	:config
+  	(setf (alist-get 'prettier-json apheleia-formatters)
+				'("prettier" "--stdin-filepath" filepath))
+  	(apheleia-global-mode +1))
+#+END_SRC
+
+** C / C++
+#+BEGIN_SRC emacs-lisp tangle: yes
+  (use-package cc-mode
+    :ensure nil  :hook
+    ((c-mode . (lambda ()
+							 (setq indent-tabs-mode nil)
+							 (setq c-basic-offset 2)))
+     (c++-mode . (lambda ()
+								 (setq indent-tabs-mode nil)
+								 (setq c-basic-offset 2))))
+    :config
+    ;; Example: bind “go to definition” to F12
+    (define-key c-mode-base-map (kbd "<f12>") 'lsp-find-definition)
+    (define-key c-mode-base-map (kbd "C-c h")  'lsp-describe-thing-at-point))
+#+END_SRC
 ** Rust
 #+BEGIN_SRC emacs-lisp tangle: yes
-  (use-package company
-    :hook (prog-mode . company-mode)
-    :config
-    (setq company-minimum-prefix-length 1
-	  company-idle-delay 0.2))
-
-  (use-package lsp-mode
-    :commands (lsp lsp-deferred)
-    :hook ((lsp-mode . lsp-enable-which-key-integration)
-	   (rust-mode . lsp-deferred))
-    :custom
-    (lsp-log-io nil)
-    (lsp-keymap-prefix "C-c l")
-
-    ;; lsp proper
-    (lsp-eldoc-render-all t)
-    (lsp-idle-delay 0.8)
-    (lsp-enable-snippet t)
-
-    ;; Rust Settings
-    (lsp-rust-server 'rust-analyzer)
-    (lsp-rust-analyzer-server-display-inlay-hints t)
-    (lsp-rust-analyzer-proc-macro-enable t)
-    (lsp-rust-analyzer-cargo-watch-command "clippy"))
-
-  (use-package lsp-ui
-    :after lsp-mode
-    :commands (lsp-ui-mode lsp-ui-peek-find-definitions lsp-ui-peek-find-references)
-    :init
-    ;; Disable the sideline completely
-    (setq lsp-ui-sideline-enable nil)
-
-    ;; Enable the hover/documentation pop-up
-    (setq lsp-ui-doc-enable t
-	  lsp-ui-doc-delay 0.5        ;; delay before showing doc
-	  lsp-ui-doc-show-with-cursor nil
-	  lsp-ui-doc-show-with-mouse t)
-
-    ;; Enable the “peek” UI (jump-to-definition/references in a popup)
-    (setq lsp-ui-peek-enable t
-	  lsp-ui-peek-peek-height 20
-	  lsp-ui-peek-list-width 50)
-
-    ;; Enable the Imenu window on the side
-    (setq lsp-ui-imenu-enable t
-	  lsp-ui-imenu-kind-position 'left)
-
-    ;; Optionally enable a flycheck-style fringe indicator instead of sideline
-	(setq lsp-ui-flycheck-enable t)
-
-    :hook
-    (lsp-mode . lsp-ui-mode)
-
-    :config
-    ;; Example keybindings to trigger “peek” commands:
-    (define-key lsp-mode-map (kbd "C-c l d") #'lsp-ui-peek-find-definitions)
-    (define-key lsp-mode-map (kbd "C-c l r") #'lsp-ui-peek-find-references)
-
-    ;; Optional: adjust how the doc frame looks
-    (setq lsp-ui-doc-use-webkit t             ;; if you want richer rendering
-	  lsp-ui-doc-position 'at-point)      ;; or ’top or ’bottom or ’at-point
-    )
-
   (use-package rust-mode
     :ensure t
     :bind (
@@ -871,6 +1096,42 @@ Enable =yaml-mode=
     :ensure t
     :mode "\\.toml\\'")
  #+END_SRC
+
+** Go
+#+BEGIN_SRC emacs-lisp tangle: yes
+  (use-package go-mode
+    :ensure t
+    :mode "\\.go\\'"
+    :hook ((go-mode . lsp-deferred)
+           (go-mode . (lambda ()
+                        (setq indent-tabs-mode t)
+                        (setq tab-width 4))))
+    :config
+    (setq gofmt-command "gofumpt")
+    (add-hook 'before-save-hook 'gofmt-before-save))
+
+  (use-package go-tag
+    :ensure t
+    :bind (:map go-mode-map
+                ("C-c t a" . go-tag-add)
+                ("C-c t r" . go-tag-remove)))
+
+  (use-package gotest
+    :ensure t
+    :bind (:map go-mode-map
+                ("C-c t f" . go-test-current-file)
+                ("C-c t t" . go-test-current-test)
+                ("C-c t p" . go-test-current-project)
+                ("C-c t b" . go-test-current-benchmark)))
+
+  (use-package go-eldoc
+    :ensure t
+    :hook (go-mode . go-eldoc-setup))
+
+  (use-package go-guru
+    :ensure t
+    :hook (go-mode . go-guru-hl-identifier-mode))
+#+END_SRC
 
 ** Python
 #+BEGIN_SRC emacs-lisp tangle: yes
