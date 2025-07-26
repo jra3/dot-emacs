@@ -24,7 +24,7 @@ eshell/
 config.el
 .org-id-locations
 .last-package-update-day
-.lsp-session-*
+.lsp-session*
 .cask
 org-roam.db
 

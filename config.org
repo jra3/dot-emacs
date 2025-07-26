@@ -36,10 +36,12 @@ Mac tries to hide your $PATH from you when using a graphical mode
     :diminish vertico-mode
     :init
     (savehist-mode 1)
+    (recentf-mode 1)  ; Enable recent file tracking
     :config
     (vertico-mode 1)
     (setq vertico-cycle t
-          vertico-count 15))  ; Show more candidates
+          vertico-count 15  ; Show more candidates
+          recentf-max-saved-items 100))  ; Track more recent files
 
   ;; Enable vertico directory navigation
   (use-package vertico-directory
@@ -279,57 +281,113 @@ No bell, thanks
     (setq save-place-file (expand-file-name ".places" "~/tmp/saves")))
 #+END_SRC
 
-** Popwin
+** Window Management
 
-Popwin give us special temporary behavior for certain buffers. This
-lets them pop in and out in a way that I like better than the
-default behavior of taking over the other-buffer
+Configure special buffer display behavior using native Emacs functionality
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package popwin
-    :config
-    (progn
-      (setq popwin:special-display-config nil)
-      (push '("*Ibuffer*"
-              :dedicated t :position top    :stick t :noselect t   :height 30)
-            popwin:special-display-config)
-      (push '("*Backtrace*"
-              :dedicated t :position bottom :stick t :noselect nil :height 0.33)
-            popwin:special-display-config)
-      (push '("*compilation*"
-              :dedicated t :position bottom :stick t :noselect t   :height 0.5)
-            popwin:special-display-config)
-      (push '("*Compile-Log*"
-              :dedicated t :position bottom :stick t :noselect t   :height 0.33)
-            popwin:special-display-config)
-      (push '("*Help*"
-              :dedicated t :position bottom :stick t :noselect nil :height 0.33)
-            popwin:special-display-config)
-      (push '("*Shell Command Output*"
-              :dedicated t :position bottom :stick t :noselect nil :height 0.33)
-            popwin:special-display-config)
-      (push '(" *undo-tree*"
-              :dedicated t :position bottom :stick t :noselect nil :height 0.33)
-            popwin:special-display-config)
-      (push '("*Warnings*"
-              :dedicated t :position bottom :stick t :noselect nil :height 0.33)
-            popwin:special-display-config)
-      (push '("^\\*Man .*\\*$"
-              :regexp t    :position bottom :stick t :noselect nil :height 0.33)
-            popwin:special-display-config)
-      (popwin-mode 1)))
+  ;; Configure how specific buffers are displayed
+  (setq display-buffer-alist
+        '(;; Bottom side windows for various outputs
+          ("\\*\\(compilation\\|grep\\|Compile-Log\\|Flymake\\)\\*"
+           (display-buffer-in-side-window)
+           (side . bottom)
+           (window-height . 0.3)
+           (window-parameters . ((no-delete-other-windows . t)
+                                 (mode-line-format . none))))
+          
+          ;; Help and documentation windows (including LSP)
+          ("\\*\\(Help\\|helpful\\|info\\|lsp-help\\|eldoc\\)\\*"
+           (display-buffer-in-side-window)
+           (side . bottom)
+           (window-height . 0.33))
+          
+          ;; REPLs and interactive shells - these might want more space
+          ("\\*\\(shell\\|eshell\\|term\\|vterm\\)\\*"
+           (display-buffer-in-side-window)
+           (side . bottom)
+           (window-height . 0.4)
+           (window-parameters . ((no-delete-other-windows . t))))
+          
+          ;; Quick command output
+          ("\\*Shell Command Output\\*"
+           (display-buffer-in-side-window)
+           (side . bottom)
+           (window-height . 0.25))
+          
+          ;; Async command output
+          ("\\*Async Shell Command\\*"
+           (display-buffer-in-side-window)
+           (side . bottom)
+           (window-height . 0.25))
+          
+          ;; Warnings and errors - smaller since usually short
+          ("\\*\\(Warnings\\|Backtrace\\|Messages\\|Errors\\)\\*"
+           (display-buffer-in-side-window)
+           (side . bottom)
+           (window-height . 0.25))
+          
+          ;; Completions - small popup
+          ("\\*Completions\\*"
+           (display-buffer-in-side-window)
+           (side . bottom)
+           (window-height . 0.2))
+          
+          ;; Man pages - need more space
+          ("\\*Man .*\\*"
+           (display-buffer-in-side-window)
+           (side . bottom)
+           (window-height . 0.5))
+          
+          ;; Occur results
+          ("\\*Occur\\*"
+           (display-buffer-in-side-window)
+           (side . bottom)
+           (window-height . 0.3))
+          
+          ;; Package manager
+          ("\\*Packages\\*"
+           (display-buffer-same-window))
+          
+          ;; Process list
+          ("\\*Process List\\*"
+           (display-buffer-in-side-window)
+           (side . bottom)
+           (window-height . 0.25))
+          
+          ;; Echo key buffer (from your config)
+          ("\\*echo-key\\*"
+           (display-buffer-in-side-window)
+           (side . bottom)
+           (window-height . 10)
+           (window-parameters . ((no-delete-other-windows . t))))
+          
+          ;; Version control
+          ("\\*vc-\\(diff\\|change-log\\|log\\|dir\\)\\*"
+           (display-buffer-in-side-window)
+           (side . bottom)
+           (window-height . 0.3))
+          
+          ;; Org-mode special buffers
+          ("\\*Org Src .*\\*"
+           (display-buffer-same-window))
+          
+          ;; Calendar
+          ("\\*Calendar\\*"
+           (display-buffer-in-side-window)
+           (side . bottom)
+           (window-height . 10))
+          
+          ;; Bookmarks
+          ("\\*Bookmark List\\*"
+           (display-buffer-same-window))
+          
+          ;; Customization
+          ("\\*Customize.*\\*"
+           (display-buffer-same-window))))
 
-  ;; (setq popwin:special-display-config
-  ;;     (quote
-  ;;      (("*Ibuffer*" :position top :noselect t :height 30)
-  ;;       ("*Python Check*" :position top :noselect t :height 30)
-  ;;       ("*compilation*")
-  ;;       ("*Python Doc*")
-  ;;       ("*xref*")
-  ;;       ("*grep*")
-  ;;       ("*Help*")
-  ;;       ("*Completions*" :noselect t)
-  ;;       ("*Occur*" :noselect t)))))
+  ;; Make it easy to close all side windows with one command
+  (global-set-key (kbd "C-c w k") 'window-toggle-side-windows)
 #+END_SRC
 
 ** Splitting
@@ -361,6 +419,31 @@ it's awesome
   (use-package expand-region
     :commands er/expand-region
     :bind ("C-=" . er/expand-region))
+#+END_SRC
+
+** Configure Windmove
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (windmove-default-keybindings 'hyper)
+#+END_SRC
+
+** Manipulate Window Sizes
+
+C-x <arrow>
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (global-set-key
+   (kbd "C-x <right>")
+   '(lambda () (interactive) (enlarge-window-horizontally 4)))
+  (global-set-key
+   (kbd "C-x <left>")
+   '(lambda () (interactive) (shrink-window-horizontally 4)))
+  (global-set-key
+   (kbd "C-x <up>")
+   '(lambda () (interactive) (enlarge-window 4)))
+  (global-set-key
+   (kbd "C-x <down>")
+   '(lambda () (interactive) (shrink-window 4)))
 #+END_SRC
 
 ** Searching
@@ -885,191 +968,6 @@ https://endlessparentheses.com/the-toggle-map-and-wizardry.html
   (global-set-key (kbd "C-c m d") 'dev-ts-project)
 #+END_SRC
 
-* Navigation
-
-** Configure Windmove
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (windmove-default-keybindings 'hyper)
-#+END_SRC
-
-** Manipulate Window Sizes
-
-C-x <arrow>
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (global-set-key
-   (kbd "C-x <right>")
-   '(lambda () (interactive) (enlarge-window-horizontally 4)))
-  (global-set-key
-   (kbd "C-x <left>")
-   '(lambda () (interactive) (shrink-window-horizontally 4)))
-  (global-set-key
-   (kbd "C-x <up>")
-   '(lambda () (interactive) (enlarge-window 4)))
-  (global-set-key
-   (kbd "C-x <down>")
-   '(lambda () (interactive) (shrink-window 4)))
-#+END_SRC
-
-** Popwin
-
-Popwin give us special temporary behavior for certain buffers. This
-lets them pop in and out in a way that I like better than the
-default behavior of taking over the other-buffer
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package popwin
-    :config
-    (progn
-      (setq popwin:special-display-config nil)
-      (push '("*Ibuffer*"
-              :dedicated t :position top    :stick t :noselect t   :height 30)
-            popwin:special-display-config)
-      (push '("*Backtrace*"
-              :dedicated t :position bottom :stick t :noselect nil :height 0.33)
-            popwin:special-display-config)
-      (push '("*compilation*"
-              :dedicated t :position bottom :stick t :noselect t   :height 0.5)
-            popwin:special-display-config)
-      (push '("*Compile-Log*"
-              :dedicated t :position bottom :stick t :noselect t   :height 0.33)
-            popwin:special-display-config)
-      (push '("*Help*"
-              :dedicated t :position bottom :stick t :noselect nil :height 0.33)
-            popwin:special-display-config)
-      (push '("*Shell Command Output*"
-              :dedicated t :position bottom :stick t :noselect nil :height 0.33)
-            popwin:special-display-config)
-      (push '(" *undo-tree*"
-              :dedicated t :position bottom :stick t :noselect nil :height 0.33)
-            popwin:special-display-config)
-      (push '("*Warnings*"
-              :dedicated t :position bottom :stick t :noselect nil :height 0.33)
-            popwin:special-display-config)
-      (push '("^\\*Man .*\\*$"
-              :regexp t    :position bottom :stick t :noselect nil :height 0.33)
-            popwin:special-display-config)
-      (popwin-mode 1)))
-
-  ;; (setq popwin:special-display-config
-  ;;     (quote
-  ;;      (("*Ibuffer*" :position top :noselect t :height 30)
-  ;;       ("*Python Check*" :position top :noselect t :height 30)
-  ;;       ("*compilation*")
-  ;;       ("*Python Doc*")
-  ;;       ("*xref*")
-  ;;       ("*grep*")
-  ;;       ("*Help*")
-  ;;       ("*Completions*" :noselect t)
-  ;;       ("*Occur*" :noselect t)))))
-#+END_SRC
-
-** Enable win-switch
-
-Super nice to switch between frames and buffers
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package win-switch
-    :bind (("C-x o" . win-switch-dispatch))
-    :config
-    (setq win-switch-provide-visual-feedback t)
-    (setq win-switch-feedback-background-color "purple")
-    (setq win-switch-feedback-foreground-color "white")
-    (win-switch-setup-keys-default))
-#+END_SRC
-
-** Enable ibuffer
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package ibuffer-vc)
-  (define-key global-map (kbd "C-x C-b") 'ibuffer)
-  (setq ibuffer-default-sorting-mode 'major-mode)
-  ;; (define-key
-  ;;   ibuffer-mode-map
-  ;;   (kbd "RET")
-  ;;   'ibuffer-visit-buffer-other-window)
-#+END_SRC
-
-** Enable =anzu=
-
-Show number and ordinality of matching
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package anzu
-    :config (global-anzu-mode +1)
-    (setq anzu-mode-lighter ""))
-#+END_SRC
-
-** Save Point Positions Between Sessions
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package saveplace
-    :config
-    (setq-default save-place t)
-    (setq save-place-file (expand-file-name ".places" "~/tmp/saves")))
-#+END_SRC
-
-** narrow/widen
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (defun narrow-or-widen-dwim (p)
-    "Widen if buffer is narrowed, narrow-dwim otherwise.
-  Dwim means: region, org-src-block, org-subtree, or
-  defun, whichever applies first. Narrowing to
-  org-src-block actually calls `org-edit-src-code'.
-
-  With prefix P, don't widen, just narrow even if buffer
-  is already narrowed."
-    (interactive "P")
-    (declare (interactive-only))
-    (cond ((and (buffer-narrowed-p) (not p)) (widen))
-          ((region-active-p)
-           (narrow-to-region (region-beginning)
-                             (region-end)))
-          ((derived-mode-p 'org-mode)
-           ;; `org-edit-src-code' is not a real narrowing
-           ;; command. Remove this first conditional if
-           ;; you don't want it.
-           (cond ((ignore-errors (org-edit-src-code) t)
-                  (delete-other-windows))
-                 ((ignore-errors (org-narrow-to-block) t))
-                 (t (org-narrow-to-subtree))))
-          ((derived-mode-p 'latex-mode)
-           (LaTeX-narrow-to-environment))
-          (t (narrow-to-defun))))
-
-  (define-key endless/toggle-map "n"
-    #'narrow-or-widen-dwim)
-  ;; This line actually replaces Emacs' entire narrowing
-  ;; keymap, that's how much I like this command. Only
-  ;; copy it if that's what you want.
-  (define-key ctl-x-map "n" #'narrow-or-widen-dwim)
-  (add-hook 'LaTeX-mode-hook
-            (lambda ()
-              (define-key LaTeX-mode-map "\C-xn"
-                nil)))
-
-  (defun jallen-org-src-save-or-close () (interactive)
-    (indent-region (point-min) (point-max))
-    (if (buffer-modified-p)
-        (save-buffer)
-      (org-edit-src-exit)))
-
-  (eval-after-load 'org-src
-    '(define-key org-src-mode-map
-       "\C-x\C-s" #'jallen-org-src-save-or-close))
-#+END_SRC
-
-** expand-region
-
-it's awesome
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package expand-region
-    :commands er/expand-region
-    :bind ("C-=" . er/expand-region))
-#+END_SRC
 
 * Appearance
 
