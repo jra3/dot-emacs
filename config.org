@@ -56,6 +56,41 @@
                        (float-time (time-subtract after-init-time before-init-time)))))
 #+END_SRC
 
+** Suppress Compilation Warnings
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+  ;; Reduce byte-compile warnings from packages
+  (setq byte-compile-warnings '(not free-vars unresolved noruntime lexical make-local))
+  
+  ;; Native compilation settings (Emacs 28+)
+  (when (and (fboundp 'native-comp-available-p)
+             (native-comp-available-p))
+    ;; Suppress native comp warnings
+    (setq native-comp-async-report-warnings-errors nil
+          native-comp-warning-on-missing-source nil
+          native-comp-verbose 0))
+  
+  ;; Suppress specific warning types
+  (with-eval-after-load 'warnings
+    (add-to-list 'warning-suppress-types '(comp))
+    (add-to-list 'warning-suppress-types '(bytecomp))
+    (add-to-list 'warning-suppress-types '(docstring)))
+  
+  ;; Quiet package.el
+  (setq package-native-compile t)
+  
+  ;; Advice to reduce warnings during package operations
+  (defun my/quieter-byte-compile (orig-fun &rest args)
+    "Reduce verbosity during byte compilation."
+    (let ((byte-compile-warnings '(not free-vars unresolved noruntime 
+                                       lexical make-local docstring 
+                                       obsolete))
+          (inhibit-message t))
+      (apply orig-fun args)))
+  
+  (advice-add 'byte-compile-file :around #'my/quieter-byte-compile)
+#+END_SRC
+
 * Mac Magic
 
 #+BEGIN_SRC emacs-lisp :tangle yes

@@ -27,4 +27,12 @@
 ;; Prevent the glimpse of un-styled Emacs by disabling these UI elements early
 (setq frame-inhibit-implied-resize t)
 
+;; Suppress compilation warnings early
+(setq byte-compile-warnings '(not free-vars unresolved noruntime lexical make-local))
+(setq warning-minimum-level :error)
+
+;; Native compilation settings
+(setq native-comp-async-report-warnings-errors nil)
+(setq native-comp-warning-on-missing-source nil)
+
 ;;; early-init.el ends here
