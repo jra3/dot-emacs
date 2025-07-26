@@ -11,6 +11,56 @@
 # - Consider migrating from yasnippet to tempel for templates
 # - Consider ace-window instead of win-switch for window management
 
+* Performance Optimizations
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+  ;; Increase garbage collection threshold for faster startup
+  ;; Default is 800KB, we set to 100MB during init
+  (setq gc-cons-threshold (* 100 1024 1024))
+  
+  ;; Increase the amount of data Emacs reads from processes
+  (setq read-process-output-max (* 1024 1024)) ; 1MB
+  
+  ;; Optimize file handling
+  (setq auto-save-default t
+        auto-save-timeout 20  ; seconds
+        auto-save-interval 200) ; keystrokes
+  
+  ;; Disable bidirectional text for performance
+  (setq-default bidi-paragraph-direction 'left-to-right)
+  (setq bidi-inhibit-bpa t)  ; Emacs 27+ only
+  
+  ;; Disable line numbers in non-programming modes for performance
+  (add-hook 'prog-mode-hook #'display-line-numbers-mode)
+  
+  ;; Optimize long line handling
+  (setq-default truncate-lines t)
+  (setq truncate-partial-width-windows nil)
+  
+  ;; Fast scrolling
+  (setq fast-but-imprecise-scrolling t)
+  (setq jit-lock-defer-time 0.05)
+  
+  ;; Increase undo limits for better experience
+  (setq undo-limit 80000000         ; 80MB
+        undo-strong-limit 120000000  ; 120MB
+        undo-outer-limit 240000000)  ; 240MB
+  
+  ;; Optimize minibuffer
+  (setq enable-recursive-minibuffers t)
+  (setq max-mini-window-height 0.3)
+  
+  ;; Don't compact font caches during GC
+  (setq inhibit-compacting-font-caches t)
+  
+  ;; Reset GC threshold after startup (defer this to the end)
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (setq gc-cons-threshold (* 16 1024 1024))  ; 16MB
+              (message "Startup time: %.2f seconds"
+                       (float-time (time-subtract after-init-time before-init-time)))))
+#+END_SRC
+
 * Mac Magic
 
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -50,7 +100,13 @@ Mac tries to hide your $PATH from you when using a graphical mode
     (vertico-mode 1)
     (setq vertico-cycle t
           vertico-count 15  ; Show more candidates
-          recentf-max-saved-items 100))  ; Track more recent files
+          recentf-max-saved-items 100  ; Track more recent files
+          recentf-max-menu-items 15
+          recentf-auto-cleanup 'never)  ; Don't cleanup on startup
+    ;; Exclude some paths from recentf
+    (add-to-list 'recentf-exclude "/tmp/")
+    (add-to-list 'recentf-exclude "/var/")
+    (add-to-list 'recentf-exclude ".gz\\'"))
 
   ;; Enable vertico directory navigation
   (use-package vertico-directory
@@ -482,10 +538,22 @@ C-x <arrow>
 
 ** Disable Warnings About Large Files
 
-I'm not afraid of large files, yo
+File Handling Optimizations
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (setq large-file-warning-threshold nil)
+  ;; Warn when opening large files (100MB)
+  (setq large-file-warning-threshold (* 100 1024 1024))
+  
+  ;; Use fundamental-mode for very large files
+  (defun my-large-file-hook ()
+    "Optimize settings for large files."
+    (when (> (buffer-size) large-file-warning-threshold)
+      (setq buffer-read-only t)
+      (buffer-disable-undo)
+      (fundamental-mode)
+      (message "Large file: disabled features for performance")))
+  
+  (add-hook 'find-file-hook 'my-large-file-hook)
 #+END_SRC
 
 ** Snippets
@@ -581,10 +649,10 @@ editing many similar lines. More interactive than macros.
   (setq make-backup-files t
         backup-by-copying t      ; don't clobber symlinks
         backup-directory-alist
-        '(("." . user-temporary-file-directory))    ; don't litter my fs tree
+        `(("." . ,user-temporary-file-directory))    ; don't litter my fs tree
         delete-old-versions t
-        kept-new-versions 6
-        kept-old-versions 2
+        kept-new-versions 3      ; Keep fewer versions for performance
+        kept-old-versions 1
         version-control t)       ; use versioned backups
 
   (setq vc-make-backup-files t)
@@ -1026,6 +1094,22 @@ to set xterm-mode as a terminal option for this
 #+END_SRC
 
 * Compilation
+
+** Performance Settings
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+  ;; Optimize compilation buffer performance
+  (setq compilation-scroll-output t
+        compilation-always-kill t        ; Kill old compilation process before starting new
+        compilation-skip-threshold 2)    ; Skip warnings
+  
+  ;; Limit compilation buffer size
+  (add-hook 'compilation-filter-hook
+            (lambda ()
+              (when (> (buffer-size) (* 256 1024)) ; 256KB limit
+                (let ((inhibit-read-only t))
+                  (delete-region (point-min) (/ (point-max) 2))))))
+#+END_SRC
 
 If I'm compiling, just save all the buffers automatically for me
 
