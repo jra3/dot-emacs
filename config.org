@@ -7,8 +7,8 @@
 # - ✓ Removed anzu in favor of built-in isearch-lazy-count
 # - ✓ Replaced jade-mode with pug-mode for Pug templates
 # - ✓ Using lsp-mode (supports multiple LSPs per buffer, unlike eglot)
+# - ✓ Migrated to built-in treesit from external tree-sitter packages
 # - Consider migrating from yasnippet to tempel for templates
-# - For Emacs 29+: tree-sitter packages can be replaced with built-in treesit
 # - Consider ace-window instead of win-switch for window management
 
 * Mac Magic
@@ -1087,37 +1087,50 @@ it.
 
 * Modes
 
-** Treesitter Grammars / Languages
+** Tree-sitter Configuration (Built-in Emacs 29+)
 
-Stolen from https://www.ovistoica.com/blog/2024-7-05-modern-emacs-typescript-web-tsx-config#orgb6fd011
+Using built-in tree-sitter support instead of external packages
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package tree-sitter
-    :mode (("\\.tsx\\'" . tsx-ts-mode)
-           ("\\.js\\'"  . typescript-ts-mode)
-           ("\\.mjs\\'" . typescript-ts-mode)
-           ("\\.mts\\'" . typescript-ts-mode)
-           ("\\.cjs\\'" . typescript-ts-mode)
-           ("\\.ts\\'"  . typescript-ts-mode)
-           ("\\.jsx\\'" . tsx-ts-mode)
-           ("\\.json\\'" .  json-ts-mode)
-           ("\\.Dockerfile\\'" . dockerfile-ts-mode)
-           ("\\.prisma\\'" . prisma-ts-mode))
-    :hook
-    (prog-mode . global-tree-sitter-mode)
-    (tree-sitter-after-on . tree-sitter-hl-mode))
+  ;; Ensure tree-sitter grammars are installed
+  ;; Run M-x treesit-install-language-grammar to install grammars
+  
+  ;; Configure automatic mode selection for tree-sitter modes
+  (setq treesit-language-source-alist
+        '((bash       "https://github.com/tree-sitter/tree-sitter-bash")
+          (c          "https://github.com/tree-sitter/tree-sitter-c")
+          (cpp        "https://github.com/tree-sitter/tree-sitter-cpp")
+          (css        "https://github.com/tree-sitter/tree-sitter-css")
+          (go         "https://github.com/tree-sitter/tree-sitter-go")
+          (html       "https://github.com/tree-sitter/tree-sitter-html")
+          (java       "https://github.com/tree-sitter/tree-sitter-java")
+          (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
+          (json       "https://github.com/tree-sitter/tree-sitter-json")
+          (markdown   "https://github.com/tree-sitter-grammars/tree-sitter-markdown")
+          (python     "https://github.com/tree-sitter/tree-sitter-python")
+          (ruby       "https://github.com/tree-sitter/tree-sitter-ruby")
+          (rust       "https://github.com/tree-sitter/tree-sitter-rust")
+          (tsx        "https://github.com/tree-sitter/tree-sitter-typescript" "tsx/src")
+          (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "typescript/src")
+          (yaml       "https://github.com/tree-sitter-grammars/tree-sitter-yaml")))
 
-  (use-package tree-sitter-langs
-    :after tree-sitter)
+  ;; Auto-install missing grammars
+  (defun treesit-install-all-languages ()
+    "Install all tree-sitter grammars."
+    (interactive)
+    (dolist (lang treesit-language-source-alist)
+      (unless (treesit-language-available-p (car lang))
+        (treesit-install-language-grammar (car lang)))))
 
+  ;; Remap major modes to use tree-sitter variants
   (setq major-mode-remap-alist
         '((c-mode          . c-ts-mode)
           (c++-mode        . c++-ts-mode)
           (python-mode     . python-ts-mode)
+          (javascript-mode . js-ts-mode)
+          (js-mode         . js-ts-mode)
+          (js2-mode        . js-ts-mode)
           (typescript-mode . typescript-ts-mode)
-          (js-mode         . typescript-ts-mode)
-          (js2-mode        . typescript-ts-mode)
-          (tsx-mode        . tsx-ts-mode)
           (rust-mode       . rust-ts-mode)
           (go-mode         . go-ts-mode)
           (ruby-mode       . ruby-ts-mode)
@@ -1126,8 +1139,27 @@ Stolen from https://www.ovistoica.com/blog/2024-7-05-modern-emacs-typescript-web
           (css-mode        . css-ts-mode)
           (json-mode       . json-ts-mode)
           (yaml-mode       . yaml-ts-mode)
-          (markdown-mode   . markdown-ts-mode)))
+          (sh-mode         . bash-ts-mode)))
+
+  ;; Configure file associations for TypeScript/TSX
+  (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.jsx\\'" . tsx-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.mjs\\'" . js-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.cjs\\'" . js-ts-mode))
+  
+  ;; Enable font-lock (syntax highlighting) for tree-sitter modes
+  (global-font-lock-mode t)
+  
+  ;; Set tree-sitter font-lock level (1-4, higher = more detailed)
+  (setq treesit-font-lock-level 4)
 #+END_SRC
+
+To install tree-sitter grammars:
+1. Run `M-x treesit-install-language-grammar` for individual languages
+2. Or run `M-x treesit-install-all-languages` to install all configured grammars
+3. Grammars are installed to `~/.emacs.d/tree-sitter/` by default
 
 ** ediff
 
@@ -1396,9 +1428,7 @@ Prettier Formatting
     :mode ("\\.py\\'" . python-mode)
     :hook ((python-mode . (lambda ()
                             (setq indent-tabs-mode t)
-                            (setq python-indent-offset 2)))
-           (python-mode . tree-sitter-mode)
-           (python-mode . tree-sitter-hl-mode))
+                            (setq python-indent-offset 2))))
     :config
     (setq python-shell-interpreter "python3"
           python-shell-interpreter-args "-i"))
