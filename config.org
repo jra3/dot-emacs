@@ -148,12 +148,6 @@ isearch faces customizations
 
 ** Frame Settings
 
-Titles
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (setq frame-title-format (concat  "%b - emacs@" system-name))
-#+END_SRC
-
 Frame Configuration
 
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -760,7 +754,7 @@ And here we do the killing
     (lsp-rust-analyzer-server-display-inlay-hints t)
     (lsp-rust-analyzer-proc-macro-enable t)
     (lsp-rust-analyzer-cargo-watch-command "clippy"))
-    
+
   ;; Add useful keybindings for LSP
   (with-eval-after-load 'lsp-mode
     (add-hook 'lsp-mode-hook
@@ -1122,7 +1116,7 @@ Using built-in tree-sitter support instead of external packages
 #+BEGIN_SRC emacs-lisp :tangle yes
   ;; Ensure tree-sitter grammars are installed
   ;; Run M-x treesit-install-language-grammar to install grammars
-  
+
   ;; Configure automatic mode selection for tree-sitter modes
   (setq treesit-language-source-alist
         '((bash       "https://github.com/tree-sitter/tree-sitter-bash")
@@ -1176,10 +1170,10 @@ Using built-in tree-sitter support instead of external packages
   (add-to-list 'auto-mode-alist '("\\.jsx\\'" . tsx-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.mjs\\'" . js-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.cjs\\'" . js-ts-mode))
-  
+
   ;; Enable font-lock (syntax highlighting) for tree-sitter modes
   (global-font-lock-mode t)
-  
+
   ;; Set tree-sitter font-lock level (1-4, higher = more detailed)
   (setq treesit-font-lock-level 4)
 #+END_SRC
@@ -1347,7 +1341,7 @@ Pug Templates for my JS misadventures
   (use-package pug-mode
     :ensure t
     :mode "\\.pug\\'"
-    :config 
+    :config
     (setq pug-tab-width 2)
     (add-hook 'pug-mode-hook 'electric-indent-local-mode))
 #+END_SRC
