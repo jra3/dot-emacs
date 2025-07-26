@@ -1267,8 +1267,14 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
 ** Capture Templates
 
 #+BEGIN_SRC emacs-lisp :tangle yes
+  (defun my/org-capture-target-at-heading ()
+    "Return a point marker at the current heading."
+    (save-excursion
+      (org-back-to-heading)
+      (point-marker)))
+  
   (setq org-capture-templates
-        '(("t" "Todo" entry (file+headline org-default-notes-file "Inbox")
+        '(("t" "Todo" entry (file+headline (concat org-directory "gtd.org") "Inbox")
            "* TODO %?\n  %i\n  %a")
           
           ("n" "Note" entry (file+datetree org-default-notes-file)
@@ -1277,8 +1283,11 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
           ("j" "Journal" entry (file+datetree (concat org-directory "journal.org"))
            "* %?\n  %U\n  %i")
           
-          ("m" "Meeting" entry (file+headline org-default-notes-file "Meetings")
-           "* MEETING %? :MEETING:\n  %U\n  %^{Attendees}")
+          ("5" "5 Minute Journal")
+          ("5m" "Morning Entry" entry (file+datetree (concat org-directory "5-min-journal.org"))
+           "* Morning\n  I am grateful for...\n  - %?\n  - \n  - \n\n  What will I do to make today great?\n  - \n  - \n  - \n\n  I am ...")
+          ("5e" "Evening Entry" entry (file+datetree (concat org-directory "5-min-journal.org"))
+           "* Evening\n  3 amazing things that happened today...\n  - %?\n  - \n  - \n\n  How could I have made today even better?\n  - \n")
           
           ("." "Note at point" item
            (function my/org-capture-target-at-heading)

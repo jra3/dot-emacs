@@ -663,58 +663,6 @@ I find this much more readable
 	org-edit-timestamp-down-means-later t)
 #+END_SRC
 
-** =org-capture= templates
-
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (defun my/org-capture-target-at-heading ()
-	"Return a point marker at the current heading."
-	(save-excursion
-		(org-back-to-heading)
-		(point-marker)))
-
-  (setq
-   org-capture-templates
-   '(
-	 ("t" "Todo [inbox]" entry ; New inbox item to be processed
-		(file+headline jallen-org-gtd-file "Inbox")
-		"* TODO %?\n %i\n\n")
-
-	 ("m" "Meeting" entry (file+headline jallen-org-notes-file "Meetings")
-		"* MEETING with %? :MEETING:\n%U")
-	 ("p" "Phone call" entry (file+headline jallen-org-notes-file "Phone Calls")
-		"* PHONE %? :PHONE:\n%U")
-
-	 ("j" "Journal Entries")
-	 ("jm" "Precious Memory" entry ; Freeform journal entry
-		(file+datetree jallen-org-journal-file)
-		"* %? :memory:\n  %i\n  %a")
-	 ("jl" "Today I Learned" entry ; Breif TIL journal entry
-		(file+datetree jallen-org-journal-file "TIL")
-		"* %?\nLearned on %U :til:\n  %i\n  %a")
-	 ("j." "Journal" entry ; Freeform journal entry
-		(file+datetree jallen-org-journal-file)
-		"* %?\nEntered on %U\n  %i\n  %a")
-
-	 ("5" "5 Minute Journal")
-	 ("5m" "Morning Entry" entry (file+datetree jallen-org-5-min-journal-file)
-		"* Morning\n  I am grateful for...\n  - %?\n  - \n  - \n\n  What will I do to make today great?\n  - \n  - \n  - \n\n  I am ...")
-	 ("5e" "Evening Entry" entry (file+datetree jallen-org-5-min-journal-file)
-		"* Evening\n  3 amazing things that happened today...\n  - %?\n  - \n  - \n\n  How could I have made today even better?\n  - \n")
-
-	 ("f" "Food")
-	 ("."
-		"note at point"
-		item
-		(function my/org-capture-target-at-heading) "%? %U"
-		:prepend t
-		)
-
-	 ("n" "notes" entry ; Generic notebook entry
-		(file+datetree jallen-org-notes-file)
-		"* %? %U\n")
-	 ))
-#+END_SRC
-
 
 
 ** Revert/Save around captures
