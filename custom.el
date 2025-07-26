@@ -58,18 +58,7 @@
  '(org-pomodoro-format "P~%s")
  '(org-pomodoro-play-sounds nil)
  '(org-special-ctrl-a/e 'reversed)
- '(package-selected-packages
-    '(2048-game add-node-modules-path anzu apheleia auto-package-update
-       button-lock cargo claude-code company corfu cython-mode eat
-       elisp-slime-nav embark-consult exec-path-from-shell
-       expand-region flycheck-golangci-lint git-gutter go-eldoc
-       go-guru go-tag google-c-style gotest helm-descbinds helm-flx
-       helm-xref ibuffer-vc jade-mode jest lsp-ui marginalia
-       modern-cpp-font-lock multiple-cursors nodejs-repl npm-mode
-       orderless org-pomodoro package-lint popwin protobuf-mode
-       rainbow-delimiters rainbow-mode rust-mode tangotango-theme tide
-       toml-mode tree-sitter-langs vertico vterm win-switch yaml-mode
-       yasnippet))
+ '(package-selected-packages nil)
  '(shr-width 80)
  '(tab-width 2)
  '(undo-outer-limit 120000000))

@@ -2,6 +2,15 @@
 #+AUTHOR: John Allen
 #+STARTUP: overview
 
+# Package Modernization Notes:
+# - ✓ Using corfu instead of company for completions (with cape for extra sources)
+# - ✓ Removed anzu in favor of built-in isearch-lazy-count
+# - ✓ Replaced jade-mode with pug-mode for Pug templates
+# - ✓ Using lsp-mode (supports multiple LSPs per buffer, unlike eglot)
+# - Consider migrating from yasnippet to tempel for templates
+# - For Emacs 29+: tree-sitter packages can be replaced with built-in treesit
+# - Consider ace-window instead of win-switch for window management
+
 * Mac Magic
 
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -179,9 +188,9 @@ Show lines and columns
 Show number and ordinality of matching
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package anzu
-    :config (global-anzu-mode +1)
-    (setq anzu-mode-lighter ""))
+  ;; Use built-in isearch-lazy-count (available in Emacs 27+)
+  (setq isearch-lazy-count t)
+  (setq isearch-lazy-count-format "(%s/%s) ")
 #+END_SRC
 
 Highlight the selected region
@@ -380,6 +389,23 @@ Super nice to switch between frames and buffers
           win-switch-feedback-foreground-color "white")
     (win-switch-setup-keys-default))
 #+END_SRC
+
+;; Alternative: ace-window (more modern, actively maintained)
+;; Provides numbered overlays on windows for quick jumping
+;; #+BEGIN_SRC emacs-lisp :tangle no
+;;   (use-package ace-window
+;;     :ensure t
+;;     :bind (("C-x o" . ace-window)
+;;            ("M-o" . ace-window))
+;;     :config
+;;     (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
+;;           aw-dispatch-always t
+;;           aw-background nil)
+;;     ;; Make the ace-window overlays look nicer
+;;     (custom-set-faces
+;;      '(aw-leading-char-face
+;;        ((t (:inherit ace-jump-face-foreground :height 3.0))))))
+;; #+END_SRC
 
 ** Expand Region
 
@@ -659,11 +685,14 @@ And here we do the killing
 ** LSP
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package company
-    :hook (prog-mode . company-mode)
-    :config
-    (setq company-minimum-prefix-length 1
-          company-idle-delay 0.2))
+  ;; Configure cape for additional completion sources with corfu
+  (use-package cape
+    :ensure t
+    :init
+    ;; Add useful Cape completion functions to completion-at-point-functions
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+    (add-to-list 'completion-at-point-functions #'cape-file)
+    (add-to-list 'completion-at-point-functions #'cape-keyword))
 
   (use-package lsp-mode
     :commands (lsp lsp-deferred)
@@ -676,7 +705,7 @@ And here we do the killing
     :custom
     (lsp-log-io nil)                      ; IMPORTANT! Use only for debugging! Drastically affects performance
     (lsp-keymap-prefix "C-c l")           ; Prefix for LSP actions
-    ;;(lsp-completion-provider :none)     ; Using Corfu as the provider
+    (lsp-completion-provider :none)       ; Using Corfu as the provider
     (lsp-diagnostics-provider :flycheck)
     (lsp-session-file (locate-user-emacs-file ".lsp-session"))
     (lsp-keep-workspace-alive nil)        ; Close LSP server if all project buffers are closed
@@ -1218,7 +1247,7 @@ Meat and potatoes
 
   (use-package tide
     :ensure t
-    :after (typescript-ts-mode company flycheck)
+    :after (typescript-ts-mode flycheck)
     :hook ((typescript-ts-mode . tide-setup)
            (typescript-ts-mode . tide-hl-identifier-mode)
            (tsx-ts-mode . tide-setup)
@@ -1255,9 +1284,12 @@ Meat and potatoes
 Pug Templates for my JS misadventures
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package jade-mode
-    :mode (("\\.pug\\'" . jade-mode))
-    :config (add-hook 'jade-mode-hook 'indent-tabs-mode))
+  (use-package pug-mode
+    :ensure t
+    :mode "\\.pug\\'"
+    :config 
+    (setq pug-tab-width 2)
+    (add-hook 'pug-mode-hook 'electric-indent-local-mode))
 #+END_SRC
 
 Prettier Formatting
