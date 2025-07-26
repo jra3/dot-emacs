@@ -2,12 +2,7 @@
 #+AUTHOR: John Allen
 #+STARTUP: overview
 
-# Package Modernization Notes:
-# - ✓ Using corfu instead of company for completions (with cape for extra sources)
-# - ✓ Removed anzu in favor of built-in isearch-lazy-count
-# - ✓ Replaced jade-mode with pug-mode for Pug templates
-# - ✓ Using lsp-mode (supports multiple LSPs per buffer, unlike eglot)
-# - ✓ Migrated to built-in treesit from external tree-sitter packages
+# Potential Future Improvements:
 # - Consider migrating from yasnippet to tempel for templates
 # - Consider ace-window instead of win-switch for window management
 
@@ -440,22 +435,6 @@ Super nice to switch between frames and buffers
     (win-switch-setup-keys-default))
 #+END_SRC
 
-;; Alternative: ace-window (more modern, actively maintained)
-;; Provides numbered overlays on windows for quick jumping
-;; #+BEGIN_SRC emacs-lisp :tangle no
-;;   (use-package ace-window
-;;     :ensure t
-;;     :bind (("C-x o" . ace-window)
-;;            ("M-o" . ace-window))
-;;     :config
-;;     (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
-;;           aw-dispatch-always t
-;;           aw-background nil)
-;;     ;; Make the ace-window overlays look nicer
-;;     (custom-set-faces
-;;      '(aw-leading-char-face
-;;        ((t (:inherit ace-jump-face-foreground :height 3.0))))))
-;; #+END_SRC
 
 ** Expand Region
 
