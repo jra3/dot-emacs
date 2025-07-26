@@ -121,9 +121,6 @@ I remove the bulk of the defaults because I really don't use many of these featu
 	   ("a" . org-archive-subtree-default-with-confirmation)
 	   ("@" . org-mark-subtree)
 	   ("#" . org-toggle-comment)
-	   ("Clock Commands")
-	   ("I" . org-clock-in)
-	   ("O" . org-clock-out)
 	   ("Meta Data Editing")
 	   ("T" . org-todo)
 	   ("," ignore)
@@ -152,10 +149,8 @@ I remove the bulk of the defaults because I really don't use many of these featu
 #+BEGIN_SRC emacs-lisp tangle: yes
   (setq jallen-org-notes-file (concat org-directory "notes.org")
 	jallen-org-gtd-file (concat org-directory "gtd.org")
-	jallen-org-reference-file (concat org-directory "reference.org")
 	jallen-org-journal-file (concat org-directory "journal.org")
 	jallen-org-5-min-journal-file (concat org-directory "5-min-journal.org")
-	jallen-org-weekly-report-file (concat org-directory "weekly.org")
 
 	jallen-default-org-agenda-files (list jallen-org-gtd-file)
 	org-default-notes-file jallen-org-notes-file
@@ -176,8 +171,7 @@ I remove the bulk of the defaults because I really don't use many of these featu
 	org-refile-use-outline-path t
 	org-refile-target-verify-function 'jallen/filter-refile-targets
 
-	org-refile-targets '((jallen-org-gtd-file :maxlevel . 4)
-			     (jallen-org-reference-file :maxlevel . 4)))
+	org-refile-targets '((jallen-org-gtd-file :maxlevel . 4)))
 	#+END_SRC
 
 ** =Agendas= configurations
@@ -662,31 +656,11 @@ I find this much more readable
 #+BEGIN_SRC emacs-lisp tangle: yes
   (setq org-enable-priority-commands nil)
 #+END_SRC
-** Clocks
-*** Org Pomodoro
-
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (use-package org-pomodoro)
-#+END_SRC
-
-*** Logging time of task completion
+** Logging
 #+BEGIN_SRC emacs-lisp tangle: yes
   (setq org-log-done 'time ; log the time a task is marked done
-	org-clock-out-remove-zero-time-clocks t
-	org-log-into-drawer t) ; timestamps go in a drawer, not the body
-#+END_SRC
-
-*** Editing timestamps
-
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (setq org-edit-timestamp-down-means-later t)
-#+END_SRC
-
-*** Save the running clock and all clock history when exiting Emacs, load it on startp
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (org-clock-persistence-insinuate)
-  (setq org-clock-persist 'history
-	org-clock-in-resume t)
+	org-log-into-drawer t ; timestamps go in a drawer, not the body
+	org-edit-timestamp-down-means-later t)
 #+END_SRC
 
 ** =org-capture= templates
@@ -706,9 +680,9 @@ I find this much more readable
 		"* TODO %?\n %i\n\n")
 
 	 ("m" "Meeting" entry (file "~/git/org/refile.org")
-		"* MEETING with %? :MEETING:\n%U" :clock-in t :clock-resume t)
+		"* MEETING with %? :MEETING:\n%U")
 	 ("p" "Phone call" entry (file "~/git/org/refile.org")
-		"* PHONE %? :PHONE:\n%U" :clock-in t :clock-resume t)
+		"* PHONE %? :PHONE:\n%U")
 
 	 ("j" "Journal Entries")
 	 ("jm" "Precious Memory" entry ; Freeform journal entry

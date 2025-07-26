@@ -1262,9 +1262,6 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
           ("HOLD" . ?H)
           ("CANCELLED" . ?C)))
   
-  ;; Effort estimates
-  (setq org-global-properties
-        '(("Effort_ALL" . "0:05 0:30 1:00 2:00 4:00 8:00")))
 #+END_SRC
 
 ** Capture Templates
@@ -1283,7 +1280,8 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
           ("m" "Meeting" entry (file+headline org-default-notes-file "Meetings")
            "* MEETING %? :MEETING:\n  %U\n  %^{Attendees}")
           
-          ("." "Note at point" item (clock)
+          ("." "Note at point" item
+           (function my/org-capture-target-at-heading)
            "%? %U"
            :prepend t)))
   
@@ -1303,8 +1301,8 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
         org-agenda-restore-windows-after-quit t
         org-agenda-span 'day
         org-agenda-start-with-log-mode t
-        org-agenda-log-mode-items '(closed clock state)
-        org-columns-default-format "%50ITEM(Task) %2PRIORITY %10Effort(Effort){:} %10CLOCKSUM")
+        org-agenda-log-mode-items '(closed state)
+        org-columns-default-format "%50ITEM(Task) %2PRIORITY")
   
   ;; Better time grid
   (setq org-agenda-time-grid
@@ -1316,7 +1314,7 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
   (setq org-agenda-custom-commands
         '(("n" "Next Actions" tags-todo "-WAITING-CANCELLED/!NEXT"
            ((org-agenda-overriding-header "Next Actions")
-            (org-agenda-sorting-strategy '(effort-up category-keep))))
+            (org-agenda-sorting-strategy '(category-keep))))
           
           ("w" "Waiting" todo "WAITING"
            ((org-agenda-overriding-header "Waiting")))
@@ -1399,19 +1397,13 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
         org-habit-graph-column 60)
 #+END_SRC
 
-** Clocking
+** Logging
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-  ;; Clock settings
+  ;; Log settings
   (setq org-log-done 'time              ; Log time when task is done
         org-log-into-drawer t           ; Put timestamps in drawer
-        org-clock-out-remove-zero-time-clocks t
         org-edit-timestamp-down-means-later t)
-  
-  ;; Clock persistence
-  (org-clock-persistence-insinuate)
-  (setq org-clock-persist 'history
-        org-clock-in-resume t)
 #+END_SRC
 
 ** Helper Functions

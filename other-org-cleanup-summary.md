@@ -38,7 +38,6 @@
 - reference.org (reference material)
 - journal.org (regular journal)
 - 5-min-journal.org (5-minute journal)
-- weekly.org (weekly reports)
 
 ### 2. Major Sections:
 - Speed commands configuration
