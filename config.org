@@ -119,36 +119,6 @@ Mac tries to hide your $PATH from you when using a graphical mode
 
 * Appearance
 
-** Fonts
-
-Install fonts from my .emacs.d into system locations
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (defun jallen-install-font ()
-    "copy my font files into the system-specific location"
-    (let ((fonts-source "~/.emacs.d/Input_Fonts/"))
-      (if (string-equal system-type "darwin")
-          (copy-directory fonts-source "~/Library/Fonts/") ; Mac
-        (copy-directory fonts-source "~/.fonts/")) ; Linux
-      ))
-
-  (add-hook 'before-make-frame-hook
-            (lambda ()
-              (if (-any '(lambda (fonts) (string-prefix-p "-*-Input " (elt fonts 6))) (x-family-fonts))
-                  (jallen-install-font))))
-#+END_SRC
-
-Define some shortcuts for sizes that I use sometimes
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (defun jallen-font () (interactive)
-    (set-frame-font "Input Mono Narrow-16"))
-  (defun jallen-font-no-contacts () (interactive)
-    (set-frame-font "Input Mono Narrow-22"))
-  (defun jallen-blind () (interactive)
-    (set-frame-font "Input Mono Narrow-30"))
-#+END_SRC
-
 ** Theme
 
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -295,93 +265,93 @@ Configure special buffer display behavior using native Emacs functionality
            (window-height . 0.3)
            (window-parameters . ((no-delete-other-windows . t)
                                  (mode-line-format . none))))
-          
+
           ;; Help and documentation windows (including LSP)
           ("\\*\\(Help\\|helpful\\|info\\|lsp-help\\|eldoc\\)\\*"
            (display-buffer-in-side-window)
            (side . bottom)
            (window-height . 0.33))
-          
+
           ;; REPLs and interactive shells - these might want more space
           ("\\*\\(shell\\|eshell\\|term\\|vterm\\)\\*"
            (display-buffer-in-side-window)
            (side . bottom)
            (window-height . 0.4)
            (window-parameters . ((no-delete-other-windows . t))))
-          
+
           ;; Quick command output
           ("\\*Shell Command Output\\*"
            (display-buffer-in-side-window)
            (side . bottom)
            (window-height . 0.25))
-          
+
           ;; Async command output
           ("\\*Async Shell Command\\*"
            (display-buffer-in-side-window)
            (side . bottom)
            (window-height . 0.25))
-          
+
           ;; Warnings and errors - smaller since usually short
           ("\\*\\(Warnings\\|Backtrace\\|Messages\\|Errors\\)\\*"
            (display-buffer-in-side-window)
            (side . bottom)
            (window-height . 0.25))
-          
+
           ;; Completions - small popup
           ("\\*Completions\\*"
            (display-buffer-in-side-window)
            (side . bottom)
            (window-height . 0.2))
-          
+
           ;; Man pages - need more space
           ("\\*Man .*\\*"
            (display-buffer-in-side-window)
            (side . bottom)
            (window-height . 0.5))
-          
+
           ;; Occur results
           ("\\*Occur\\*"
            (display-buffer-in-side-window)
            (side . bottom)
            (window-height . 0.3))
-          
+
           ;; Package manager
           ("\\*Packages\\*"
            (display-buffer-same-window))
-          
+
           ;; Process list
           ("\\*Process List\\*"
            (display-buffer-in-side-window)
            (side . bottom)
            (window-height . 0.25))
-          
+
           ;; Echo key buffer (from your config)
           ("\\*echo-key\\*"
            (display-buffer-in-side-window)
            (side . bottom)
            (window-height . 10)
            (window-parameters . ((no-delete-other-windows . t))))
-          
+
           ;; Version control
           ("\\*vc-\\(diff\\|change-log\\|log\\|dir\\)\\*"
            (display-buffer-in-side-window)
            (side . bottom)
            (window-height . 0.3))
-          
+
           ;; Org-mode special buffers
           ("\\*Org Src .*\\*"
            (display-buffer-same-window))
-          
+
           ;; Calendar
           ("\\*Calendar\\*"
            (display-buffer-in-side-window)
            (side . bottom)
            (window-height . 10))
-          
+
           ;; Bookmarks
           ("\\*Bookmark List\\*"
            (display-buffer-same-window))
-          
+
           ;; Customization
           ("\\*Customize.*\\*"
            (display-buffer-same-window))))
@@ -969,123 +939,6 @@ https://endlessparentheses.com/the-toggle-map-and-wizardry.html
 #+END_SRC
 
 
-* Appearance
-
-** Frame Titles
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (setq frame-title-format (concat  "%b - emacs@" system-name))
-#+END_SRC
-
-** Fonts
-
-Install fonts from my .emacs.d into system locations
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (defun jallen-install-font ()
-    "copy my font files into the system-specific location"
-    (let ((fonts-source "~/.emacs.d/Input_Fonts/"))
-      (if (string-equal system-type "darwin")
-          (copy-directory fonts-source "~/Library/Fonts/") ; Mac
-        (copy-directory fonts-source "~/.fonts/")) ; Linux
-      ))
-
-  (add-hook 'before-make-frame-hook
-            (lambda ()
-              (if (-any '(lambda (fonts) (string-prefix-p "-*-Input " (elt fonts 6))) (x-family-fonts))
-                  (jallen-install-font))))
-#+END_SRC
-
-Define some shortcuts for sizes that I use sometimes
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (defun jallen-font () (interactive)
-    (set-frame-font "Input Mono Narrow-16"))
-  (defun jallen-font-no-contacts () (interactive)
-    (set-frame-font "Input Mono Narrow-22"))
-  (defun jallen-blind () (interactive)
-    (set-frame-font "Input Mono Narrow-30"))
-#+END_SRC
-
-** Frame Configuration
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (setq default-frame-alist
-        (quote
-         ((left-fringe . 1)
-          (right-fringe . 1)
-          (menu-bar-lines . 0)
-          (tool-bar-lines . 0)
-          (font . "Input Mono Narrow-16"))))
-#+END_SRC
-
-** Theme
-
-I love tangotango
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package tangotango-theme
-    :config (load-theme 'tangotango t))
-#+END_SRC
-
-** Uniquify Buffer Names
-
-TODO make this lazy load maybe?
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (require 'uniquify)
-  (setq uniquify-buffer-name-style 'reverse
-        uniquify-separator "|"
-        uniquify-after-kill-buffer-p t
-        uniquify-ignore-buffers-re "^\\*")
-#+END_SRC
-
-** isearch faces
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (set-face-foreground 'lazy-highlight "black")
-  (set-face-background 'lazy-highlight "yellow")
-  (set-face-foreground 'isearch "white")
-  (set-face-background 'isearch "blue")
-#+END_SRC
-
-** Turn Off NUX and Noisy UI
-
-No scroll, tool, menu bars
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-  (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-  (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-#+END_SRC
-
-Scratch buffer can just be empty, thanks
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (setq initial-scratch-message nil)
-#+END_SRC
-
-No NUX
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (setq inhibit-splash-screen t
-        inhibit-startup-message t
-        inhibit-startup-echo-area-message t)
-#+END_SRC
-
-** Show Lines and Columns
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (setq line-number-mode t
-        column-number-mode t)
-#+END_SRC
-
-** Highlight the Selected Region
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (setq transient-mark-mode t)
-#+END_SRC
-
 * Terminal Configuration
 
 ** Terminals in Emacs Should Use ANSI Colors
@@ -1120,187 +973,6 @@ to set xterm-mode as a terminal option for this
     ;; weird
     (global-set-key [select] [S-up]))
 #+END_SRC
-
-* Editing
-
-** Treesitter
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package tree-sitter
-    :ensure t
-    :config
-    ;; activate tree-sitter on any buffer containing code for which it has a parser available
-    (global-tree-sitter-mode)
-    ;; you can easily see the difference tree-sitter-hl-mode makes for python, ts or tsx
-    ;; by switching on and off
-    (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
-
-  (use-package tree-sitter-langs
-    :ensure t
-    :after tree-sitter)
-#+END_SRC
-
-** Multiple Cursors                                                             :today:
-
-Multi-cursor editing is so cool when you can do it. Useful when
-editing many similar lines. More interactive than macros.
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package multiple-cursors
-    :bind (("M-c" . mc/edit-lines)
-           ("C->" . mc/mark-next-like-this)
-           ("C-<" . mc/mark-previous-like-this)
-           ("C-c C-<" . mc/mark-all-like-this)
-           ("C-S-<mouse-1>" . mc/add-cursor-on-click)))
-#+END_SRC
-
-** Align Lines on ' = '
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (global-set-key (kbd "C-c =") 'align-eq)
-#+END_SRC
-
-** Revert a Buffer
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (global-set-key (kbd "C-c r") 'revert-buffer)
-#+END_SRC
-
-** Unfill Paragraphs
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (defun unfill-paragraph ()
-    "Takes a multi-line paragraph and makes it into a single line of text."
-    (interactive)
-    (let ((fill-column (point-max)))
-      (fill-paragraph nil)))
-
-  (global-set-key (kbd "M-Q") 'unfill-paragraph)
-#+END_SRC
-
-** Code Formatting
-   :LOGBOOK:
-   - State "MAYBE"      from "TODO"       [2019-02-13 Wed 10:37]
-   :END:
-
-*** Default Indentation
-
-c-basic-offset is used by most major modes I use as the basis for
-how deeply to indent any code.
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (setq c-basic-offset 1)
-#+END_SRC
-
-*** Whitespace
-
-I don't highlight trailing whitespace, because I auto-kill it anyway
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (setq-default show-trailing-whitespace nil)
-#+END_SRC
-
-And here we do the killing
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (add-hook 'before-save-hook 'whitespace-cleanup)
-#+END_SRC
-
-*** Tabs
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (setq-default indent-tabs-mode t)
-  (setq-default tab-width 2)
-  (setq tab-width 2)
-#+END_SRC
-
-*** Add Newline to the End of Files
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (setq require-final-newline t)
-#+END_SRC
-
-*** Set Unix File Coding System
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (setq-default buffer-file-coding-system 'utf-8-unix)
-  (setq-default default-buffer-file-coding-system 'utf-8-unix)
-  (set-default-coding-systems 'utf-8-unix)
-  (prefer-coding-system 'utf-8-unix)
-#+END_SRC
-
-** LSP
-
-*** TODO Basic
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package eglot :ensure t)
-  ;(use-package lsp-mode
-  ;  :config
-  ;  (setq
-  ;   lsp-ui-sideline-show-code-actions nil
-  ;   lsp-ui-sideline-show-hover nil
-  ;   lsp-highlight-symbol-at-point nil))
-  ;(use-package lsp-ui :commands lsp-ui-mode)
-#+END_SRC
-
-*** Claude Code
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  ;; for eat terminal backend:
-  (use-package eat :ensure t)
-
-  ;; install claude-code.el
-  (use-package claude-code :ensure t
-    :vc (:url "https://github.com/stevemolitor/claude-code.el" :rev :newest)
-    :config (claude-code-mode)
-    :bind-keymap ("C-c d" . claude-code-command-map))
-#+END_SRC
-
-*** Go Development
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  ;; Go mode with LSP and formatting
-  (use-package go-mode
-    :ensure t
-    :mode "\\.go\\'"
-    :hook ((go-mode . eglot-ensure)
-           (go-mode . (lambda ()
-                        (add-hook 'before-save-hook #'gofmt-before-save nil t))))
-    :config
-    ;; Use goimports for formatting (handles imports too)
-    (setq gofmt-command "goimports"))
-
-  ;; Configure Eglot for gopls
-  (with-eval-after-load 'eglot
-    (add-to-list 'eglot-server-programs '(go-mode . ("gopls")))
-    ;; Organize imports on save
-    (add-hook 'go-mode-hook
-              (lambda ()
-                (add-hook 'before-save-hook
-                          (lambda ()
-                            (call-interactively 'eglot-code-action-organize-imports))
-                          nil t))))
-
-  ;; Flycheck for additional linting
-  (use-package flycheck
-    :ensure t
-    :init (global-flycheck-mode)
-    :config
-    ;; Only enable for programming modes
-    (setq flycheck-global-modes '(not text-mode org-mode)))
-
-  ;; Optional: Additional Go tools integration
-  (use-package flycheck-golangci-lint
-    :ensure t
-    :after (flycheck go-mode)
-    :hook (go-mode . flycheck-golangci-lint-setup)
-    :config
-    ;; Use golangci-lint for comprehensive linting
-    (setq flycheck-golangci-lint-enable-all t))
-#+END_SRC
-
-What o
 
 * Compilation
 
@@ -1343,45 +1015,6 @@ And follow the output!!!
   (setq fill-column 78)
 #+END_SRC
 
-** Backups
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (defvar user-temporary-file-directory "~/tmp/saves/"
-    (concat temporary-file-directory user-login-name "/"))
-
-  (make-directory user-temporary-file-directory t)
-
-  (setq make-backup-files t
-        backup-by-copying t      ; don't clobber symlinks
-        backup-directory-alist
-        '(("." . user-temporary-file-directory))    ; don't litter my fs tree
-        delete-old-versions t
-        kept-new-versions 6
-        kept-old-versions 2
-        version-control t)       ; use versioned backups
-
-  (setq vc-make-backup-files t)
-
-  (setq backup-directory-alist
-        `((".*" . ,user-temporary-file-directory)))
-  (setq auto-save-file-name-transforms
-        `((".*" ,user-temporary-file-directory t)))
-  (setq auto-save-list-file-prefix
-        (concat user-temporary-file-directory ".auto-saves-"))
-#+END_SRC
-
-** Text-mode is a Better Default Than Fundamental for Me
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (setq-default major-mode 'text-mode)
-#+END_SRC
-
-** Replace 'yes/no' by Just 'y/n'
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (fset 'yes-or-no-p 'y-or-n-p)
-#+END_SRC
-
 ** Tags Operations Should Be Case Sensitive
 
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1407,24 +1040,10 @@ https://www.emacswiki.org/emacs/SmoothScrolling
         split-width-threshold 10000)
 #+END_SRC
 
-** Subword Movement in prog-mode
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (add-hook 'prog-mode-hook 'subword-mode)
-#+END_SRC
-
 ** No Bell, Thanks
 
 #+BEGIN_SRC emacs-lisp :tangle yes
   (setq ring-bell-function 'ignore)
-#+END_SRC
-
-** Disable Warnings About Large Files
-
-I'm not afraid of large files, yo
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (setq large-file-warning-threshold nil)
 #+END_SRC
 
 ** Search/Match Should Be Case Insensitive
@@ -1435,67 +1054,6 @@ it.
 
 #+BEGIN_SRC emacs-lisp :tangle yes
   (setq case-fold-search t)
-#+END_SRC
-
-** Revert Files When They Change On Disk
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (global-auto-revert-mode t)
-#+END_SRC
-
-** Make Scripts Executable on Save
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (add-hook 'after-save-hook
-            'executable-make-buffer-file-executable-if-script-p)
-#+END_SRC
-
-* VC
-
-** git-gutter-mode
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package git-gutter
-    :diminish git-gutter-mode
-    :commands (git-gutter-mode)
-    :bind (:map vc-prefix-map
-                ("[" . git-gutter:previous-hunk)
-                ("]" . git-gutter:next-hunk)
-                ("n" . git-gutter:revert-hunk)
-                ("SPC" . git-gutter:mark-hunk))
-    :init
-    (global-git-gutter-mode)
-    :config
-    (setq git-gutter:handled-backends '(git hg)))
-
-  ;; vc-hg comes with emacs, but we can still use use-package to group related
-  ;; config
-
-  (use-package vc-hg
-    :ensure nil
-    :bind
-    (:map vc-prefix-map
-          ("a" . vc-annotate)
-          ;; 'g' is the original binding for vc-annotate
-          ("g" . nil))
-    :config
-    (setq vc-hg-annotate-re
-          (concat
-           "^\\(?: *[^ ]+ +\\)?\\(D?[0-9]+\\) +" ;; user and revision
-           "\\([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\\)" ;; date
-           "\\(?: +\\([^:]+\\)\\)?:") ;; filename
-          vc-annotate-hg-switches "-u")
-    ;; redefine vc-hg-annotate-command to use -p (phabricator diff) instead of -n
-    ;; (revision number)
-    ;; TODO select -p or -n base on whether or not the hg repo is a phabricator
-    ;; project. Is there a better way to do this other than replacing the
-    ;; function, e.g. with advice?
-    (defun vc-hg-annotate-command (file buffer &optional revision)
-      "Execute \"hg annotate\" on FILE, inserting the contents in BUFFER.
-  Optional arg REVISION is a revision to annotate from."
-      (apply #'vc-hg-command buffer 0 file "annotate" "-dq" "-p"
-             (append (vc-switches 'hg 'annotate)
-                     (if revision (list (concat "-r" revision)))))))
 #+END_SRC
 
 * Modes
