@@ -57,7 +57,6 @@
  '(org-export-with-toc nil)
  '(org-pomodoro-format "P~%s")
  '(org-pomodoro-play-sounds nil)
- '(org-special-ctrl-a/e 'reversed)
  '(package-selected-packages nil)
  '(shr-width 80)
  '(tab-width 2)

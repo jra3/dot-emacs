@@ -1,33 +1,16 @@
+* Additional Org Configuration
+This file contains specialized org-mode configuration not migrated to config.org.
+Key items: complex agenda views, specific GTD workflows, capture template extensions.
+
 * Configuring =org-mode=
 ** Set environment
-Blocked tasks are tasks that have subtasks which are not in a done
-todo state. Blocked tasks show up in a grayed font by default in the
-agenda.
-
-To enable task blocking set the following variable:
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (setq org-enforce-todo-dependencies t)
-#+END_SRC
 
 #+BEGIN_SRC emacs-lisp tangle: yes
-
-  (setq org-agenda-sticky t)
-  	(setq org-cycle-separator-lines 0)
-
-  	(setq org-directory "~/org/"
-	  org-tags-exclude-from-inheritance '("BUCKET" "PROJECTS"))
+  	(setq org-tags-exclude-from-inheritance '("BUCKET" "PROJECTS"))
 
   	(defun org-file-path (filename)
   		"Return the absolute address of an org file, given its relative name."
   		(concat (file-name-as-directory org-directory) filename))
-
-
-  (defun org-find-file ()
-  	"Leverage Helm to quickly open any org files."
-  	(interactive)
-  	(find-file (concat org-directory
-		       (helm-comp-read "Select your org file: "
-				       (directory-files org-directory nil "\.org$")))))
 
   	(eval-after-load "org"
   		'(defun org-save-all-org-buffers ()
@@ -45,59 +28,12 @@ To enable task blocking set the following variable:
 		(define-key org-agenda-mode-map (kbd "M-.") (lambda () (interactive) (org-agenda-schedule nil ".")))
 		(define-key org-agenda-mode-map (kbd "C-.") (lambda () (interactive) (org-agenda-schedule t)))
 		(define-key org-agenda-mode-map "Y" 'org-todo-yesterday)
-		(define-key org-agenda-mode-map "P" 'org-pomodoro)
 		(define-key org-agenda-mode-map "N" nil)
 		(cd "/tmp")
 		(add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
 		(auto-save-mode)))
 	#+END_SRC
 
-** Modules
-We ensure that we load org-habit
-
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (setq-default org-modules
-		'(org-bibtex
-		  org-habit
-		  org-id
-		  org-info))
-#+END_SRC
-
-** Enable =org-mode= for org files
-
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (use-package org
-  	 :mode ("\\.org\\'" . org-mode)
-  	 :mode ("\\.org_archive\\'" . org-mode)
-  	 :config (windmove-mode nil))
-#+END_SRC
-
-** GTD TODO, tags, effort
-
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (setq org-global-properties
-	'(("Effort_ALL". "0:05 0:30 1:00 2:00 4:00 8:00")))
-
-  (setq org-todo-keywords
-	(quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-		(sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING")))
-
-	org-todo-keyword-faces
-	(quote (("TODO" :foreground "red" :weight bold)
-		("NEXT" :foreground "blue" :weight bold)
-		("DONE" :foreground "forest green" :weight bold)
-		("WAITING" :foreground "orange" :weight bold)
-		("HOLD" :foreground "magenta" :weight bold)
-		("CANCELLED" :foreground "forest green" :weight bold)))
-
-	org-todo-state-tags-triggers
-	(quote (("CANCELLED" ("CANCELLED" . t))
-		("WAITING" ("WAITING" . t))
-		("HOLD" ("WAITING") ("HOLD" . t))
-		(done ("WAITING") ("HOLD"))
-		("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
-		("NEXT" ("WAITING") ("CANCELLED") ("HOLD") ("TASK" . t))
-		("DONE" ("WAITING") ("CANCELLED") ("HOLD"))))
 
 	org-tag-persistent-alist
 	'((:startgroup . "types")
@@ -122,19 +58,6 @@ We ensure that we load org-habit
 	  ))
 
 #+END_SRC
-** Pretty headlines
-
-Make headlines more compact
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (setq org-hide-leading-stars t
-	org-ellipsis "⤵"
-	org-tags-column 80)
-#+END_SRC
-
-Start folded by default
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (setq org-startup-folded 'content)
-#+END_SRC
 
 Make all headline levels the same size
 #+BEGIN_SRC emacs-lisp tangle: yes
@@ -142,17 +65,7 @@ Make all headline levels the same size
   (set-face-attribute 'org-level-2 nil :foreground "#edd400" :weight 'bold :height 1.0)
 #+END_SRC
 
-** Columns, get your columns here
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (setq org-columns-default-format "%50ITEM(Task) %2PRIORITY %10Effort(Effort){:} %10CLOCKSUM")
-#+END_SRC
 
-** Enter follows links at point
-
-Because how the hell else should it work?
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (setq org-return-follows-link t)
-#+END_SRC
 
 ** Random Elt
 #+BEGIN_SRC emacs-lisp tangle: yes
@@ -166,39 +79,6 @@ Because how the hell else should it work?
   	(org-narrow-to-subtree)
   	(org-show-all))
 #+END_SRC
-** Src blocks
-*** Intentation and fontification
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (setq org-src-fontify-natively t)
-  (setq org-src-tab-acts-natively t)
-
-  (defun my/org-cleanup ()
-  	 (interactive)
-  	 (org-edit-special)
-  	 (indent-region (point-min) (point-max))
-  	 (org-edit-src-exit))
-
-  (define-key org-mode-map (kbd "C-M-<tab>") 'my/org-cleanup)
-
-  ;; (org-element-map (org-element-parse-buffer) 'src-block
-  ;;   (lambda (src-block)
-  ;;     (message src-block)
-  ;;     ))
-
-#+END_SRC
-
-*** Just evaluate it, don't backtalk me
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (setq org-confirm-babel-evaluate nil)
-#+END_SRC
-
-** Set up global keys
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (global-set-key "\C-cl" 'org-store-link)
-  (global-set-key "\C-ca" 'org-agenda)
-  (global-set-key "\C-cc" 'org-capture)
-  (global-set-key "\C-cb" 'org-switchb)
-#+END_SRC
 
 ** Speed commands
 
@@ -207,7 +87,6 @@ These are speed commands. They make the ORG go faster.
 I remove the bulk of the defaults because I really don't use many of these features...
 
 #+BEGIN_SRC emacs-lisp tangle: yes
-  (setq org-use-speed-commands t
   org-speed-commands '(("Outline Navigation")
 	   ("u" . ignore)
 	   ("j" . ignore)
@@ -243,7 +122,6 @@ I remove the bulk of the defaults because I really don't use many of these featu
 	   ("@" . org-mark-subtree)
 	   ("#" . org-toggle-comment)
 	   ("Clock Commands")
-	   ("P" . org-pomodoro)
 	   ("I" . org-clock-in)
 	   ("O" . org-clock-out)
 	   ("Meta Data Editing")
@@ -274,16 +152,10 @@ I remove the bulk of the defaults because I really don't use many of these featu
 #+BEGIN_SRC emacs-lisp tangle: yes
   (setq jallen-org-notes-file (concat org-directory "notes.org")
 	jallen-org-gtd-file (concat org-directory "gtd.org")
-	jallen-org-beorg-calendar-file (concat org-directory "mobile/calendar-beorg.org")
 	jallen-org-reference-file (concat org-directory "reference.org")
-	jallen-org-chores-file (concat org-directory "chores.org")
-	jallen-org-habits-file (concat org-directory "habits.org")
-
 	jallen-org-journal-file (concat org-directory "journal.org")
 	jallen-org-5-min-journal-file (concat org-directory "5-min-journal.org")
 	jallen-org-weekly-report-file (concat org-directory "weekly.org")
-	jallen-org-cbt-journal-file (concat org-directory "cbt-journal.org")
-	jallen-org-diet-journal-file (concat org-directory "diet-journal.org")
 
 	jallen-default-org-agenda-files (list jallen-org-gtd-file)
 	org-default-notes-file jallen-org-notes-file
@@ -504,15 +376,6 @@ I remove the bulk of the defaults because I really don't use many of these featu
 	 ((org-is-habit-p) subtree-end)
 	 (t	nil)))))
 
-  (defun jra3/skip-habits-on-hold ()
-	"Skip habit tasks that are hold TODO status"
-	(save-restriction
-		(widen)
-		(let ((subtree-end (save-excursion (org-end-of-subtree t))))
-	(cond
-	 ((and (org-is-habit-p)
-	       (member (org-get-todo-state) (list "HOLD"))) subtree-end)
-	 (t nil)))))
 
 
 #+END_SRC
@@ -642,20 +505,6 @@ I remove the bulk of the defaults because I really don't use many of these featu
 	  (0.49 . my-org-deadline-later)
 	  (0.00 . my-org-deadline-someday)))
 #+END_SRC
-*** Highlight the line that the point is on
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (add-hook 'org-agenda-finalize-hook (lambda () (hl-line-mode)))
-#+END_SRC
-*** Buffer setup
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (setq org-agenda-use-time-grid t
-	org-agenda-dim-blocked-tasks nil ;; Do not dim blocked tasks
-	org-agenda-compact-blocks nil      ;; Compact the block agenda view
-	org-agenda-restore-windows-after-quit t
-	org-agenda-start-on-weekday nil
-	org-agenda-span 1
-	org-agenda-window-setup 'current-window)
-#+END_SRC
 *** org-goto should use a narrowed view
 I find this much more readable
 
@@ -705,7 +554,7 @@ I find this much more readable
 		  (org-agenda-start-day "+0d")
 		  (org-agenda-include-diary t)
 		  (org-agenda-show-all-dates nil)
-		  (org-agenda-files (list jallen-org-gtd-file jallen-org-beorg-calendar-file))
+		  (org-agenda-files (list jallen-org-gtd-file))
 		  (org-agenda-todo-ignore-deadlines nil)))
 
 	jallen-oacc-stuck
@@ -720,29 +569,6 @@ I find this much more readable
 		    ((org-agenda-overriding-header "Delegated Projects")
 		     (org-agenda-skip-function 'bh/skip-non-projects)
 		     ))
-
-	jallen-oacc-habits
-	'(agenda ""
-		 ((org-agenda-overriding-header "Habits:")
-		  (org-agenda-remove-tags t)
-		  (org-agenda-use-time-grid nil)
-		  (org-agenda-files (list jallen-org-habits-file))
-		  (org-agenda-skip-function 'jra3/skip-habits-on-hold)
-		  (org-agenda-span 'day)
-		  (org-agenda-ndays 30)
-		  (org-agenda-start-on-weekday nil)
-		  (org-agenda-start-day "+0d")
-		  (org-agenda-todo-ignore-deadlines nil)))
-
-	jallen-oacc-chores
-	'(agenda ""
-		 ((org-agenda-overriding-header "Chores:")
-		  (org-agenda-remove-tags t)
-		  (org-agenda-files (list jallen-org-chores-file))
-		  (org-agenda-span 7)
-		  (org-agenda-ndays 60)
-		  (org-agenda-show-all-dates nil)
-		  (org-agenda-todo-ignore-deadlines nil)))
 
 
 	jallen-oacc-next
@@ -829,8 +655,6 @@ I find this much more readable
 		     jallen-oacc-waiting
 		     jallen-oacc-stuck
 		     jallen-oacc-delegated
-		     jallen-oacc-habits
-		     jallen-oacc-chores
 		     ))))
 #+END_SRC
 
@@ -904,15 +728,6 @@ I find this much more readable
 		"* Evening\n  3 amazing things that happened today...\n  - %?\n  - \n  - \n\n  How could I have made today even better?\n  - \n")
 
 	 ("f" "Food")
-	 ("fb" "Breakfast" entry (file+datetree jallen-org-diet-journal-file)
-		"* Breakfast\n %U %?")
-	 ("fl" "Lunch" entry (file+datetree jallen-org-diet-journal-file)
-		"* Lunch\n %U %?")
-	 ("fd" "Dinner" entry (file+datetree jallen-org-diet-journal-file)
-		"* Dinner\n %U %?")
-	 ("fs" "Snack" entry (file+datetree jallen-org-diet-journal-file)
-		"* Snack\n %U %?")
-
 	 ("."
 		"note at point"
 		item
@@ -926,55 +741,7 @@ I find this much more readable
 	 ))
 #+END_SRC
 
-** Habits
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (require 'org-habit)
-  (setq org-habit-preceding-days 14
-	org-habit-following-days 1
-	org-habit-show-habits-only-for-today t
-	org-habit-graph-column 52
-	org-habit-show-all-today nil)
-#+END_SRC
 
-** Auto habit tracking for 5-min-journal et al.
-The ids in here are hardcoded the the random ids in my habits.org
-
-#+BEGIN_SRC emacs-lisp tangle: yes
-  (defun jallen/habit-id-checkoff (id)
-	"Mark the habit with id as DONE"
-	(save-excursion
-		(org-id-goto id)
-		(org-todo "DONE")))
-
-  (defun jallen/complete-on-capture ()
-	"To be run in org-capture-before-finalize-hook"
-	(pcase (plist-get org-capture-current-plist :description)
-		("Evening Entry" (jallen/habit-id-checkoff "81125689-466F-4C87-9898-FB344CDD175F"))
-		("Morning Entry" (jallen/habit-id-checkoff "FEE1A918-0FFE-446F-A954-5B7A6DE29D3F"))
-		("breakfast" (jallen/habit-id-checkoff "04E10333-848C-4328-B029-96AFDEEB9728"))
-		("Lunch" (jallen/habit-id-checkoff "88A42399-6041-4F0B-8255-17301AC69F74"))
-		("Dinner" (jallen/habit-id-checkoff "D4CFC543-13A6-40C3-A82F-880191F60CF5"))
-		("Weekly Report" (jallen/habit-id-checkoff "2BFA322E-1B16-4C62-868F-92BEE62D091E"))
-		(_ (message "Capture complete!"))))
-
-  (defun jallen/review-after-capture ()
-	(let ((key  (plist-get org-capture-plist :key))
-	  (desc (plist-get org-capture-plist :description)))
-		(if (not org-note-abort)
-	  (pcase desc
-	    ("Evening Entry" (jallen/random-journal-entry))
-	    ("Morning Entry" (jallen/random-journal-entry))
-	    (_ (message "Template with key %s and description “%s” run successfully" key desc))))))
-
-  (add-hook
-   'org-capture-before-finalize-hook
-   'jallen/complete-on-capture)
-
-  (add-hook
-   'org-capture-after-finalize-hook
-   'jallen/review-after-capture)
-
-#+END_SRC
 
 ** Revert/Save around captures
 #+BEGIN_SRC emacs-lisp tangle: yes
