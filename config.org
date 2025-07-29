@@ -770,6 +770,13 @@ And here we do the killing
     (add-to-list 'completion-at-point-functions #'cape-file)
     (add-to-list 'completion-at-point-functions #'cape-keyword))
 
+  (use-package which-key
+    :ensure t
+    :diminish which-key-mode
+    :config
+    (which-key-mode)
+    (setq which-key-idle-delay 0.5))
+
   (use-package lsp-mode
     :commands (lsp lsp-deferred)
     :hook ((lsp-mode           . lsp-enable-which-key-integration)
