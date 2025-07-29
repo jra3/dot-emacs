@@ -1079,6 +1079,48 @@ https://endlessparentheses.com/the-toggle-map-and-wizardry.html
 #+END_SRC
 
 
+* Version Control
+
+** Magit - Git Integration
+
+Magit is the best Git interface for Emacs. It provides a complete Git porcelain inside Emacs.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package magit
+    :ensure t
+    :bind (("C-x g" . magit-status)
+           ("C-x M-g" . magit-dispatch)
+           ("C-c g" . magit-file-dispatch))
+    :config
+    ;; Show word-granularity differences within diff hunks
+    (setq magit-diff-refine-hunk t)
+    ;; Don't show recent commits in magit-status
+    (setq magit-log-section-commit-count 0)
+    ;; Speed up magit
+    (setq magit-refresh-status-buffer nil)
+    ;; Open magit status in same window
+    (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+  ;; Show git diff indicators in the fringe
+  (use-package diff-hl
+    :ensure t
+    :hook ((prog-mode . diff-hl-mode)
+           (magit-pre-refresh . diff-hl-magit-pre-refresh)
+           (magit-post-refresh . diff-hl-magit-post-refresh))
+    :config
+    (diff-hl-flydiff-mode))
+
+  ;; Browse file history
+  (use-package git-timemachine
+    :ensure t
+    :bind ("C-x v t" . git-timemachine))
+
+  ;; GitHub/GitLab integration (requires Magit)
+  (use-package forge
+    :ensure t
+    :after magit)
+#+END_SRC
+
 * Terminal Configuration
 
 ** Terminals in Emacs Should Use ANSI Colors
