@@ -714,11 +714,20 @@ editing many similar lines. More interactive than macros.
 
 *** Default Indentation
 
-c-basic-offset is used by most major modes I use as the basis for
-how deeply to indent any code.
+Set default indentation to 4 spaces, not tabs.
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (setq c-basic-offset 1)
+  ;; Use spaces instead of tabs by default
+  (setq-default indent-tabs-mode nil)
+  
+  ;; Set default tab width to 4 spaces
+  (setq-default tab-width 4)
+  
+  ;; Set default indentation offset to 4
+  (setq-default c-basic-offset 4)
+  
+  ;; For modes that use standard-indent
+  (setq-default standard-indent 4)
 #+END_SRC
 
 *** Whitespace
@@ -776,6 +785,9 @@ And here we do the killing
     :config
     (which-key-mode)
     (setq which-key-idle-delay 0.5))
+
+  (use-package hydra
+    :ensure t)
 
   (use-package lsp-mode
     :commands (lsp lsp-deferred)
@@ -844,17 +856,50 @@ And here we do the killing
     (lsp-rust-analyzer-proc-macro-enable t)
     (lsp-rust-analyzer-cargo-watch-command "clippy"))
 
-  ;; Add useful keybindings for LSP
+  ;; Define LSP Hydra for better command organization
   (with-eval-after-load 'lsp-mode
-    (add-hook 'lsp-mode-hook
-              (lambda ()
-                (local-set-key (kbd "C-c l a") #'lsp-execute-code-action)
-                (local-set-key (kbd "C-c l f") #'lsp-format-buffer)
-                (local-set-key (kbd "C-c l F") #'lsp-format-region)
-                (local-set-key (kbd "C-c l n") #'lsp-rename)
-                (local-set-key (kbd "C-c l o") #'lsp-organize-imports)
-                (local-set-key (kbd "C-c l w r") #'lsp-workspace-restart)
-                (local-set-key (kbd "C-c l w s") #'lsp-workspace-shutdown))))
+    (defhydra hydra-lsp (:color blue :hint nil)
+      "
+ LSP Commands:
+ ^Navigation^          ^Refactor^            ^Help^              ^Workspace^
+ ^^^─────────────────  ^^^─────────────────  ^^^───────────────  ^^^─────────────────
+ _g d_: definition     _r n_: rename         _h s_: show doc     _w r_: restart
+ _g r_: references     _r a_: code action    _h h_: hide doc     _w s_: shutdown
+ _g i_: implementation _r f_: format buffer  _h e_: errors       _w a_: add folder
+ _g t_: type def       _r F_: format region  _h l_: lens toggle  _w d_: remove folder
+ _g h_: hierarchy      _r o_: organize imp.  ^ ^                 _w l_: list folders
+ "
+      ;; Navigation
+      ("g d" lsp-ui-peek-find-definitions)
+      ("g r" lsp-ui-peek-find-references)
+      ("g i" lsp-ui-peek-find-implementation)
+      ("g t" lsp-find-type-definition)
+      ("g h" lsp-treemacs-call-hierarchy)
+      
+      ;; Refactor
+      ("r n" lsp-rename)
+      ("r a" lsp-execute-code-action)
+      ("r f" lsp-format-buffer)
+      ("r F" lsp-format-region)
+      ("r o" lsp-organize-imports)
+      
+      ;; Help
+      ("h s" lsp-ui-doc-show)
+      ("h h" lsp-ui-doc-hide)
+      ("h e" lsp-treemacs-errors-list)
+      ("h l" lsp-lens-mode)
+      
+      ;; Workspace
+      ("w r" lsp-workspace-restart)
+      ("w s" lsp-workspace-shutdown)
+      ("w a" lsp-workspace-folders-add)
+      ("w d" lsp-workspace-folders-remove)
+      ("w l" lsp-describe-session)
+      
+      ("q" nil "quit"))
+    
+    ;; Bind the hydra to C-c l
+    (define-key lsp-mode-map (kbd "C-c l") 'hydra-lsp/body))
 
   (use-package lsp-ui
     :after lsp-mode
@@ -881,13 +926,7 @@ And here we do the killing
     (lsp-ui-peek-always-show t)
     ;; Misc
     (lsp-ui-imenu-enable t)
-    (lsp-ui-imenu-kind-position 'left)
-    :bind (:map lsp-mode-map
-                ("C-c l d" . lsp-ui-peek-find-definitions)
-                ("C-c l r" . lsp-ui-peek-find-references)
-                ("C-c l i" . lsp-ui-peek-find-implementation)
-                ("C-c l s" . lsp-ui-doc-show)
-                ("C-c l h" . lsp-ui-doc-hide)))
+    (lsp-ui-imenu-kind-position 'left))
 #+END_SRC
 
 * Utilities
@@ -1089,8 +1128,7 @@ Magit is the best Git interface for Emacs. It provides a complete Git porcelain 
   (use-package magit
     :ensure t
     :bind (("C-x g" . magit-status)
-           ("C-x M-g" . magit-dispatch)
-           ("C-c g" . magit-file-dispatch))
+           ("C-x M-g" . magit-dispatch))
     :config
     ;; Show word-granularity differences within diff hunks
     (setq magit-diff-refine-hunk t)
@@ -1119,6 +1157,53 @@ Magit is the best Git interface for Emacs. It provides a complete Git porcelain 
   (use-package forge
     :ensure t
     :after magit)
+
+  ;; Define Magit Hydra for quick git operations
+  (with-eval-after-load 'magit
+    (defhydra hydra-magit (:color blue :hint nil)
+      "
+ Git Commands:
+ ^Status^      ^Branch^           ^Actions^          ^History^
+ ^^^─────────  ^^^──────────────  ^^^──────────────  ^^^─────────────
+ _s_: status   _b_: checkout      _c_: commit        _l_: log current
+ _d_: diff     _B_: new branch    _p_: push          _L_: log all
+ _S_: stage    _m_: merge         _P_: pull          _t_: timemachine
+ _u_: unstage  _r_: rebase        _f_: fetch         _h_: file history
+ _z_: stash    _R_: branch mgr    _M_: remotes       _H_: reflog
+ "
+      ;; Status
+      ("s" magit-status)
+      ("d" magit-diff-dwim)
+      ("S" magit-stage-file)
+      ("u" magit-unstage-file)
+      ("z" magit-stash)
+      
+      ;; Branch
+      ("b" magit-checkout)
+      ("B" magit-branch-create)
+      ("m" magit-merge)
+      ("r" magit-rebase)
+      ("R" magit-branch)
+      
+      ;; Actions
+      ("c" magit-commit)
+      ("p" magit-push-current)
+      ("P" magit-pull-current)
+      ("f" magit-fetch)
+      ("M" magit-remote)
+      
+      ;; History
+      ("l" magit-log-current)
+      ("L" magit-log-all)
+      ("t" git-timemachine)
+      ("h" magit-log-buffer-file)
+      ("H" magit-reflog-current)
+      
+      ("g" magit-refresh "refresh")
+      ("q" nil "quit"))
+    
+    ;; Bind to C-c g for quick git access
+    (global-set-key (kbd "C-c g") 'hydra-magit/body))
 #+END_SRC
 
 * Terminal Configuration
@@ -1785,11 +1870,11 @@ Prettier Formatting
     :ensure nil
     :hook
     ((c-mode . (lambda ()
-                 (setq indent-tabs-mode nil)
-                 (setq c-basic-offset 2)))
+                 ;; C mode uses default 4 spaces from global config
+                 ))
      (c++-mode . (lambda ()
-                   (setq indent-tabs-mode nil)
-                   (setq c-basic-offset 2))))
+                   ;; C++ mode uses default 4 spaces from global config
+                   )))
     :config
     ;; Example: bind "go to definition" to F12
     (define-key c-mode-base-map (kbd "<f12>") 'lsp-find-definition)
@@ -1863,8 +1948,8 @@ Prettier Formatting
     :ensure nil
     :mode ("\\.py\\'" . python-mode)
     :hook ((python-mode . (lambda ()
-                            (setq indent-tabs-mode t)
-                            (setq python-indent-offset 2))))
+                            (setq indent-tabs-mode nil)
+                            (setq python-indent-offset 4))))
     :config
     (setq python-shell-interpreter "python3"
           python-shell-interpreter-args "-i"))
