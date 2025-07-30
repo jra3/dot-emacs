@@ -54,7 +54,15 @@
  '(org-agenda-timegrid-use-ampm nil)
  '(org-archive-location "~/org/archive/archive.org::* From %s")
  '(org-export-with-toc nil)
- '(package-selected-packages nil)
+ '(package-selected-packages
+    '(add-node-modules-path apheleia auto-package-update cape cargo corfu
+       diff-hl elisp-slime-nav embark-consult exec-path-from-shell
+       expand-region forge git-gutter git-timemachine go-eldoc go-guru
+       go-tag gotest hydra ibuffer-vc jest lsp-ui marginalia
+       multiple-cursors nodejs-repl npm-mode orderless org-bullets
+       org-modern org-super-agenda package-lint protobuf-mode pug-mode
+       rainbow-delimiters rust-mode tangotango-theme tide toml-mode
+       vertico win-switch yaml-mode yasnippet))
  '(shr-width 80)
  '(tab-width 2)
  '(undo-outer-limit 120000000))

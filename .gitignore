@@ -37,3 +37,4 @@ tree-sitter/
 history
 projectile-bookmarks.eld
 elpa-backup-*.tar.gz
+/forge-database.sqlite

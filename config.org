@@ -787,7 +787,8 @@ And here we do the killing
     (setq which-key-idle-delay 0.5))
 
   (use-package hydra
-    :ensure t)
+    :ensure t
+    :demand t)  ; Load immediately so hydras are available
 
   (use-package lsp-mode
     :commands (lsp lsp-deferred)
@@ -1127,8 +1128,10 @@ Magit is the best Git interface for Emacs. It provides a complete Git porcelain 
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package magit
     :ensure t
+    :after hydra  ; Ensure hydra is loaded first
     :bind (("C-x g" . magit-status)
-           ("C-x M-g" . magit-dispatch))
+           ("C-x M-g" . magit-dispatch)
+           ("C-c g" . hydra-magit/body))
     :config
     ;; Show word-granularity differences within diff hunks
     (setq magit-diff-refine-hunk t)
@@ -1137,29 +1140,9 @@ Magit is the best Git interface for Emacs. It provides a complete Git porcelain 
     ;; Speed up magit
     (setq magit-refresh-status-buffer nil)
     ;; Open magit status in same window
-    (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
-
-  ;; Show git diff indicators in the fringe
-  (use-package diff-hl
-    :ensure t
-    :hook ((prog-mode . diff-hl-mode)
-           (magit-pre-refresh . diff-hl-magit-pre-refresh)
-           (magit-post-refresh . diff-hl-magit-post-refresh))
-    :config
-    (diff-hl-flydiff-mode))
-
-  ;; Browse file history
-  (use-package git-timemachine
-    :ensure t
-    :bind ("C-x v t" . git-timemachine))
-
-  ;; GitHub/GitLab integration (requires Magit)
-  (use-package forge
-    :ensure t
-    :after magit)
-
-  ;; Define Magit Hydra for quick git operations
-  (with-eval-after-load 'magit
+    (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
+    
+    ;; Define Magit Hydra
     (defhydra hydra-magit (:color blue :hint nil)
       "
  Git Commands:
@@ -1200,10 +1183,27 @@ Magit is the best Git interface for Emacs. It provides a complete Git porcelain 
       ("H" magit-reflog-current)
       
       ("g" magit-refresh "refresh")
-      ("q" nil "quit"))
-    
-    ;; Bind to C-c g for quick git access
-    (global-set-key (kbd "C-c g") 'hydra-magit/body))
+      ("q" nil "quit")))
+
+  ;; Show git diff indicators in the fringe
+  (use-package diff-hl
+    :ensure t
+    :hook ((prog-mode . diff-hl-mode)
+           (magit-pre-refresh . diff-hl-magit-pre-refresh)
+           (magit-post-refresh . diff-hl-magit-post-refresh))
+    :config
+    (diff-hl-flydiff-mode))
+
+  ;; Browse file history
+  (use-package git-timemachine
+    :ensure t
+    :bind ("C-x v t" . git-timemachine))
+
+  ;; GitHub/GitLab integration (requires Magit)
+  (use-package forge
+    :ensure t
+    :after magit)
+
 #+END_SRC
 
 * Terminal Configuration
