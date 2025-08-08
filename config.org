@@ -319,6 +319,102 @@ No bell, thanks
   (setq ring-bell-function 'ignore)
 #+END_SRC
 
+** Simplify Mode Line
+
+Hide minor mode clutter and simplify the mode line display
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+  ;; Install diminish if not already available
+  (use-package diminish
+    :ensure t)
+  
+  ;; Hide all the noisy minor modes from mode line
+  ;; These are the actual modes showing up in your setup
+  (with-eval-after-load 'subword
+    (diminish 'subword-mode))
+  
+  (with-eval-after-load 'diff-hl
+    (diminish 'diff-hl-mode)
+    (diminish 'diff-hl-flydiff-mode))
+  
+  (with-eval-after-load 'rainbow-delimiters
+    (diminish 'rainbow-delimiters-mode))
+  
+  (with-eval-after-load 'elisp-slime-nav
+    (diminish 'elisp-slime-nav-mode))
+  
+  (with-eval-after-load 'which-key
+    (diminish 'which-key-mode))
+  
+  (with-eval-after-load 'autorevert
+    (diminish 'auto-revert-mode)
+    (diminish 'global-auto-revert-mode))
+  
+  (with-eval-after-load 'yasnippet
+    (diminish 'yas-minor-mode))
+  
+  (with-eval-after-load 'git-gutter
+    (diminish 'git-gutter-mode))
+  
+  (with-eval-after-load 'apheleia
+    (diminish 'apheleia-mode))
+  
+  (with-eval-after-load 'eldoc
+    (diminish 'eldoc-mode))
+  
+  (with-eval-after-load 'company
+    (diminish 'company-mode))
+  
+  (with-eval-after-load 'flycheck
+    (diminish 'flycheck-mode))
+  
+  (with-eval-after-load 'projectile
+    (diminish 'projectile-mode))
+  
+  (with-eval-after-load 'lsp-mode
+    (diminish 'lsp-mode " LSP"))
+  
+  ;; Clean up the mode line format
+  ;; Remove less useful information
+  (setq mode-line-percent-position nil)  ; Don't show percentage through file
+  (size-indication-mode -1)              ; Don't show file size
+  
+  ;; Simplify VC (version control) display in mode line
+  (setq auto-revert-check-vc-info nil)   ; Don't constantly check VC status
+  
+  ;; Customize VC display to show minimal git info (no branch name)
+  ;; Shows just "Git" with a status indicator
+  (defun my/simple-vc-mode-line ()
+    "Return a simple VC indicator without branch name."
+    (when vc-mode
+      (let ((backend (vc-backend buffer-file-name)))
+        (when backend
+          (pcase backend
+            ('Git (if (and buffer-file-name (vc-git-registered buffer-file-name))
+                     (let ((state (vc-state buffer-file-name backend)))
+                       (pcase state
+                         ('up-to-date " Git:✓")
+                         ('edited " Git:*")
+                         ('added " Git:+")
+                         ('removed " Git:-")
+                         ('conflict " Git:!")
+                         ('missing " Git:?")
+                         (_ " Git")))
+                     " Git"))
+            (_ (format " %s" backend)))))))
+  
+  ;; Replace the VC mode line string with our simple version
+  (setq-default mode-line-format
+    (mapcar (lambda (elem)
+              (if (equal elem '(vc-mode vc-mode))
+                  '(:eval (my/simple-vc-mode-line))
+                elem))
+            mode-line-format))
+  
+  ;; Make the mode line more compact
+  (setq mode-line-compact t)             ; Available in Emacs 28+
+#+END_SRC
+
 * Navigation
 
 ** Enable ibuffer
