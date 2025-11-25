@@ -12,42 +12,42 @@
   ;; Increase garbage collection threshold for faster startup
   ;; Default is 800KB, we set to 100MB during init
   (setq gc-cons-threshold (* 100 1024 1024))
-  
+
   ;; Increase the amount of data Emacs reads from processes
   (setq read-process-output-max (* 1024 1024)) ; 1MB
-  
+
   ;; Optimize file handling
   (setq auto-save-default t
         auto-save-timeout 20  ; seconds
         auto-save-interval 200) ; keystrokes
-  
+
   ;; Disable bidirectional text for performance
   (setq-default bidi-paragraph-direction 'left-to-right)
   (setq bidi-inhibit-bpa t)  ; Emacs 27+ only
-  
+
   ;; Disable line numbers in non-programming modes for performance
-  (add-hook 'prog-mode-hook #'display-line-numbers-mode)
-  
+  ;; (add-hook 'prog-mode-hook #'display-line-numbers-mode)
+
   ;; Optimize long line handling
   (setq-default truncate-lines t)
   (setq truncate-partial-width-windows nil)
-  
+
   ;; Fast scrolling
   (setq fast-but-imprecise-scrolling t)
   (setq jit-lock-defer-time 0.05)
-  
+
   ;; Increase undo limits for better experience
   (setq undo-limit 80000000         ; 80MB
         undo-strong-limit 120000000  ; 120MB
         undo-outer-limit 240000000)  ; 240MB
-  
+
   ;; Optimize minibuffer
   (setq enable-recursive-minibuffers t)
   (setq max-mini-window-height 0.3)
-  
+
   ;; Don't compact font caches during GC
   (setq inhibit-compacting-font-caches t)
-  
+
   ;; Reset GC threshold after startup (defer this to the end)
   (add-hook 'emacs-startup-hook
             (lambda ()
@@ -61,7 +61,7 @@
 #+BEGIN_SRC emacs-lisp :tangle yes
   ;; Reduce byte-compile warnings from packages
   (setq byte-compile-warnings '(not free-vars unresolved noruntime lexical make-local))
-  
+
   ;; Native compilation settings (Emacs 28+)
   (when (and (fboundp 'native-comp-available-p)
              (native-comp-available-p))
@@ -69,25 +69,25 @@
     (setq native-comp-async-report-warnings-errors nil
           native-comp-warning-on-missing-source nil
           native-comp-verbose 0))
-  
+
   ;; Suppress specific warning types
   (with-eval-after-load 'warnings
     (add-to-list 'warning-suppress-types '(comp))
     (add-to-list 'warning-suppress-types '(bytecomp))
     (add-to-list 'warning-suppress-types '(docstring)))
-  
+
   ;; Quiet package.el
   (setq package-native-compile t)
-  
+
   ;; Advice to reduce warnings during package operations
   (defun my/quieter-byte-compile (orig-fun &rest args)
     "Reduce verbosity during byte compilation."
-    (let ((byte-compile-warnings '(not free-vars unresolved noruntime 
-                                       lexical make-local docstring 
+    (let ((byte-compile-warnings '(not free-vars unresolved noruntime
+                                       lexical make-local docstring
                                        obsolete))
           (inhibit-message t))
       (apply orig-fun args)))
-  
+
   (advice-add 'byte-compile-file :around #'my/quieter-byte-compile)
 #+END_SRC
 
@@ -115,6 +115,41 @@ Mac tries to hide your $PATH from you when using a graphical mode
     :if (memq window-system '(mac ns))
     :config
     (exec-path-from-shell-initialize))
+#+END_SRC
+
+* Terminal Configuration
+
+** Terminals in Emacs Should Use ANSI Colors
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package ansi-color)
+  (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+  (setq comint-prompt-read-only t)
+#+END_SRC
+
+** Deal with Running Emacs in Terminal
+
+Here is some scar tissue of me trying to make all keys work in the
+terminal as they do in X11. This isn't possible as far as I can tell,
+and I'm no longer sure if this does anything for me.
+
+we are expecting an xterm compatible terminal here. tmux requires you
+to set xterm-mode as a terminal option for this
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (defadvice terminal-init-xterm (after map-S-up-escape-sequence activate)
+    (define-key input-decode-map "\e[1;9A" [M-up])
+    (define-key input-decode-map "\e[1;9B" [M-down])
+    (define-key input-decode-map "\e[1;9C" [M-right])
+    (define-key input-decode-map "\e[1;9D" [M-left])
+
+    (define-key input-decode-map "\e[1;10A" [M-S-up])
+    (define-key input-decode-map "\e[1;10B" [M-S-down])
+    (define-key input-decode-map "\e[1;10C" [M-S-right])
+    (define-key input-decode-map "\e[1;10D" [M-S-left])
+
+    ;; weird
+    (global-set-key [select] [S-up]))
 #+END_SRC
 
 * Configure Completions
@@ -158,7 +193,7 @@ Mac tries to hide your $PATH from you when using a graphical mode
   (use-package consult
     :ensure t
     :bind (("C-x b" . consult-buffer)
-           ("C-s" . consult-line)
+           ;("C-s" . consult-line)
            ("M-y" . consult-yank-pop)     ; Better kill-ring browsing
            ("M-o" . consult-find)
            ("M-l" . consult-goto-line)
@@ -327,61 +362,61 @@ Hide minor mode clutter and simplify the mode line display
   ;; Install diminish if not already available
   (use-package diminish
     :ensure t)
-  
+
   ;; Hide all the noisy minor modes from mode line
   ;; These are the actual modes showing up in your setup
   (with-eval-after-load 'subword
     (diminish 'subword-mode))
-  
+
   (with-eval-after-load 'diff-hl
     (diminish 'diff-hl-mode)
     (diminish 'diff-hl-flydiff-mode))
-  
+
   (with-eval-after-load 'rainbow-delimiters
     (diminish 'rainbow-delimiters-mode))
-  
+
   (with-eval-after-load 'elisp-slime-nav
     (diminish 'elisp-slime-nav-mode))
-  
+
   (with-eval-after-load 'which-key
     (diminish 'which-key-mode))
-  
+
   (with-eval-after-load 'autorevert
     (diminish 'auto-revert-mode)
     (diminish 'global-auto-revert-mode))
-  
+
   (with-eval-after-load 'yasnippet
     (diminish 'yas-minor-mode))
-  
+
   (with-eval-after-load 'git-gutter
     (diminish 'git-gutter-mode))
-  
+
   (with-eval-after-load 'apheleia
     (diminish 'apheleia-mode))
-  
+
   (with-eval-after-load 'eldoc
     (diminish 'eldoc-mode))
-  
+
   (with-eval-after-load 'company
     (diminish 'company-mode))
-  
+
   (with-eval-after-load 'flycheck
     (diminish 'flycheck-mode))
-  
+
   (with-eval-after-load 'projectile
     (diminish 'projectile-mode))
-  
+
   (with-eval-after-load 'lsp-mode
     (diminish 'lsp-mode " LSP"))
-  
+
   ;; Clean up the mode line format
   ;; Remove less useful information
   (setq mode-line-percent-position nil)  ; Don't show percentage through file
   (size-indication-mode -1)              ; Don't show file size
-  
+
   ;; Simplify VC (version control) display in mode line
   (setq auto-revert-check-vc-info nil)   ; Don't constantly check VC status
-  
+
   ;; Customize VC display to show minimal git info (no branch name)
   ;; Shows just "Git" with a status indicator
   (defun my/simple-vc-mode-line ()
@@ -402,7 +437,7 @@ Hide minor mode clutter and simplify the mode line display
                          (_ " Git")))
                      " Git"))
             (_ (format " %s" backend)))))))
-  
+
   ;; Replace the VC mode line string with our simple version
   (setq-default mode-line-format
     (mapcar (lambda (elem)
@@ -410,7 +445,7 @@ Hide minor mode clutter and simplify the mode line display
                   '(:eval (my/simple-vc-mode-line))
                 elem))
             mode-line-format))
-  
+
   ;; Make the mode line more compact
   (setq mode-line-compact t)             ; Available in Emacs 28+
 #+END_SRC
@@ -653,7 +688,7 @@ File Handling Optimizations
 #+BEGIN_SRC emacs-lisp :tangle yes
   ;; Warn when opening large files (100MB)
   (setq large-file-warning-threshold (* 100 1024 1024))
-  
+
   ;; Use fundamental-mode for very large files
   (defun my-large-file-hook ()
     "Optimize settings for large files."
@@ -662,7 +697,7 @@ File Handling Optimizations
       (buffer-disable-undo)
       (fundamental-mode)
       (message "Large file: disabled features for performance")))
-  
+
   (add-hook 'find-file-hook 'my-large-file-hook)
 #+END_SRC
 
@@ -815,13 +850,13 @@ Set default indentation to 4 spaces, not tabs.
 #+BEGIN_SRC emacs-lisp :tangle yes
   ;; Use spaces instead of tabs by default
   (setq-default indent-tabs-mode nil)
-  
+
   ;; Set default tab width to 4 spaces
   (setq-default tab-width 4)
-  
+
   ;; Set default indentation offset to 4
   (setq-default c-basic-offset 4)
-  
+
   ;; For modes that use standard-indent
   (setq-default standard-indent 4)
 #+END_SRC
@@ -896,6 +931,7 @@ And here we do the killing
            (typescript-ts-mode . lsp-deferred)
            (tsx-ts-mode        . lsp-deferred)
            (js-ts-mode         . lsp-deferred)
+           (go-mode            . lsp-deferred)  ; Add regular go-mode
            (go-ts-mode         . lsp-deferred)
            (python-ts-mode     . lsp-deferred))
     :custom
@@ -951,7 +987,19 @@ And here we do the killing
     (lsp-rust-server 'rust-analyzer)
     (lsp-rust-analyzer-server-display-inlay-hints t)
     (lsp-rust-analyzer-proc-macro-enable t)
-    (lsp-rust-analyzer-cargo-watch-command "clippy"))
+    (lsp-rust-analyzer-cargo-watch-command "clippy")
+    ;; Go/gopls specific settings to prevent "no views" error
+    (lsp-go-gopls-server-path "/Users/john/go/bin/gopls")
+    (lsp-go-gopls-server-args '("-remote=auto"))
+    (lsp-go-directory-filters ["-node_modules" "-.git" "-vendor"])
+    (lsp-go-use-placeholders t)
+    (lsp-go-codelenses '((gc_details . t)
+                        (generate . t)
+                        (regenerate_cgo . t)
+                        (test . t)
+                        (tidy . t)
+                        (upgrade_dependency . t)
+                        (vendor . t))))
 
   ;; Define LSP Hydra for better command organization
   (with-eval-after-load 'lsp-mode
@@ -972,29 +1020,29 @@ And here we do the killing
       ("g i" lsp-ui-peek-find-implementation)
       ("g t" lsp-find-type-definition)
       ("g h" lsp-treemacs-call-hierarchy)
-      
+
       ;; Refactor
       ("r n" lsp-rename)
       ("r a" lsp-execute-code-action)
       ("r f" lsp-format-buffer)
       ("r F" lsp-format-region)
       ("r o" lsp-organize-imports)
-      
+
       ;; Help
       ("h s" lsp-ui-doc-show)
       ("h h" lsp-ui-doc-hide)
       ("h e" lsp-treemacs-errors-list)
       ("h l" lsp-lens-mode)
-      
+
       ;; Workspace
       ("w r" lsp-workspace-restart)
       ("w s" lsp-workspace-shutdown)
       ("w a" lsp-workspace-folders-add)
       ("w d" lsp-workspace-folders-remove)
       ("w l" lsp-describe-session)
-      
+
       ("q" nil "quit"))
-    
+
     ;; Bind the hydra to C-c l
     (define-key lsp-mode-map (kbd "C-c l") 'hydra-lsp/body))
 
@@ -1157,64 +1205,6 @@ https://endlessparentheses.com/the-toggle-map-and-wizardry.html
   (define-key endless/toggle-map "w" #'whitespace-mode)
 #+END_SRC
 
-** Project Management
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package projectile
-    :ensure t
-    :diminish projectile-mode
-    :config
-    (projectile-mode +1)
-    (setq projectile-project-search-path '("~/am/")
-          projectile-completion-system 'consult)
-    :bind (:map projectile-mode-map
-                ("C-c p" . projectile-command-map)))
-
-  (defun compile-go-project ()
-    "Compile current Go project using make build"
-    (interactive)
-    (compile "make build"))
-
-  (defun test-go-project ()
-    "Test current Go project using make test"
-    (interactive)
-    (compile "make test"))
-
-  (defun lint-go-project ()
-    "Lint current Go project using make lint"
-    (interactive)
-    (compile "make lint"))
-
-  (defun format-go-project ()
-    "Format current Go project using make fmt"
-    (interactive)
-    (compile "make fmt"))
-
-  (defun compile-ts-project ()
-    "Compile current TypeScript project using turbo build"
-    (interactive)
-    (compile "turbo build"))
-
-  (defun test-ts-project ()
-    "Test current TypeScript project using turbo test"
-    (interactive)
-    (compile "turbo test"))
-
-  (defun dev-ts-project ()
-    "Start dev server for TypeScript project using turbo dev"
-    (interactive)
-    (compile "turbo dev"))
-
-  (global-set-key (kbd "C-c m b") 'compile-go-project)
-  (global-set-key (kbd "C-c m t") 'test-go-project)
-  (global-set-key (kbd "C-c m l") 'lint-go-project)
-  (global-set-key (kbd "C-c m f") 'format-go-project)
-  (global-set-key (kbd "C-c m B") 'compile-ts-project)
-  (global-set-key (kbd "C-c m T") 'test-ts-project)
-  (global-set-key (kbd "C-c m d") 'dev-ts-project)
-#+END_SRC
-
-
 * Version Control
 
 ** Magit - Git Integration
@@ -1225,9 +1215,7 @@ Magit is the best Git interface for Emacs. It provides a complete Git porcelain 
   (use-package magit
     :ensure t
     :after hydra  ; Ensure hydra is loaded first
-    :bind (("C-x g" . magit-status)
-           ("C-x M-g" . magit-dispatch)
-           ("C-c g" . hydra-magit/body))
+    :bind (("C-c g" . hydra-magit/body))
     :config
     ;; Show word-granularity differences within diff hunks
     (setq magit-diff-refine-hunk t)
@@ -1237,7 +1225,7 @@ Magit is the best Git interface for Emacs. It provides a complete Git porcelain 
     (setq magit-refresh-status-buffer nil)
     ;; Open magit status in same window
     (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
-    
+
     ;; Define Magit Hydra
     (defhydra hydra-magit (:color blue :hint nil)
       "
@@ -1256,28 +1244,28 @@ Magit is the best Git interface for Emacs. It provides a complete Git porcelain 
       ("S" magit-stage-file)
       ("u" magit-unstage-file)
       ("z" magit-stash)
-      
+
       ;; Branch
       ("b" magit-checkout)
       ("B" magit-branch-create)
       ("m" magit-merge)
       ("r" magit-rebase)
       ("R" magit-branch)
-      
+
       ;; Actions
       ("c" magit-commit)
       ("p" magit-push-current)
       ("P" magit-pull-current)
       ("f" magit-fetch)
       ("M" magit-remote)
-      
+
       ;; History
       ("l" magit-log-current)
       ("L" magit-log-all)
       ("t" git-timemachine)
       ("h" magit-log-buffer-file)
       ("H" magit-reflog-current)
-      
+
       ("g" magit-refresh "refresh")
       ("q" nil "quit")))
 
@@ -1292,50 +1280,10 @@ Magit is the best Git interface for Emacs. It provides a complete Git porcelain 
 
   ;; Browse file history
   (use-package git-timemachine
-    :ensure t
-    :bind ("C-x v t" . git-timemachine))
-
-  ;; GitHub/GitLab integration (requires Magit)
-  (use-package forge
-    :ensure t
-    :after magit)
+    :ensure t)
 
 #+END_SRC
 
-* Terminal Configuration
-
-** Terminals in Emacs Should Use ANSI Colors
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package ansi-color)
-  (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
-  (setq comint-prompt-read-only t)
-#+END_SRC
-
-** Deal with Running Emacs in Terminal
-
-Here is some scar tissue of me trying to make all keys work in the
-terminal as they do in X11. This isn't possible as far as I can tell,
-and I'm no longer sure if this does anything for me.
-
-we are expecting an xterm compatible terminal here. tmux requires you
-to set xterm-mode as a terminal option for this
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (defadvice terminal-init-xterm (after map-S-up-escape-sequence activate)
-    (define-key input-decode-map "\e[1;9A" [M-up])
-    (define-key input-decode-map "\e[1;9B" [M-down])
-    (define-key input-decode-map "\e[1;9C" [M-right])
-    (define-key input-decode-map "\e[1;9D" [M-left])
-
-    (define-key input-decode-map "\e[1;10A" [M-S-up])
-    (define-key input-decode-map "\e[1;10B" [M-S-down])
-    (define-key input-decode-map "\e[1;10C" [M-S-right])
-    (define-key input-decode-map "\e[1;10D" [M-S-left])
-
-    ;; weird
-    (global-set-key [select] [S-up]))
-#+END_SRC
 
 * Compilation
 
@@ -1346,7 +1294,7 @@ to set xterm-mode as a terminal option for this
   (setq compilation-scroll-output t
         compilation-always-kill t        ; Kill old compilation process before starting new
         compilation-skip-threshold 2)    ; Skip warnings
-  
+
   ;; Limit compilation buffer size
   (add-hook 'compilation-filter-hook
             (lambda ()
@@ -1454,7 +1402,7 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
     ;; Directories
     (org-directory "~/org/")
     (org-default-notes-file (concat org-directory "notes.org"))
-    
+
     ;; Appearance
     (org-hide-emphasis-markers t)
     (org-pretty-entities t)
@@ -1462,7 +1410,7 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
     (org-startup-folded 'content)
     (org-ellipsis " ⤵")
     (org-hide-leading-stars t)
-    
+
     ;; Behavior
     (org-catch-invisible-edits 'smart)
     (org-special-ctrl-a/e t)
@@ -1472,18 +1420,18 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
     (org-enforce-todo-dependencies t)
     (org-agenda-sticky t)
     (org-cycle-separator-lines 0)
-    
+
     ;; Source blocks
     (org-src-fontify-natively t)
     (org-src-tab-acts-natively t)
     (org-src-preserve-indentation t)
     (org-edit-src-content-indentation 0)
     (org-confirm-babel-evaluate nil)
-    
+
     :config
     ;; Load modules
     (setq org-modules '(org-habit org-id))
-    
+
     ;; Better RET behavior
     (add-hook 'org-mode-hook
               (lambda ()
@@ -1497,7 +1445,7 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
   (setq org-todo-keywords
         '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
           (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)")))
-  
+
   (setq org-todo-keyword-faces
         '(("TODO" :foreground "red" :weight bold)
           ("NEXT" :foreground "blue" :weight bold)
@@ -1505,7 +1453,7 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
           ("WAITING" :foreground "orange" :weight bold)
           ("HOLD" :foreground "magenta" :weight bold)
           ("CANCELLED" :foreground "forest green" :weight bold)))
-  
+
   ;; Auto-update tags based on TODO state
   (setq org-todo-state-tags-triggers
         '(("CANCELLED" ("CANCELLED" . t))
@@ -1514,7 +1462,7 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
           (done ("WAITING") ("HOLD"))
           ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
           ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))))
-  
+
   ;; Tags
   (setq org-tag-alist
         '((:startgroup)
@@ -1526,7 +1474,7 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
           ("WAITING" . ?W)
           ("HOLD" . ?H)
           ("CANCELLED" . ?C)))
-  
+
 #+END_SRC
 
 ** Capture Templates
@@ -1537,28 +1485,28 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
     (save-excursion
       (org-back-to-heading)
       (point-marker)))
-  
+
   (setq org-capture-templates
         '(("t" "Todo" entry (file+headline (concat org-directory "gtd.org") "Inbox")
            "* TODO %?\n  %i\n  %a")
-          
+
           ("n" "Note" entry (file+datetree org-default-notes-file)
            "* %? :NOTE:\n  %U\n  %a")
-          
+
           ("j" "Journal" entry (file+datetree (concat org-directory "journal.org"))
            "* %?\n  %U\n  %i")
-          
+
           ("5" "5 Minute Journal")
           ("5m" "Morning Entry" entry (file+datetree (concat org-directory "5-min-journal.org"))
            "* Morning\n  I am grateful for...\n  - %?\n  - \n  - \n\n  What will I do to make today great?\n  - \n  - \n  - \n\n  I am ...")
           ("5e" "Evening Entry" entry (file+datetree (concat org-directory "5-min-journal.org"))
            "* Evening\n  3 amazing things that happened today...\n  - %?\n  - \n  - \n\n  How could I have made today even better?\n  - \n")
-          
+
           ("." "Note at point" item
            (function my/org-capture-target-at-heading)
            "%? %U"
            :prepend t)))
-  
+
   ;; Save buffer after capture
   (add-hook 'org-capture-before-finalize-hook
             (lambda () (save-buffer)))
@@ -1569,7 +1517,7 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
 #+BEGIN_SRC emacs-lisp :tangle yes
   ;; Agenda files
   (setq org-agenda-files (list org-directory))
-  
+
   ;; Agenda appearance
   (setq org-agenda-window-setup 'current-window
         org-agenda-restore-windows-after-quit t
@@ -1577,29 +1525,29 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
         org-agenda-start-with-log-mode t
         org-agenda-log-mode-items '(closed state)
         org-columns-default-format "%50ITEM(Task) %2PRIORITY")
-  
+
   ;; Better time grid
   (setq org-agenda-time-grid
         '((daily today require-timed)
           (800 1000 1200 1400 1600 1800 2000)
           " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
-  
+
   ;; Custom commands
   (setq org-agenda-custom-commands
         '(("n" "Next Actions" tags-todo "-WAITING-CANCELLED/!NEXT"
            ((org-agenda-overriding-header "Next Actions")
             (org-agenda-sorting-strategy '(category-keep))))
-          
+
           ("w" "Waiting" todo "WAITING"
            ((org-agenda-overriding-header "Waiting")))
-          
+
           ("d" "Daily Review"
            ((agenda "" ((org-agenda-span 'day)))
             (tags-todo "-WAITING-CANCELLED/!NEXT"
                        ((org-agenda-overriding-header "Next Actions")))
             (todo "WAITING"
                   ((org-agenda-overriding-header "Waiting")))))))
-  
+
   ;; Highlight current line in agenda
   (add-hook 'org-agenda-finalize-hook
             (lambda () (hl-line-mode 1)))
@@ -1612,7 +1560,7 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
   (setq org-refile-targets
         '((nil :maxlevel . 3)
           (org-agenda-files :maxlevel . 3)))
-  
+
   ;; Create parent nodes if needed
   (setq org-refile-use-outline-path 'file
         org-outline-path-complete-in-steps nil
@@ -1628,7 +1576,7 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
     :hook (org-mode . org-bullets-mode)
     :custom
     (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
-  
+
   ;; Even better modern appearance
   (use-package org-modern
     :ensure t
@@ -1640,7 +1588,7 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
                           (?- . "☐")
                           (?\s . "☐")))
     (org-modern-table t))
-  
+
   ;; Super agenda for better grouping
   (use-package org-super-agenda
     :ensure t
@@ -1687,11 +1635,11 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
   (defun my/org-find-file ()
     "Quickly open org files."
     (interactive)
-    (find-file 
+    (find-file
      (completing-read "Org file: "
                       (directory-files org-directory nil "\\.org$")
                       nil t)))
-  
+
   ;; Clean up source blocks
   (defun my/org-cleanup-src-block ()
     "Format the current source block."
@@ -1699,7 +1647,7 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
     (org-edit-special)
     (indent-region (point-min) (point-max))
     (org-edit-src-exit))
-  
+
   (define-key org-mode-map (kbd "C-c C-v C-f") 'my/org-cleanup-src-block)
 #+END_SRC
 
@@ -1766,6 +1714,9 @@ Using built-in tree-sitter support instead of external packages
   (add-to-list 'auto-mode-alist '("\\.jsx\\'" . tsx-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.mjs\\'" . js-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.cjs\\'" . js-ts-mode))
+
+  ;; IMPORTANT: Force Go files to use go-ts-mode
+  (add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
 
   ;; Enable font-lock (syntax highlighting) for tree-sitter modes
   (global-font-lock-mode t)
@@ -2006,10 +1957,14 @@ Prettier Formatting
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package go-mode
     :ensure t
-    :mode "\\.go\\'"
+    ;; DO NOT use :mode - let auto-mode-alist handle it
     :hook ((go-mode . (lambda ()
                         (setq indent-tabs-mode t)
-                        (setq tab-width 4))))
+                        (setq tab-width 4)))
+           ;; Also configure go-ts-mode
+           (go-ts-mode . (lambda ()
+                          (setq indent-tabs-mode t)
+                          (setq tab-width 4))))
     :config
     (setq gofmt-command "gofumpt")
     (add-hook 'before-save-hook 'gofmt-before-save))
