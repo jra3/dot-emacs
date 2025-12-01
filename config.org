@@ -1531,14 +1531,6 @@ it.
       (org-back-to-heading)
       (point-marker)))
 
-  (defun my/org-find-file ()
-    "Quickly open org files."
-    (interactive)
-    (find-file
-     (completing-read "Org file: "
-                      (directory-files org-directory nil "\\.org$")
-                      nil t)))
-
   (defun my/org-cleanup-src-block ()
     "Format the current source block."
     (interactive)
