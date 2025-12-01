@@ -787,27 +787,20 @@ editing many similar lines. More interactive than macros.
 
 #+BEGIN_SRC emacs-lisp :tangle yes
   (defvar user-temporary-file-directory "~/tmp/saves/"
-    (concat temporary-file-directory user-login-name "/"))
+    "Directory for backup and auto-save files.")
 
   (make-directory user-temporary-file-directory t)
 
   (setq make-backup-files t
-        backup-by-copying t      ; don't clobber symlinks
-        backup-directory-alist
-        `(("." . ,user-temporary-file-directory))    ; don't litter my fs tree
+        backup-by-copying t
+        backup-directory-alist `((".*" . ,user-temporary-file-directory))
+        auto-save-file-name-transforms `((".*" ,user-temporary-file-directory t))
+        auto-save-list-file-prefix (concat user-temporary-file-directory ".auto-saves-")
         delete-old-versions t
-        kept-new-versions 3      ; Keep fewer versions for performance
+        kept-new-versions 3
         kept-old-versions 1
-        version-control t)       ; use versioned backups
-
-  (setq vc-make-backup-files t)
-
-  (setq backup-directory-alist
-        `((".*" . ,user-temporary-file-directory)))
-  (setq auto-save-file-name-transforms
-        `((".*" ,user-temporary-file-directory t)))
-  (setq auto-save-list-file-prefix
-        (concat user-temporary-file-directory ".auto-saves-"))
+        version-control t
+        vc-make-backup-files t)
 #+END_SRC
 
 ** Revert Files When They Change On Disk
