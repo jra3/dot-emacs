@@ -987,11 +987,13 @@ And here we do the killing
     (lsp-rust-analyzer-server-display-inlay-hints t)
     (lsp-rust-analyzer-proc-macro-enable t)
     (lsp-rust-analyzer-cargo-watch-command "clippy")
-    ;; Go/gopls specific settings to prevent "no views" error
-    (lsp-go-gopls-server-path "/Users/john/go/bin/gopls")
-    (lsp-go-gopls-server-args '("-remote=auto"))
+    ;; Go/gopls settings
     (lsp-go-directory-filters ["-node_modules" "-.git" "-vendor"])
     (lsp-go-use-placeholders t)
+    (lsp-go-analyses '((unusedparams . t)
+                       (unusedwrite . t)
+                       (nilness . t)
+                       (shadow . t)))
     (lsp-go-codelenses '((gc_details . t)
                         (generate . t)
                         (regenerate_cgo . t)
@@ -1844,41 +1846,33 @@ Prettier Formatting
 ** Go
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package go-mode
-    :ensure t
-    ;; DO NOT use :mode - let auto-mode-alist handle it
-    :hook ((go-mode . (lambda ()
-                        (setq indent-tabs-mode t)
-                        (setq tab-width 4)))
-           ;; Also configure go-ts-mode
-           (go-ts-mode . (lambda ()
-                          (setq indent-tabs-mode t)
-                          (setq tab-width 4))))
-    :config
-    (setq gofmt-command "gofumpt")
-    (add-hook 'before-save-hook 'gofmt-before-save))
+  ;; Go indentation settings (tabs, width 4)
+  (defun my/go-mode-setup ()
+    (setq indent-tabs-mode t)
+    (setq tab-width 4)
+    ;; Use LSP for formatting on save (gopls uses gofumpt if configured)
+    (add-hook 'before-save-hook #'lsp-format-buffer nil t)
+    (add-hook 'before-save-hook #'lsp-organize-imports nil t))
 
+  (add-hook 'go-ts-mode-hook #'my/go-mode-setup)
+
+  ;; Struct tag editing
   (use-package go-tag
     :ensure t
-    :bind (:map go-mode-map
+    :after go-ts-mode
+    :bind (:map go-ts-mode-map
                 ("C-c t a" . go-tag-add)
                 ("C-c t r" . go-tag-remove)))
 
+  ;; Test runner
   (use-package gotest
     :ensure t
-    :bind (:map go-mode-map
+    :after go-ts-mode
+    :bind (:map go-ts-mode-map
                 ("C-c t f" . go-test-current-file)
                 ("C-c t t" . go-test-current-test)
                 ("C-c t p" . go-test-current-project)
                 ("C-c t b" . go-test-current-benchmark)))
-
-  (use-package go-eldoc
-    :ensure t
-    :hook (go-mode . go-eldoc-setup))
-
-  (use-package go-guru
-    :ensure t
-    :hook (go-mode . go-guru-hl-identifier-mode))
 #+END_SRC
 
 ** Python
