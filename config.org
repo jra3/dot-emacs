@@ -1402,8 +1402,8 @@ it.
     :custom
     ;; Directories
     (org-directory "~/org/")
-    (org-default-notes-file (concat org-directory "notes.org"))
-    (org-agenda-files (list org-directory))
+    (org-default-notes-file "~/org/notes.org")
+    (org-agenda-files '("~/org/"))
 
     ;; Appearance
     (org-hide-emphasis-markers t)
@@ -1503,18 +1503,18 @@ it.
     :config
     (setq org-modules '(org-habit org-id))
 
-    ;; Capture templates (in :config because they reference org-directory)
+    ;; Capture templates
     (setq org-capture-templates
-          '(("t" "Todo" entry (file+headline (concat org-directory "gtd.org") "Inbox")
+          '(("t" "Todo" entry (file+headline "~/org/gtd.org" "Inbox")
              "* TODO %?\n  %i\n  %a")
-            ("n" "Note" entry (file+datetree org-default-notes-file)
+            ("n" "Note" entry (file+olp+datetree "~/org/notes.org")
              "* %? :NOTE:\n  %U\n  %a")
-            ("j" "Journal" entry (file+datetree (concat org-directory "journal.org"))
+            ("j" "Journal" entry (file+olp+datetree "~/org/journal.org")
              "* %?\n  %U\n  %i")
             ("5" "5 Minute Journal")
-            ("5m" "Morning Entry" entry (file+datetree (concat org-directory "5-min-journal.org"))
+            ("5m" "Morning Entry" entry (file+olp+datetree "~/org/5-min-journal.org")
              "* Morning\n  I am grateful for...\n  - %?\n  - \n  - \n\n  What will I do to make today great?\n  - \n  - \n  - \n\n  I am ...")
-            ("5e" "Evening Entry" entry (file+datetree (concat org-directory "5-min-journal.org"))
+            ("5e" "Evening Entry" entry (file+olp+datetree "~/org/5-min-journal.org")
              "* Evening\n  3 amazing things that happened today...\n  - %?\n  - \n  - \n\n  How could I have made today even better?\n  - \n")
             ("." "Note at point" item
              (function my/org-capture-target-at-heading)
