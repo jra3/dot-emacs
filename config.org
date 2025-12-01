@@ -1413,6 +1413,7 @@ it.
     (org-return-follows-link t)
     (org-use-speed-commands t)
     (org-cycle-separator-lines 0)
+    (org-enforce-todo-dependencies t)
 
     ;; Source blocks
     (org-src-preserve-indentation t)
@@ -1423,6 +1424,7 @@ it.
     (org-todo-keywords
      '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
        (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)")))
+
     (org-todo-keyword-faces
      '(("TODO" :foreground "red" :weight bold)
        ("NEXT" :foreground "blue" :weight bold)
@@ -1430,6 +1432,7 @@ it.
        ("WAITING" :foreground "orange" :weight bold)
        ("HOLD" :foreground "magenta" :weight bold)
        ("CANCELLED" :foreground "forest green" :weight bold)))
+
     (org-todo-state-tags-triggers
      '(("CANCELLED" ("CANCELLED" . t))
        ("WAITING" ("WAITING" . t))
@@ -1437,7 +1440,7 @@ it.
        (done ("WAITING") ("HOLD"))
        ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
        ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))))
-    (org-enforce-todo-dependencies t)
+
     (org-tag-alist
      '((:startgroup)
        ("@work" . ?w)
