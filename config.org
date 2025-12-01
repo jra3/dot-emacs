@@ -112,9 +112,15 @@ GUI Emacs doesn't inherit shell PATH, so we need to source it
 
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package exec-path-from-shell
-    :if (memq window-system '(mac ns x))
     :config
     (exec-path-from-shell-initialize))
+
+  ;; Ensure Go binaries are available
+  (let ((gopath (expand-file-name "~/go/bin")))
+    (unless (member gopath exec-path)
+      (add-to-list 'exec-path gopath t))
+    (unless (string-match-p gopath (getenv "PATH"))
+      (setenv "PATH" (concat (getenv "PATH") ":" gopath))))
 #+END_SRC
 
 * Terminal Configuration
