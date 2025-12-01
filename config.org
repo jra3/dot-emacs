@@ -1002,6 +1002,20 @@ And here we do the killing
                         (upgrade_dependency . t)
                         (vendor . t))))
 
+  ;; Register golangci-lint-langserver as additional Go linter
+  (with-eval-after-load 'lsp-mode
+    (lsp-register-client
+     (make-lsp-client
+      :new-connection (lsp-stdio-connection
+                       '("golangci-lint-langserver"))
+      :activation-fn (lsp-activate-on "go")
+      :language-id "go"
+      :priority -1  ; Lower priority than gopls
+      :server-id 'golangci-lint-ls
+      :add-on? t    ; Run alongside gopls, not instead of
+      :initialization-options
+      '((command . ["golangci-lint" "run" "--out-format=json"])))))
+
   ;; Define LSP Hydra for better command organization
   (with-eval-after-load 'lsp-mode
     (defhydra hydra-lsp (:color blue :hint nil)
