@@ -12,10 +12,8 @@
     (package-install 'use-package))
 
   (require 'use-package)
-  (eval-when-compile
-    (require 'use-package)					; install packages from package archive automatically
-    (require 'use-package-ensure)
-    (setq use-package-always-ensure t))
+  (require 'use-package-ensure)
+  (setq use-package-always-ensure t)
 
   (use-package auto-package-update
     :config
