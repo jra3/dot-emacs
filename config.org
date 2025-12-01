@@ -1488,8 +1488,6 @@ it.
     (org-edit-timestamp-down-means-later t)
 
     :config
-    (setq org-modules '(org-id))
-
     ;; Capture templates
     (setq org-capture-templates
           '(("t" "Todo" entry (file+headline "~/org/gtd.org" "Inbox")
