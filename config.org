@@ -1522,7 +1522,9 @@ it.
     (org-modern-checkbox '((?X . "☑")
                           (?- . "☐")
                           (?\s . "☐")))
-    (org-modern-table t))
+    (org-modern-table t)
+    (org-modern-todo nil)
+    (org-modern-tag nil))
 #+END_SRC
 
 ** Helper Functions
