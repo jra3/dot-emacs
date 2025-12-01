@@ -1016,6 +1016,14 @@ And here we do the killing
       :initialization-options
       '((command . ["golangci-lint" "run" "--out-format=json"])))))
 
+  ;; ESLint via lsp-mode (runs alongside typescript-language-server)
+  (use-package lsp-eslint
+    :ensure nil  ; Part of lsp-mode
+    :after lsp-mode
+    :custom
+    (lsp-eslint-auto-fix-on-save t)
+    (lsp-eslint-run "onType"))
+
   ;; Define LSP Hydra for better command organization
   (with-eval-after-load 'lsp-mode
     (defhydra hydra-lsp (:color blue :hint nil)
@@ -1750,17 +1758,6 @@ Meat and potatoes
            ("\\.cjs\\'" . typescript-ts-mode)
            ("\\.ts\\'"  . typescript-ts-mode)
            ("\\.jsx\\'" . tsx-ts-mode)))
-
-  (use-package tide
-    :ensure t
-    :after (typescript-ts-mode flycheck)
-    :hook ((typescript-ts-mode . tide-setup)
-           (typescript-ts-mode . tide-hl-identifier-mode)
-           (tsx-ts-mode . tide-setup)
-           (tsx-ts-mode . tide-hl-identifier-mode))
-    :config
-    (setq tide-completion-detailed t
-          tide-always-show-documentation t))
 
   (use-package jest
     :ensure t
