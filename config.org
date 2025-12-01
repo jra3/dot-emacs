@@ -278,7 +278,7 @@ Frame Configuration
           (right-fringe . 1)
           (menu-bar-lines . 0)
           (tool-bar-lines . 0)
-          (font . "Input Mono Narrow-16"))))
+          (font . "CaskaydiaMono Nerd Font-12"))))
 #+END_SRC
 
 Uniquify Buffer Names
@@ -1385,23 +1385,25 @@ it.
 
 * Org Mode Configuration
 
-Streamlined and modernized org-mode configuration based on years of GTD usage.
-
 ** Core Settings
 
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package org
-    :ensure nil  ; Built-in
+    :ensure nil
     :mode (("\\.org\\'" . org-mode)
            ("\\.org_archive\\'" . org-mode))
     :bind (("C-c l" . org-store-link)
            ("C-c a" . org-agenda)
            ("C-c c" . org-capture)
            ("C-c b" . org-switchb))
+    :hook ((org-mode . (lambda () (electric-indent-local-mode -1)))
+           (org-capture-before-finalize . (lambda () (save-buffer)))
+           (org-agenda-finalize . hl-line-mode))
     :custom
     ;; Directories
     (org-directory "~/org/")
     (org-default-notes-file (concat org-directory "notes.org"))
+    (org-agenda-files (list org-directory))
 
     ;; Appearance
     (org-hide-emphasis-markers t)
@@ -1417,167 +1419,112 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
     (org-insert-heading-respect-content t)
     (org-return-follows-link t)
     (org-use-speed-commands t)
-    (org-enforce-todo-dependencies t)
-    (org-agenda-sticky t)
     (org-cycle-separator-lines 0)
 
     ;; Source blocks
-    (org-src-fontify-natively t)
-    (org-src-tab-acts-natively t)
     (org-src-preserve-indentation t)
     (org-edit-src-content-indentation 0)
     (org-confirm-babel-evaluate nil)
 
+    ;; GTD keywords
+    (org-todo-keywords
+     '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+       (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)")))
+    (org-todo-keyword-faces
+     '(("TODO" :foreground "red" :weight bold)
+       ("NEXT" :foreground "blue" :weight bold)
+       ("DONE" :foreground "forest green" :weight bold)
+       ("WAITING" :foreground "orange" :weight bold)
+       ("HOLD" :foreground "magenta" :weight bold)
+       ("CANCELLED" :foreground "forest green" :weight bold)))
+    (org-todo-state-tags-triggers
+     '(("CANCELLED" ("CANCELLED" . t))
+       ("WAITING" ("WAITING" . t))
+       ("HOLD" ("WAITING") ("HOLD" . t))
+       (done ("WAITING") ("HOLD"))
+       ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
+       ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))))
+    (org-enforce-todo-dependencies t)
+    (org-tag-alist
+     '((:startgroup)
+       ("@work" . ?w)
+       ("@home" . ?h)
+       ("@computer" . ?c)
+       ("@anywhere" . ?a)
+       (:endgroup)
+       ("WAITING" . ?W)
+       ("HOLD" . ?H)
+       ("CANCELLED" . ?C)))
+
+    ;; Agenda
+    (org-agenda-window-setup 'current-window)
+    (org-agenda-restore-windows-after-quit t)
+    (org-agenda-span 'day)
+    (org-agenda-sticky t)
+    (org-agenda-start-with-log-mode t)
+    (org-agenda-log-mode-items '(closed state))
+    (org-columns-default-format "%50ITEM(Task) %2PRIORITY")
+    (org-agenda-time-grid
+     '((daily today require-timed)
+       (800 1000 1200 1400 1600 1800 2000)
+       " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
+    (org-agenda-custom-commands
+     '(("n" "Next Actions" tags-todo "-WAITING-CANCELLED/!NEXT"
+        ((org-agenda-overriding-header "Next Actions")
+         (org-agenda-sorting-strategy '(category-keep))))
+       ("w" "Waiting" todo "WAITING"
+        ((org-agenda-overriding-header "Waiting")))
+       ("d" "Daily Review"
+        ((agenda "" ((org-agenda-span 'day)))
+         (tags-todo "-WAITING-CANCELLED/!NEXT"
+                    ((org-agenda-overriding-header "Next Actions")))
+         (todo "WAITING"
+               ((org-agenda-overriding-header "Waiting")))))))
+
+    ;; Refile
+    (org-refile-targets
+     '((nil :maxlevel . 3)
+       (org-agenda-files :maxlevel . 3)))
+    (org-refile-use-outline-path 'file)
+    (org-outline-path-complete-in-steps nil)
+    (org-refile-allow-creating-parent-nodes 'confirm)
+
+    ;; Logging
+    (org-log-done 'time)
+    (org-log-into-drawer t)
+    (org-edit-timestamp-down-means-later t)
+
+    ;; Habits
+    (org-habit-preceding-days 14)
+    (org-habit-following-days 1)
+    (org-habit-show-habits-only-for-today nil)
+    (org-habit-graph-column 60)
+
     :config
-    ;; Load modules
     (setq org-modules '(org-habit org-id))
 
-    ;; Better RET behavior
-    (add-hook 'org-mode-hook
-              (lambda ()
-                (electric-indent-local-mode -1))))
+    ;; Capture templates (in :config because they reference org-directory)
+    (setq org-capture-templates
+          '(("t" "Todo" entry (file+headline (concat org-directory "gtd.org") "Inbox")
+             "* TODO %?\n  %i\n  %a")
+            ("n" "Note" entry (file+datetree org-default-notes-file)
+             "* %? :NOTE:\n  %U\n  %a")
+            ("j" "Journal" entry (file+datetree (concat org-directory "journal.org"))
+             "* %?\n  %U\n  %i")
+            ("5" "5 Minute Journal")
+            ("5m" "Morning Entry" entry (file+datetree (concat org-directory "5-min-journal.org"))
+             "* Morning\n  I am grateful for...\n  - %?\n  - \n  - \n\n  What will I do to make today great?\n  - \n  - \n  - \n\n  I am ...")
+            ("5e" "Evening Entry" entry (file+datetree (concat org-directory "5-min-journal.org"))
+             "* Evening\n  3 amazing things that happened today...\n  - %?\n  - \n  - \n\n  How could I have made today even better?\n  - \n")
+            ("." "Note at point" item
+             (function my/org-capture-target-at-heading)
+             "%? %U"
+             :prepend t))))
 #+END_SRC
 
-** GTD Setup
+** Modern Appearance
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-  ;; GTD keywords and workflow
-  (setq org-todo-keywords
-        '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-          (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)")))
-
-  (setq org-todo-keyword-faces
-        '(("TODO" :foreground "red" :weight bold)
-          ("NEXT" :foreground "blue" :weight bold)
-          ("DONE" :foreground "forest green" :weight bold)
-          ("WAITING" :foreground "orange" :weight bold)
-          ("HOLD" :foreground "magenta" :weight bold)
-          ("CANCELLED" :foreground "forest green" :weight bold)))
-
-  ;; Auto-update tags based on TODO state
-  (setq org-todo-state-tags-triggers
-        '(("CANCELLED" ("CANCELLED" . t))
-          ("WAITING" ("WAITING" . t))
-          ("HOLD" ("WAITING") ("HOLD" . t))
-          (done ("WAITING") ("HOLD"))
-          ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
-          ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))))
-
-  ;; Tags
-  (setq org-tag-alist
-        '((:startgroup)
-          ("@work" . ?w)
-          ("@home" . ?h)
-          ("@computer" . ?c)
-          ("@anywhere" . ?a)
-          (:endgroup)
-          ("WAITING" . ?W)
-          ("HOLD" . ?H)
-          ("CANCELLED" . ?C)))
-
-#+END_SRC
-
-** Capture Templates
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (defun my/org-capture-target-at-heading ()
-    "Return a point marker at the current heading."
-    (save-excursion
-      (org-back-to-heading)
-      (point-marker)))
-
-  (setq org-capture-templates
-        '(("t" "Todo" entry (file+headline (concat org-directory "gtd.org") "Inbox")
-           "* TODO %?\n  %i\n  %a")
-
-          ("n" "Note" entry (file+datetree org-default-notes-file)
-           "* %? :NOTE:\n  %U\n  %a")
-
-          ("j" "Journal" entry (file+datetree (concat org-directory "journal.org"))
-           "* %?\n  %U\n  %i")
-
-          ("5" "5 Minute Journal")
-          ("5m" "Morning Entry" entry (file+datetree (concat org-directory "5-min-journal.org"))
-           "* Morning\n  I am grateful for...\n  - %?\n  - \n  - \n\n  What will I do to make today great?\n  - \n  - \n  - \n\n  I am ...")
-          ("5e" "Evening Entry" entry (file+datetree (concat org-directory "5-min-journal.org"))
-           "* Evening\n  3 amazing things that happened today...\n  - %?\n  - \n  - \n\n  How could I have made today even better?\n  - \n")
-
-          ("." "Note at point" item
-           (function my/org-capture-target-at-heading)
-           "%? %U"
-           :prepend t)))
-
-  ;; Save buffer after capture
-  (add-hook 'org-capture-before-finalize-hook
-            (lambda () (save-buffer)))
-#+END_SRC
-
-** Agenda Configuration
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  ;; Agenda files
-  (setq org-agenda-files (list org-directory))
-
-  ;; Agenda appearance
-  (setq org-agenda-window-setup 'current-window
-        org-agenda-restore-windows-after-quit t
-        org-agenda-span 'day
-        org-agenda-start-with-log-mode t
-        org-agenda-log-mode-items '(closed state)
-        org-columns-default-format "%50ITEM(Task) %2PRIORITY")
-
-  ;; Better time grid
-  (setq org-agenda-time-grid
-        '((daily today require-timed)
-          (800 1000 1200 1400 1600 1800 2000)
-          " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
-
-  ;; Custom commands
-  (setq org-agenda-custom-commands
-        '(("n" "Next Actions" tags-todo "-WAITING-CANCELLED/!NEXT"
-           ((org-agenda-overriding-header "Next Actions")
-            (org-agenda-sorting-strategy '(category-keep))))
-
-          ("w" "Waiting" todo "WAITING"
-           ((org-agenda-overriding-header "Waiting")))
-
-          ("d" "Daily Review"
-           ((agenda "" ((org-agenda-span 'day)))
-            (tags-todo "-WAITING-CANCELLED/!NEXT"
-                       ((org-agenda-overriding-header "Next Actions")))
-            (todo "WAITING"
-                  ((org-agenda-overriding-header "Waiting")))))))
-
-  ;; Highlight current line in agenda
-  (add-hook 'org-agenda-finalize-hook
-            (lambda () (hl-line-mode 1)))
-#+END_SRC
-
-** Refile Settings
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  ;; Refile targets
-  (setq org-refile-targets
-        '((nil :maxlevel . 3)
-          (org-agenda-files :maxlevel . 3)))
-
-  ;; Create parent nodes if needed
-  (setq org-refile-use-outline-path 'file
-        org-outline-path-complete-in-steps nil
-        org-refile-allow-creating-parent-nodes 'confirm)
-#+END_SRC
-
-** Modern Enhancements
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  ;; Modern bullets
-  (use-package org-bullets
-    :ensure t
-    :hook (org-mode . org-bullets-mode)
-    :custom
-    (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
-
-  ;; Even better modern appearance
   (use-package org-modern
     :ensure t
     :hook ((org-mode . org-modern-mode)
@@ -1588,50 +1535,17 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
                           (?- . "☐")
                           (?\s . "☐")))
     (org-modern-table t))
-
-  ;; Super agenda for better grouping
-  (use-package org-super-agenda
-    :ensure t
-    :after org-agenda
-    :config
-    (org-super-agenda-mode)
-    :custom
-    (org-super-agenda-groups
-     '((:name "Today"
-              :time-grid t
-              :scheduled today
-              :deadline today)
-       (:name "Important"
-              :priority "A")
-       (:name "Next"
-              :todo "NEXT")
-       (:name "Waiting"
-              :todo "WAITING"))))
-#+END_SRC
-
-** Habits
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (require 'org-habit)
-  (setq org-habit-preceding-days 14
-        org-habit-following-days 1
-        org-habit-show-habits-only-for-today nil
-        org-habit-graph-column 60)
-#+END_SRC
-
-** Logging
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  ;; Log settings
-  (setq org-log-done 'time              ; Log time when task is done
-        org-log-into-drawer t           ; Put timestamps in drawer
-        org-edit-timestamp-down-means-later t)
 #+END_SRC
 
 ** Helper Functions
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-  ;; Quick org file access
+  (defun my/org-capture-target-at-heading ()
+    "Return a point marker at the current heading."
+    (save-excursion
+      (org-back-to-heading)
+      (point-marker)))
+
   (defun my/org-find-file ()
     "Quickly open org files."
     (interactive)
@@ -1640,7 +1554,6 @@ Streamlined and modernized org-mode configuration based on years of GTD usage.
                       (directory-files org-directory nil "\\.org$")
                       nil t)))
 
-  ;; Clean up source blocks
   (defun my/org-cleanup-src-block ()
     "Format the current source block."
     (interactive)
