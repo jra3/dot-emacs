@@ -4,7 +4,6 @@
 
 # Potential Future Improvements:
 # - Consider migrating from yasnippet to tempel for templates
-# - Consider ace-window instead of win-switch for window management
 
 * Performance Optimizations
 
@@ -593,18 +592,20 @@ Configure special buffer display behavior using native Emacs functionality
         split-width-threshold 10000)
 #+END_SRC
 
-** Enable win-switch
+** Window Switching with ace-window
 
-Super nice to switch between frames and buffers
+Jump to any window by number
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package win-switch
-    :bind (("C-x o" . win-switch-dispatch))
-    :config
-    (setq win-switch-provide-visual-feedback t
-          win-switch-feedback-background-color "purple"
-          win-switch-feedback-foreground-color "white")
-    (win-switch-setup-keys-default))
+  (use-package ace-window
+    :ensure t
+    :bind (("C-x o" . ace-window))
+    :custom
+    (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))  ; Home row keys
+    (aw-scope 'frame)                         ; Only current frame
+    (aw-background t)                         ; Dim background
+    :custom-face
+    (aw-leading-char-face ((t (:height 2.0 :foreground "red")))))
 #+END_SRC
 
 
