@@ -1735,9 +1735,7 @@ Meat and potatoes
            ("\\.mts\\'" . typescript-ts-mode)
            ("\\.cjs\\'" . typescript-ts-mode)
            ("\\.ts\\'"  . typescript-ts-mode)
-           ("\\.jsx\\'" . tsx-ts-mode))
-    :hook ((typescript-ts-mode . lsp-deferred)
-           (tsx-ts-mode . lsp-deferred)))
+           ("\\.jsx\\'" . tsx-ts-mode)))
 
   (use-package tide
     :ensure t
