@@ -1711,7 +1711,22 @@ But only for emacs-lisp
     (markdown-fontify-code-blocks-natively t)
     (markdown-header-scaling t)
     :hook
-    (markdown-mode . visual-line-mode))
+    (markdown-mode . visual-line-mode)
+    :config
+    ;; Fix preview to open in external browser
+    (setq browse-url-browser-function 'browse-url-xdg-open)
+    ;; Bind convenient preview key
+    (define-key markdown-mode-map (kbd "C-c p") 'markdown-live-preview-mode)
+    ;; Preview in system browser with stylesheet
+    (defun markdown-preview-browser ()
+      "Export to HTML and open in system browser."
+      (interactive)
+      (let ((html-file (concat (file-name-sans-extension buffer-file-name) ".html"))
+            (css-file (expand-file-name "~/.config/pandoc/markdown.css")))
+        (shell-command (format "pandoc -s --css=%s --self-contained %s -o %s"
+                               css-file buffer-file-name html-file))
+        (browse-url (concat "file://" html-file))))
+    (define-key markdown-mode-map (kbd "C-c P") 'markdown-preview-browser))
 
   (use-package olivetti
     :hook (markdown-mode . olivetti-mode)
