@@ -592,23 +592,6 @@ Configure special buffer display behavior using native Emacs functionality
         split-width-threshold 10000)
 #+END_SRC
 
-** Window Switching with ace-window
-
-Jump to any window by number
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package ace-window
-    :ensure t
-    :bind (("C-x o" . ace-window))
-    :custom
-    (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))  ; Home row keys
-    (aw-scope 'frame)                         ; Only current frame
-    (aw-background t)                         ; Dim background
-    :custom-face
-    (aw-leading-char-face ((t (:height 2.0 :foreground "red")))))
-#+END_SRC
-
-
 ** Expand Region
 
 it's awesome
@@ -622,7 +605,7 @@ it's awesome
 ** Configure Windmove
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (windmove-default-keybindings 'hyper)
+  (windmove-default-keybindings 'shift)
 #+END_SRC
 
 ** Manipulate Window Sizes
