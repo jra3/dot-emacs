@@ -1703,9 +1703,20 @@ But only for emacs-lisp
 
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package markdown-mode
-    :mode (("\\.text\\'" . markdown-mode)
-           ("\\.markdown\\'" . markdown-mode)
-           ("README\\.md\\'" . gfm-mode)))
+    :mode (("\\.md\\'" . gfm-mode)
+           ("\\.text\\'" . markdown-mode)
+           ("\\.markdown\\'" . markdown-mode))
+    :custom
+    (markdown-command "pandoc")
+    (markdown-fontify-code-blocks-natively t)
+    (markdown-header-scaling t)
+    :hook
+    (markdown-mode . visual-line-mode))
+
+  (use-package olivetti
+    :hook (markdown-mode . olivetti-mode)
+    :custom
+    (olivetti-body-width 80))
 #+END_SRC
 
 ** YAML
