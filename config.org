@@ -1069,6 +1069,43 @@ EditorConfig isn't available or doesn't specify indentation.
     (lsp-eslint-auto-fix-on-save t)
     (lsp-eslint-run "onType"))
 
+  ;; --- Ensure LSP servers are installed -------------------------------
+  ;; lsp-mode only *prompts* to download a missing server
+  ;; (`lsp-enable-suggest-server-download').  If that prompt is ever
+  ;; dismissed, a client can be left pointing at a missing binary and
+  ;; crash-loop -- e.g. the bundled tailwindcss client launches
+  ;; `node <server> --stdio', but with no server it becomes `node --stdio'
+  ;; which Node rejects with exit code 9.  This proactively installs any
+  ;; listed server that isn't present yet, so a fresh machine self-heals.
+  (defvar my/lsp-required-servers
+    '(typescript-language-server
+      tailwindcss-language-server)
+    "lsp-mode dependency ids to auto-install when missing.
+Only list servers managed by `lsp-install-server'; system binaries
+installed out-of-band (gopls, rust-analyzer, golangci-lint) don't belong
+here.")
+
+  (defun my/lsp--server-installed-p (server-id)
+    "Return non-nil when SERVER-ID's binary already exists on disk."
+    (ignore-errors
+      (let ((path (lsp-package-path server-id)))
+        (and path (file-exists-p path)))))
+
+  (defun my/lsp-ensure-servers (&optional force)
+    "Install any `my/lsp-required-servers' that are missing.
+With prefix arg FORCE, (re)install/update every server in the list."
+    (interactive "P")
+    (dolist (server my/lsp-required-servers)
+      (when (or force (not (my/lsp--server-installed-p server)))
+        (message "lsp: installing missing server %s..." server)
+        (lsp-install-server force server))))
+
+  ;; Run the check once, the first time lsp-mode activates in a session.
+  (defun my/lsp-ensure-servers-once ()
+    (remove-hook 'lsp-mode-hook #'my/lsp-ensure-servers-once)
+    (my/lsp-ensure-servers))
+  (add-hook 'lsp-mode-hook #'my/lsp-ensure-servers-once)
+
   ;; Define LSP Hydra for better command organization
   (with-eval-after-load 'lsp-mode
     (defhydra hydra-lsp (:color blue :hint nil)
