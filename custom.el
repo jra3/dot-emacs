@@ -47,14 +47,13 @@
     '((agenda habit-down effort-up time-up priority-down category-keep)
        (todo priority-down category-keep)
        (tags priority-down category-keep) (search category-keep)))
- '(org-agenda-time-grid
-    '((daily today require-timed remove-match)
-       (900 1000 1100 1200 1300 1400 1500 1600 1700 1800) "......"
-       "----------------"))
  '(org-agenda-timegrid-use-ampm nil)
  '(org-archive-location "~/org/archive/archive.org::* From %s")
  '(org-export-with-toc nil)
  '(package-selected-packages nil)
+ '(package-vc-selected-packages
+    '((claude-code-ide :url
+        "https://github.com/manzaltu/claude-code-ide.el")))
  '(shr-width 80)
  '(tab-width 2)
  '(undo-outer-limit 120000000))
