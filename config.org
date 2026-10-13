@@ -1483,31 +1483,19 @@ it.
 ** Core Settings
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-  ;; Define TODO keyword faces once, used by both org and org-modern
-  (defvar my/org-todo-keyword-faces
-    '(("TODO" :foreground "#cc0000" :weight bold)
-      ("NEXT" :foreground "#f57900" :weight bold)
-      ("WAITING" :foreground "#75507b" :weight bold)
-      ("HOLD" :foreground "#555753" :weight bold)
-      ("DONE" :foreground "#6ac214" :weight bold)
-      ("CANCELLED" :foreground "#888a85" :weight bold)))
-
   (use-package org
     :ensure nil
     :mode (("\\.org\\'" . org-mode)
            ("\\.org_archive\\'" . org-mode))
     :bind (("C-c l" . org-store-link)
-           ("C-c a" . org-agenda)
            ("C-c c" . org-capture)
            ("C-c b" . org-switchb))
     :hook ((org-mode . (lambda () (electric-indent-local-mode -1)))
-           (org-capture-before-finalize . (lambda () (save-buffer)))
-           (org-agenda-finalize . hl-line-mode))
+           (org-capture-before-finalize . (lambda () (save-buffer))))
     :custom
     ;; Directories
     (org-directory "~/org/")
     (org-default-notes-file "~/org/notes.org")
-    (org-agenda-files '("~/org/"))
 
     ;; Appearance
     (org-hide-emphasis-markers t)
@@ -1524,72 +1512,11 @@ it.
     (org-return-follows-link t)
     (org-use-speed-commands t)
     (org-cycle-separator-lines 0)
-    (org-enforce-todo-dependencies t)
 
     ;; Source blocks
     (org-src-preserve-indentation t)
     (org-edit-src-content-indentation 0)
     (org-confirm-babel-evaluate nil)
-
-    ;; GTD keywords
-    (org-todo-keywords
-     '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-       (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)")))
-
-    ;; Keyword faces (used in todo selection buffer and elsewhere)
-    (org-todo-keyword-faces my/org-todo-keyword-faces)
-
-    (org-todo-state-tags-triggers
-     '(("CANCELLED" ("CANCELLED" . t))
-       ("WAITING" ("WAITING" . t))
-       ("HOLD" ("WAITING") ("HOLD" . t))
-       (done ("WAITING") ("HOLD"))
-       ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
-       ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))))
-
-    (org-tag-alist
-     '((:startgroup)
-       ("@work" . ?w)
-       ("@home" . ?h)
-       ("@computer" . ?c)
-       ("@anywhere" . ?a)
-       (:endgroup)
-       ("WAITING" . ?W)
-       ("HOLD" . ?H)
-       ("CANCELLED" . ?C)))
-
-    ;; Agenda
-    (org-agenda-window-setup 'current-window)
-    (org-agenda-restore-windows-after-quit t)
-    (org-agenda-span 'day)
-    (org-agenda-sticky t)
-    (org-agenda-start-with-log-mode t)
-    (org-agenda-log-mode-items '(closed state))
-    (org-columns-default-format "%50ITEM(Task) %2PRIORITY")
-    (org-agenda-time-grid
-     '((daily today require-timed)
-       (800 1000 1200 1400 1600 1800 2000)
-       " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
-    (org-agenda-custom-commands
-     '(("n" "Next Actions" tags-todo "-WAITING-CANCELLED/!NEXT"
-        ((org-agenda-overriding-header "Next Actions")
-         (org-agenda-sorting-strategy '(category-keep))))
-       ("w" "Waiting" todo "WAITING"
-        ((org-agenda-overriding-header "Waiting")))
-       ("d" "Daily Review"
-        ((agenda "" ((org-agenda-span 'day)))
-         (tags-todo "-WAITING-CANCELLED/!NEXT"
-                    ((org-agenda-overriding-header "Next Actions")))
-         (todo "WAITING"
-               ((org-agenda-overriding-header "Waiting")))))))
-
-    ;; Refile
-    (org-refile-targets
-     '((nil :maxlevel . 3)
-       (org-agenda-files :maxlevel . 3)))
-    (org-refile-use-outline-path 'file)
-    (org-outline-path-complete-in-steps nil)
-    (org-refile-allow-creating-parent-nodes 'confirm)
 
     ;; Logging
     (org-log-done 'time)
@@ -1599,9 +1526,7 @@ it.
     :config
     ;; Capture templates
     (setq org-capture-templates
-          '(("t" "Todo" entry (file+headline "~/org/gtd.org" "Inbox")
-             "* TODO %?\n  %i\n  %a")
-            ("n" "Note" entry (file+olp+datetree "~/org/notes.org")
+          '(("n" "Note" entry (file+olp+datetree "~/org/notes.org")
              "* %? :NOTE:\n  %U\n  %a")
             ("j" "Journal" entry (file+olp+datetree "~/org/journal.org")
              "* %?\n  %U\n  %i")
@@ -1621,8 +1546,7 @@ it.
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package org-modern
     :ensure t
-    :hook ((org-mode . org-modern-mode)
-           (org-agenda-finalize . org-modern-agenda))
+    :hook (org-mode . org-modern-mode)
     :custom
     (org-modern-star '("◉" "○" "✸" "✿"))
     (org-modern-checkbox '((?X . "☑")
