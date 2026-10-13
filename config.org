@@ -122,15 +122,6 @@ GUI Emacs doesn't inherit shell PATH, so we need to source it
       (setenv "PATH" (concat (getenv "PATH") ":" gopath))))
 #+END_SRC
 
-* Claude
-# SRC emacs-lisp :tangle yes
-(use-package claude-code-ide
-  :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
-  :bind ("C-c C-'" . claude-code-ide-menu) ; Set your favorite keybinding
-  :config
-  (claude-code-ide-emacs-tools-setup)) ; Optionally enable Emacs MCP tools
-# SRC
-
 * Terminal Configuration
 
 ** Terminals in Emacs Should Use ANSI Colors
@@ -193,7 +184,6 @@ to set xterm-mode as a terminal option for this
     :ensure nil  ; Part of vertico
     :bind (:map vertico-map
                 ("RET" . vertico-directory-enter)
-                ("DEL" . vertico-directory-delete-char)
                 ("M-DEL" . vertico-directory-delete-word))
     :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
@@ -1661,62 +1651,6 @@ it.
     (org-edit-src-exit))
 
   (define-key org-mode-map (kbd "C-c C-v C-f") 'my/org-cleanup-src-block)
-#+END_SRC
-
-*** Capture Frame (for shell integration)
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (defun my/org-capture-frame (&optional keys)
-    "Open org-capture in a dedicated frame that closes when done.
-  KEYS is an optional string for the capture template key."
-    (interactive)
-    (let ((frame (selected-frame)))
-      ;; Set frame parameter to identify this as a capture frame
-      (set-frame-parameter frame 'my/capture-frame t)
-      ;; Add hooks to close frame when capture ends
-      (let ((close-frame
-             (lambda ()
-               (when (frame-parameter nil 'my/capture-frame)
-                 (delete-frame)))))
-        (add-hook 'org-capture-after-finalize-hook close-frame nil t))
-      ;; Start capture
-      (condition-case nil
-          (progn
-            (if keys
-                (org-capture nil keys)
-              (org-capture))
-            ;; Make capture buffer take the whole frame
-            (delete-other-windows))
-        ;; If user aborts template selection (C-g), close frame
-        (quit (delete-frame)))))
-
-  (defun my/org-agenda-frame (&optional keys)
-    "Open org-agenda in a dedicated frame that closes when quit.
-  KEYS is an optional string for the agenda view key."
-    (interactive)
-    (let ((frame (selected-frame)))
-      ;; Set frame parameter to identify this as an agenda frame
-      (set-frame-parameter frame 'my/agenda-frame t)
-      ;; Add hook to close frame when agenda quits
-      (let ((close-frame
-             (lambda ()
-               (when (frame-parameter nil 'my/agenda-frame)
-                 (delete-frame)))))
-        (add-hook 'org-agenda-finalize-hook
-                  (lambda ()
-                    (local-set-key (kbd "q")
-                                   (lambda ()
-                                     (interactive)
-                                     (org-agenda-quit)
-                                     (funcall close-frame))))))
-      ;; Start agenda
-      (condition-case nil
-          (progn
-            (if keys
-                (org-agenda nil (string-to-char keys))
-              (org-agenda))
-            (delete-other-windows))
-        (quit (delete-frame)))))
 #+END_SRC
 
 * Modes

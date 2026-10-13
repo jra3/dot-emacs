@@ -51,9 +51,6 @@
  '(org-archive-location "~/org/archive/archive.org::* From %s")
  '(org-export-with-toc nil)
  '(package-selected-packages nil)
- '(package-vc-selected-packages
-    '((claude-code-ide :url
-        "https://github.com/manzaltu/claude-code-ide.el")))
  '(shr-width 80)
  '(tab-width 2)
  '(undo-outer-limit 120000000))
