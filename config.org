@@ -242,8 +242,12 @@ to set xterm-mode as a terminal option for this
     (setq completion-styles '(orderless basic)
           completion-category-defaults nil
           completion-category-overrides
-          '((file (styles partial-completion)
-                  (sort-function . vertico-sort-directories-first)))))
+          '((file (styles fussy basic partial-completion)))))
+
+  ;; flx-scored fuzzy matching for file names, like the old helm-flx
+  (use-package fussy
+    :ensure t
+    :after orderless)
 
   (use-package embark
     :ensure t
